@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Yataş Group - SellTrackIQ Portal</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS & Supabase JS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            color: #0f172a;
+        }
+
+        /* Yataş Navy Colors */
+        .bg-yatas-navy { background-color: #00205b; }
+        .bg-yatas-dark-navy { background-color: #00153e; }
+        .text-yatas-navy { color: #00205b; }
+        .border-yatas-navy { border-color: #00205b; }
+
+        /* UI Cards & Buttons */
+        .ui-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05);
+        }
+
+        .ui-card-hover {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .ui-card-hover:hover {
+            transform: translateY(-3px);
+            border-color: #00205b;
+            box-shadow: 0 12px 30px -4px rgba(0, 32, 91, 0.12);
+        }
+
+        .btn-navy {
+            background-color: #00205b;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .btn-navy:hover {
+            background-color: #00143d;
+            box-shadow: 0 4px 12px rgba(0, 32, 91, 0.25);
+        }
+
+        .announcement-bar {
+            background: linear-gradient(90deg, #00153e, #00205b);
+        }
+
+        /* Footer Hide/Show Animation */
+        footer {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+        }
+        footer.footer-hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col min-h-screen bg-slate-50 text-slate-900">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
+        <span class="bg-[#d71921] text-white px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider">NOTICE</span>
+        <span class="truncate">Real-time B2B Inventory & Order Management Portal</span>
+    </div>
+
+    <!-- SIGN IN MODAL (EXECUTIVE LOGIN) -->
+    <div id="loginModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl relative text-slate-900">
+            <div class="text-center mb-6">
+                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="h-12 mx-auto mb-4 object-contain rounded-lg">
+                <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">SellTrackIQ</h2>
+                <p class="text-xs text-slate-500 font-semibold mt-1">Executive Sell-out & Stock Tracking Portal</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dealer Code</label>
+                    <input type="text" id="loginDealerCode" required placeholder="e.g. 4000001368 or BY-0601" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b] transition placeholder:text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Password</label>
+                    <input type="password" id="loginPassword" required value="123456" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b] transition">
+                </div>
+                <button type="submit" class="w-full py-3.5 btn-navy font-extrabold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                    <span>Sign In</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN PORTAL CONTAINER -->
+    <div id="portalContainer" class="flex-1 flex flex-col min-w-0 hidden">
+
+        <!-- HEADER NAVBAR -->
+        <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
+            <div class="flex items-center gap-6">
+                <button onclick="resetToHome()" class="flex items-center">
+                    <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-9 w-auto object-contain rounded-md">
+                </button>
+
+                <div class="hidden md:flex items-center gap-2">
+                    <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm">
+                        <i class="fa-solid fa-boxes-stacked mr-1.5"></i> <span>Sales & Stock</span>
+                    </button>
+                    <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-truck-ramp-box mr-1.5"></i> <span>Goods Receipt</span>
+                        <span id="pendingBadge" class="ml-1.5 bg-[#d71921] text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center gap-4">
+                <div class="relative w-52 md:w-64 hidden sm:block">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search SKU or name..." class="w-full pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-800 font-semibold focus:outline-none focus:border-[#00205b]">
+                </div>
+
+                <span id="connectionBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Sync
+                </span>
+            </div>
+        </header>
+
+        <!-- PORTAL BODY -->
+        <div class="flex-1 flex overflow-hidden">
+
+            <!-- DEEP NAVY SIDEBAR -->
+            <aside class="w-64 bg-yatas-dark-navy text-white p-5 hidden lg:flex flex-col justify-between shrink-0 shadow-lg">
+                <div class="space-y-5">
+                    <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Dealer Info</div>
+                    
+                    <div class="bg-yatas-navy border border-slate-700 p-4 rounded-xl flex items-center gap-3 shadow-inner">
+                        <div id="dealerAvatar" class="w-10 h-10 rounded-full bg-white text-[#00205b] flex items-center justify-center font-extrabold text-sm shrink-0 shadow">
+                            --
+                        </div>
+                        <div class="min-w-0">
+                            <h4 id="dealerName" class="text-xs font-extrabold truncate text-white">--</h4>
+                            <p id="dealerCode" class="text-[10px] text-slate-300 font-mono truncate">Code: --</p>
+                        </div>
+                    </div>
+
+                    <nav class="space-y-1.5 pt-2">
+                        <button onclick="switchTab('sales')" id="sideNavSales" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition">
+                            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Sales & Inventory
+                        </button>
+                        <button onclick="switchTab('receipt')" id="sideNavReceipt" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy hover:text-white transition">
+                            <i class="fa-solid fa-truck-ramp-box text-slate-400"></i> Goods Receipt (SAP)
+                        </button>
+                    </nav>
+                </div>
+
+                <button onclick="logout()" class="w-full py-2.5 border border-slate-700 text-slate-300 hover:bg-rose-900/30 hover:text-rose-300 hover:border-rose-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </button>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main id="mainScrollArea" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-50">
+
+                <!-- TAB 1: SALES & STOCK -->
+                <div id="tab-sales-content" class="space-y-6">
+
+                    <!-- KPI BANDS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div class="ui-card p-5 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Total Stock on Hand</p>
+                                <p class="text-2xl font-extrabold text-[#00205b] mt-1" id="kpiTotalStock">0 Pcs</p>
+                            </div>
+                            <div class="w-11 h-11 rounded-xl bg-blue-50 text-[#00205b] flex items-center justify-center text-lg font-bold border border-blue-100">
+                                <i class="fa-solid fa-cubes"></i>
+                            </div>
+                        </div>
+
+                        <div class="ui-card p-5 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Today's Sales</p>
+                                <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="kpiTodaySales">0 Pcs</p>
+                            </div>
+                            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold border border-emerald-100">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                        </div>
+
+                        <div class="ui-card p-5 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Critical Stock Alert</p>
+                                <p class="text-2xl font-extrabold text-[#d71921] mt-1" id="kpiCriticalStock">0 Items</p>
+                            </div>
+                            <div class="w-11 h-11 rounded-xl bg-rose-50 text-[#d71921] flex items-center justify-center text-lg font-bold border border-rose-100">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CATALOG TITLE -->
+                    <div class="flex items-center justify-between pt-2">
+                        <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">Product Catalog & Live Stock Deduction</h3>
+                    </div>
+
+                    <!-- PRODUCT GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="productGrid">
+                        <div class="col-span-3 text-center py-12 text-slate-400 font-semibold">Loading catalog...</div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: GOODS RECEIPT -->
+                <div id="tab-receipt-content" class="space-y-6 hidden">
+                    <div class="flex items-center justify-between pt-2">
+                        <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">SAP Shipments & Goods Confirmation</h3>
+                    </div>
+
+                    <div class="ui-card rounded-2xl overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-slate-600 uppercase font-extrabold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">Invoice / Doc No</th>
+                                    <th class="p-4">Product Code & Detail</th>
+                                    <th class="p-4">Quantity</th>
+                                    <th class="p-4">Date</th>
+                                    <th class="p-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipmentTableBody" class="divide-y divide-slate-200 font-semibold">
+                                <tr><td colspan="5" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- FOOTER (AUTO-HIDES ON SCROLL) -->
+        <footer id="appFooter" class="h-10 border-t border-slate-200 bg-white px-6 flex items-center justify-between text-[11px] font-bold text-slate-500 shrink-0 z-20">
+            <div>Copyright © 2026 Yataş International</div>
+            <div class="text-[#00205b]">Proudly presented by International Sales Development Team</div>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentDealer = null;
+        let globalProducts = [];
+        let todaySalesCount = 0;
+
+        // USER LOGIN
+        async function handleLogin(e) {
+            e.preventDefault();
+            const code = document.getElementById('loginDealerCode').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+
+            const { data, error } = await supabaseClient
+                .from('dealers')
+                .select('*')
+                .eq('code', code)
+                .eq('password', pass)
+                .maybeSingle();
+
+            if (error || !data) {
+                alert('Invalid Dealer Code or Password!');
+                return;
+            }
+
+            currentDealer = data;
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('portalContainer').classList.remove('hidden');
+
+            document.getElementById('dealerName').innerText = data.name;
+            document.getElementById('dealerCode').innerText = 'Code: ' + data.code;
+            document.getElementById('dealerAvatar').innerText = data.code.substring(0, 2).toUpperCase();
+
+            fetchLiveProducts();
+            fetchPendingShipments();
+            initFooterScrollEffect();
+        }
+
+        function logout() {
+            location.reload();
+        }
+
+        // FOOTER SCROLL AUTO-HIDE EFFECT
+        function initFooterScrollEffect() {
+            const mainScroll = document.getElementById('mainScrollArea');
+            const footer = document.getElementById('appFooter');
+            let lastScroll = 0;
+
+            if (mainScroll && footer) {
+                mainScroll.addEventListener('scroll', () => {
+                    const currentScroll = mainScroll.scrollTop;
+                    if (currentScroll > lastScroll && currentScroll > 60) {
+                        footer.classList.add('footer-hidden');
+                    } else {
+                        footer.classList.remove('footer-hidden');
+                    }
+                    lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+                });
+            }
+        }
+
+        // TAB SWITCHING (SYNCS HEADER & SIDEBAR)
+        function switchTab(tab) {
+            const btnSales = document.getElementById('btnTabSales');
+            const btnReceipt = document.getElementById('btnTabReceipt');
+            const sideSales = document.getElementById('sideNavSales');
+            const sideReceipt = document.getElementById('sideNavReceipt');
+            const contentSales = document.getElementById('tab-sales-content');
+            const contentReceipt = document.getElementById('tab-receipt-content');
+
+            if (tab === 'sales') {
+                contentSales.classList.remove('hidden');
+                contentReceipt.classList.add('hidden');
+
+                btnSales.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm";
+                btnReceipt.className = "px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition";
+
+                sideSales.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition";
+                sideSales.querySelector('i').className = "fa-solid fa-boxes-stacked text-sky-400";
+                
+                sideReceipt.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy hover:text-white transition";
+                sideReceipt.querySelector('i').className = "fa-solid fa-truck-ramp-box text-slate-400";
+            } else {
+                contentSales.classList.add('hidden');
+                contentReceipt.classList.remove('hidden');
+
+                btnReceipt.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm";
+                btnSales.className = "px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition";
+
+                sideReceipt.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition";
+                sideReceipt.querySelector('i').className = "fa-solid fa-truck-ramp-box text-sky-400";
+
+                sideSales.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy hover:text-white transition";
+                sideSales.querySelector('i').className = "fa-solid fa-boxes-stacked text-slate-400";
+            }
+        }
+
+        // FETCH PRODUCTS & STOCKS
+        async function fetchLiveProducts() {
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select(`
+                    id, code, name, category, image_url,
+                    stocks ( quantity, dealer_id )
+                `);
+
+            if (error) return;
+
+            globalProducts = data.map(item => {
+                const dealerStock = item.stocks ? item.stocks.find(s => s.dealer_id === currentDealer.id) : null;
+                return {
+                    id: item.id,
+                    code: item.code,
+                    name: item.name,
+                    category: item.category || 'Collection',
+                    image: item.image_url || 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500',
+                    stock: dealerStock ? dealerStock.quantity : 0
+                };
+            });
+
+            renderProducts(globalProducts);
+            updateKPIs();
+        }
+
+        // RENDER PRODUCTS
+        function renderProducts(items) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400 font-semibold">No products found in catalog.</div>`;
+                return;
+            }
+
+            items.forEach(p => {
+                const isCritical = p.stock > 0 && p.stock <= 3;
+                
+                let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
+                if (isCritical) {
+                    badgeClass = "bg-rose-100 text-[#d71921] border-rose-200";
+                } else if (p.stock > 3) {
+                    badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                }
+
+                const card = document.createElement('div');
+                card.className = "ui-card ui-card-hover rounded-2xl overflow-hidden flex flex-col justify-between group";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="h-48 w-full bg-slate-100 relative overflow-hidden">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=500';">
+                            <span class="absolute top-3 left-3 bg-slate-900/80 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md tracking-wider">
+                                ${p.code}
+                            </span>
+                            <span class="absolute top-3 right-3 ${badgeClass} border text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
+                                Stock: ${p.stock} Pcs
+                            </span>
+                        </div>
+
+                        <div class="p-5">
+                            <span class="text-[11px] text-[#00205b] font-extrabold uppercase tracking-wider block">${p.category}</span>
+                            <h3 class="text-base font-bold text-slate-900 mt-1 leading-snug">${p.name}</h3>
+                        </div>
+                    </div>
+
+                    <div class="p-5 pt-0 mt-auto">
+                        <div class="flex items-center gap-3 pt-3 border-t border-slate-200">
+                            <div class="flex items-center bg-slate-100 rounded-xl border border-slate-200 p-1">
+                                <button onclick="updateQty('${p.id}', -1)" class="w-8 h-8 text-slate-800 font-extrabold hover:bg-slate-200 rounded-lg transition">-</button>
+                                <span id="qty-${p.id}" class="w-8 text-center text-xs font-extrabold text-slate-900">1</span>
+                                <button onclick="updateQty('${p.id}', 1)" class="w-8 h-8 text-slate-800 font-extrabold hover:bg-slate-200 rounded-lg transition">+</button>
+                            </div>
+
+                            <button onclick="makeSale('${p.id}')" class="flex-1 btn-navy font-extrabold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span>Record Sale</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // MAKE SALE
+        async function makeSale(productId) {
+            const qty = parseInt(document.getElementById(`qty-${productId}`).innerText);
+            const product = globalProducts.find(p => p.id === productId);
+
+            if (!product || product.stock < qty) {
+                alert('Insufficient Stock!');
+                return;
+            }
+
+            const newStock = product.stock - qty;
+
+            await supabaseClient
+                .from('stocks')
+                .upsert({ dealer_id: currentDealer.id, product_id: productId, quantity: newStock });
+
+            await supabaseClient
+                .from('stock_movements')
+                .insert([{ dealer_id: currentDealer.id, product_id: productId, movement_type: 'SALE', quantity: qty }]);
+
+            todaySalesCount += qty;
+            fetchLiveProducts();
+        }
+
+        // GOODS RECEIPT WITH PRODUCT THUMBNAILS
+        async function fetchPendingShipments() {
+            const { data, error } = await supabaseClient
+                .from('shipments')
+                .select('*')
+                .eq('dealer_code', currentDealer.code)
+                .eq('status', 'PENDING');
+
+            if (error || !data) return;
+
+            document.getElementById('pendingBadge').innerText = data.length;
+
+            const tbody = document.getElementById('shipmentTableBody');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(s => {
+                const matchedProduct = globalProducts.find(p => p.code === s.product_code);
+                const imgUrl = matchedProduct && matchedProduct.image 
+                    ? matchedProduct.image 
+                    : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${imgUrl}" alt="${s.product_name}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100 shadow-sm" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=100';">
+                            <div class="min-w-0">
+                                <span class="text-[10px] font-extrabold text-[#00205b] font-mono block tracking-wider">${s.product_code}</span>
+                                <span class="font-bold text-slate-900 text-xs block truncate max-w-md" title="${s.product_name || ''}">${s.product_name || ''}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 font-extrabold text-emerald-600 whitespace-nowrap">${s.quantity} Pcs</td>
+                    <td class="p-4 text-slate-500 text-xs font-semibold whitespace-nowrap">${new Date(s.created_at).toLocaleDateString('en-US')}</td>
+                    <td class="p-4 text-right whitespace-nowrap">
+                        <button onclick="approveShipment('${s.id}', '${s.product_code}', ${s.quantity})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm active:scale-95">
+                            Confirm & Add to Stock
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function approveShipment(shipmentId, productCode, qty) {
+            const product = globalProducts.find(p => p.code === productCode);
+            if (!product) {
+                alert('Product not found in database!');
+                return;
+            }
+
+            const newStock = product.stock + qty;
+            await supabaseClient
+                .from('stocks')
+                .upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: newStock });
+
+            await supabaseClient
+                .from('shipments')
+                .update({ status: 'APPROVED' })
+                .eq('id', shipmentId);
+
+            alert('Shipment confirmed and added to live inventory!');
+            fetchPendingShipments();
+            fetchLiveProducts();
+        }
+
+        function updateQty(id, delta) {
+            const el = document.getElementById(`qty-${id}`);
+            let current = parseInt(el.innerText);
+            if (current + delta >= 1) el.innerText = current + delta;
+        }
+
+        function updateKPIs() {
+            const totalStock = globalProducts.reduce((acc, p) => acc + p.stock, 0);
+            const criticalCount = globalProducts.filter(p => p.stock > 0 && p.stock <= 3).length;
+
+            document.getElementById('kpiTotalStock').innerText = totalStock + ' Pcs';
+            document.getElementById('kpiTodaySales').innerText = todaySalesCount + ' Pcs';
+            document.getElementById('kpiCriticalStock').innerText = criticalCount + ' Items';
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = globalProducts.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+
+        function resetToHome() {
+            fetchLiveProducts();
+        }
+    </script>
+</body>
+</html>
