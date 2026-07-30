@@ -54,8 +54,21 @@
             box-shadow: 0 4px 12px rgba(0, 32, 91, 0.25);
         }
 
+        /* Announcement Banner Hide/Show Animation */
         .announcement-bar {
             background: linear-gradient(90deg, #00153e, #00205b);
+            transition: margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, max-height 0.35s ease;
+            max-height: 50px;
+            opacity: 1;
+            overflow: hidden;
+        }
+        .announcement-bar.banner-hidden {
+            margin-top: -36px;
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            pointer-events: none;
         }
 
         /* Footer Hide/Show Animation */
@@ -72,7 +85,7 @@
 <body class="h-full flex flex-col min-h-screen bg-slate-50 text-slate-900">
 
     <!-- TOP ANNOUNCEMENT BAR -->
-    <div class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
+    <div id="announcementBar" class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
         <span class="bg-[#d71921] text-white px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider">NOTICE</span>
         <span class="truncate">Real-time B2B Inventory & Order Management Portal</span>
     </div>
@@ -247,7 +260,7 @@
             </main>
         </div>
 
-        <!-- FOOTER (AUTO-HIDES ON SCROLL) -->
+        <!-- FOOTER -->
         <footer id="appFooter" class="h-10 border-t border-slate-200 bg-white px-6 flex items-center justify-between text-[11px] font-bold text-slate-500 shrink-0 z-20">
             <div>Copyright © 2026 Yataş International</div>
             <div class="text-[#00205b]">Proudly presented by International Sales Development Team</div>
@@ -292,30 +305,34 @@
 
             fetchLiveProducts();
             fetchPendingShipments();
-            initFooterScrollEffect();
+            initBannerScrollEffect();
         }
 
         function logout() {
             location.reload();
         }
 
-        // FOOTER SCROLL AUTO-HIDE EFFECT
-        function initFooterScrollEffect() {
+        // BANNER & FOOTER SCROLL EFFECT
+        function initBannerScrollEffect() {
             const mainScroll = document.getElementById('mainScrollArea');
+            const announcementBar = document.getElementById('announcementBar');
             const footer = document.getElementById('appFooter');
-            let lastScroll = 0;
+            let isScrolling = null;
 
-            if (mainScroll && footer) {
-                mainScroll.addEventListener('scroll', () => {
-                    const currentScroll = mainScroll.scrollTop;
-                    if (currentScroll > lastScroll && currentScroll > 60) {
-                        footer.classList.add('footer-hidden');
-                    } else {
-                        footer.classList.remove('footer-hidden');
-                    }
-                    lastScroll = currentScroll <= 0 ? 0 : currentScroll;
-                });
+            function handleScroll() {
+                if (announcementBar) announcementBar.classList.add('banner-hidden');
+                if (footer) footer.classList.add('footer-hidden');
+
+                clearTimeout(isScrolling);
+
+                isScrolling = setTimeout(() => {
+                    if (announcementBar) announcementBar.classList.remove('banner-hidden');
+                    if (footer) footer.classList.remove('footer-hidden');
+                }, 200);
             }
+
+            if (mainScroll) mainScroll.addEventListener('scroll', handleScroll);
+            window.addEventListener('scroll', handleScroll);
         }
 
         // TAB SWITCHING (SYNCS HEADER & SIDEBAR)
@@ -354,18 +371,29 @@
             }
         }
 
-        // FETCH PRODUCTS & STOCKS
+        // FETCH PRODUCTS & STOCKS WITH PAGINATION
         async function fetchLiveProducts() {
-            const { data, error } = await supabaseClient
-                .from('products')
-                .select(`
-                    id, code, name, category, image_url,
-                    stocks ( quantity, dealer_id )
-                `);
+            let allProductsData = [];
+            let from = 0;
+            const step = 1000;
+            let hasMore = true;
 
-            if (error) return;
+            while (hasMore) {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select(`
+                        id, code, name, category, image_url,
+                        stocks ( quantity, dealer_id )
+                    `)
+                    .range(from, from + step - 1);
 
-            globalProducts = data.map(item => {
+                if (error || !data || data.length === 0) break;
+                allProductsData = allProductsData.concat(data);
+                if (data.length < step) hasMore = false;
+                from += step;
+            }
+
+            globalProducts = allProductsData.map(item => {
                 const dealerStock = item.stocks ? item.stocks.find(s => s.dealer_id === currentDealer.id) : null;
                 return {
                     id: item.id,
@@ -465,17 +493,31 @@
             fetchLiveProducts();
         }
 
-        // GOODS RECEIPT WITH PRODUCT THUMBNAILS
+        // GOODS RECEIPT WITH PAGINATION (BYPASSES 1000 LIMIT)
         async function fetchPendingShipments() {
-            const { data, error } = await supabaseClient
-                .from('shipments')
-                .select('*')
-                .eq('dealer_code', currentDealer.code)
-                .eq('status', 'PENDING');
+            let allShipments = [];
+            let from = 0;
+            const step = 1000;
+            let hasMore = true;
 
-            if (error || !data) return;
+            while (hasMore) {
+                const { data, error } = await supabaseClient
+                    .from('shipments')
+                    .select('*')
+                    .eq('dealer_code', currentDealer.code)
+                    .eq('status', 'PENDING')
+                    .range(from, from + step - 1);
 
-            document.getElementById('pendingBadge').innerText = data.length;
+                if (error || !data || data.length === 0) break;
+                allShipments = allShipments.concat(data);
+                if (data.length < step) hasMore = false;
+                from += step;
+            }
+
+            const data = allShipments;
+
+            // 1000+ Badge Formatting
+            document.getElementById('pendingBadge').innerText = data.length >= 1000 ? '1000+' : data.length;
 
             const tbody = document.getElementById('shipmentTableBody');
             if (data.length === 0) {
