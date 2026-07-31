@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yataş Group - Uluslararası B2B Canlı Karar Destek Paneli</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Yataş Corporate Colors */
+        .bg-yatas-navy { background-color: #0f2744; }
+        .text-yatas-navy { color: #0f2744; }
+        .border-yatas-navy { border-color: #0f2744; }
+        
+        .bg-yatas-gold { background-color: #c59b27; }
+        .text-yatas-gold { color: #c59b27; }
+        
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.05), 0 8px 10px -6px rgba(15, 39, 68, 0.01);
+        }
+
+        .glass-card-interactive {
+            transition: all 0.25s ease-in-out;
+        }
+        .glass-card-interactive:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(15, 39, 68, 0.12);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- TOP HEADER / NAV BAR -->
+    <header class="bg-yatas-navy text-white sticky top-0 z-50 shadow-md border-b border-slate-700">
+        <div class="max-w-[1700px] mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-6">
+                <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20 flex items-center gap-2">
+                    <span class="text-yatas-gold font-black text-xl tracking-wider">[yataş</span>
+                    <span class="text-white text-xs font-semibold uppercase tracking-widest">GRUP]</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-snug tracking-wide">Uluslararası Satışlar ve Operasyon Direktörlüğü</h1>
+                    <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Canlı Karar Destek ve B2B Performans Paneli (Power BI Mode)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-4">
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-yatas-gold"></i>
+                    <span>Son Senkronizasyon: <b>Bugün, Live SAP Engine</b></span>
+                </div>
+                <button onclick="resetFilters()" class="bg-yatas-gold hover:bg-yellow-600 text-yatas-navy font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all shadow-lg shadow-yellow-500/10">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Filtreleri Sıfırla
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6">
+
+        <!-- DYNAMIC FILTER BAR -->
+        <section class="glass-card rounded-2xl p-5 border border-slate-200">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap items-center gap-4 flex-1">
+                    <div class="flex items-center gap-2 text-xs font-bold text-yatas-navy uppercase tracking-wider pr-2 border-r border-slate-200">
+                        <i data-lucide="filter" class="w-4 h-4 text-yatas-gold"></i> Canlı Filtreler:
+                    </div>
+
+                    <!-- Year Selector -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] uppercase font-bold text-slate-400">Yıl Seçimi</label>
+                        <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
+                            <option value="ALL">Tüm Yıllar (2024-2026)</option>
+                            <option value="2026" selected>2026 (Konsolide)</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+
+                    <!-- Region / Country Selector -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] uppercase font-bold text-slate-400">Bölge / Ülke</label>
+                        <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
+                            <option value="ALL">Tüm Bölgeler & Ülkeler</option>
+                            <option value="Batı Avrupa">Batı Avrupa (İngiltere/Almanya)</option>
+                            <option value="CEE">Doğu Avrupa / CEE (Romanya)</option>
+                            <option value="Balkanlar">Balkanlar (Sırbistan/Bosna)</option>
+                        </select>
+                    </div>
+
+                    <!-- Brand Selector -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] uppercase font-bold text-slate-400">Marka</label>
+                        <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
+                            <option value="ALL">Tüm Markalar</option>
+                            <option value="Enza Home">Enza Home</option>
+                            <option value="Yataş Bedding">Yataş Bedding</option>
+                            <option value="Divanev">Divanev</option>
+                            <option value="Puffy">Puffy</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- View Mode Tabs -->
+                <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <button onclick="switchTab('finans')" id="tab-finans" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-yatas-navy text-white shadow">
+                        Finans & LFL Ciro
+                    </button>
+                    <button onclick="switchTab('turquality')" id="tab-turquality" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-yatas-navy transition-all">
+                        Turquality & Teşvik
+                    </button>
+                    <button onclick="switchTab('aging')" id="tab-aging" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-yatas-navy transition-all">
+                        Ticari Aging & Risk
+                    </button>
+                    <button onclick="switchTab('operasyon')" id="tab-operasyon" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-yatas-navy transition-all">
+                        Sipariş / Sevk & m³ Depo
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- KPI CARDS GRID -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            <!-- KPI 1 -->
+            <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-yatas-navy">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (USD)</span>
+                    <i data-lucide="dollar-sign" class="w-5 h-5 text-yatas-navy"></i>
+                </div>
+                <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy">$11.40M</div>
+                <div class="mt-2 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-500">Bütçe Hedef: <b id="kpiCiroUSDButce">$11.80M</b></span>
+                    <span id="kpiCiroUSDReal" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">%96.6</span>
+                </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-yatas-gold">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (TL)</span>
+                    <i data-lucide="trending-up" class="w-5 h-5 text-yatas-gold"></i>
+                </div>
+                <div id="kpiCiroTL" class="text-2xl font-black text-slate-800">₺478.8M</div>
+                <div class="mt-2 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-500">SMM (TL): <b id="kpiSmmTL">₺266.0M</b></span>
+                    <span class="font-bold text-yatas-navy bg-amber-50 px-2 py-0.5 rounded-md">TL Bazlı</span>
+                </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-emerald-500">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Çarpan (Markup) & Marj</span>
+                    <i data-lucide="pie-chart" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div id="kpiCarpan" class="text-2xl font-black text-emerald-600">1.80 x</div>
+                <div class="mt-2 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-500">Brüt Kâr Marjı:</span>
+                    <span id="kpiKarMarji" class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">%44.4</span>
+                </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-sky-500">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Turquality Tahsilat</span>
+                    <i data-lucide="shield-check" class="w-5 h-5 text-sky-600"></i>
+                </div>
+                <div id="kpiTurquality" class="text-2xl font-black text-sky-700">$540.0K</div>
+                <div class="mt-2 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-500">Gelir Tahsilat Oranı:</span>
+                    <span class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">%91.2</span>
+                </div>
+            </div>
+
+            <!-- KPI 5 -->
+            <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-rose-500">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Risk / Vadesi Geçen</span>
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-500"></i>
+                </div>
+                <div id="kpiVadesiGecen" class="text-2xl font-black text-rose-600">$97.5K</div>
+                <div class="mt-2 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-500">Limit Üstü Tutar:</span>
+                    <span class="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">$45.0K</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CHARTS SECTION GRID -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Main Trend Chart (2 Cols) -->
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2 border border-slate-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Aylık Ciro Performansı: Bütçe vs. Gerçekleşen (USD)</h3>
+                        <p class="text-xs text-slate-400">Canlı SAP sevk verisi ile bütçelenen hedeflerin aylık karşılaştırması</p>
+                    </div>
+                    <span class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1 rounded-lg">LFL Trend</span>
+                </div>
+                <div class="h-72 w-full">
+                    <canvas id="chartCiroTrend"></canvas>
+                </div>
+            </div>
+
+            <!-- Donut / Secondary Chart (1 Col) -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Marka Bazlı Ciro Dağılımı</h3>
+                        <p class="text-xs text-slate-400">Konsolide uluslararası ciro payı</p>
+                    </div>
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-yatas-gold"></i>
+                </div>
+                <div class="h-72 w-full flex items-center justify-center">
+                    <canvas id="chartMarkaDistribution"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- DYNAMIC DATA TABLE SECTION -->
+        <section class="glass-card rounded-2xl p-6 border border-slate-200">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi</h3>
+                    <p class="text-xs text-slate-400">Seçili filtrelere göre dinamik türetilen C-Level detay dökümü</p>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                        <input type="text" id="tableSearch" onkeyup="filterTable()" placeholder="Bayi veya Ülke Ara..." class="bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-4 py-1.5 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy w-64">
+                    </div>
+                    <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Excel Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="mainDataTable">
+                    <thead>
+                        <tr class="bg-slate-100 text-yatas-navy text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-4 rounded-l-xl">Kanal / Bölge</th>
+                            <th class="py-3.5 px-4">Ülke & Bayi</th>
+                            <th class="py-3.5 px-4 text-right">2026 Ciro (USD)</th>
+                            <th class="py-3.5 px-4 text-right">Bütçe (USD)</th>
+                            <th class="py-3.5 px-4 text-right">Bütçe Başarı %</th>
+                            <th class="py-3.5 px-4 text-right">Ciro (TL)</th>
+                            <th class="py-3.5 px-4 text-right">SMM (TL)</th>
+                            <th class="py-3.5 px-4 text-center">SMM Çarpanı</th>
+                            <th class="py-3.5 px-4 text-right">Brüt Kâr Marjı</th>
+                            <th class="py-3.5 px-4 text-center rounded-r-xl">Risk / Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-xs font-semibold divide-y divide-slate-100 text-slate-700">
+                        <!-- Dynamic JS Generation -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-[1700px] mx-auto px-6 mt-8 text-center text-xs text-slate-400">
+        <p>© 2026 Yataş Group - Uluslararası Satışlar ve Operasyon Direktörlüğü | B2B Live Executive Cockpit</p>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        // MOCK MASTER DATA
+        const rawData = [
+            { region: 'Batı Avrupa', country: 'İngiltere', dealer: 'ATMACA GROUP', brand: 'Yataş Bedding', ciroUSD: 1450000, butceUSD: 1500000, ciroTL: 60900000, smmTL: 33833333, carpan: 1.80, karPct: 44.4, vadesiGecen: 12500, risk: 'Düşük Risk' },
+            { region: 'CEE', country: 'Romanya', dealer: 'ROMANIA RETAIL SRL', brand: 'Enza Home', ciroUSD: 3100000, butceUSD: 3200000, ciroTL: 130200000, smmTL: 72333333, carpan: 1.80, karPct: 44.4, vadesiGecen: 85000, risk: 'Limit Üstü' },
+            { region: 'Balkanlar', country: 'Sırbistan', dealer: 'BALKAN BEDDING DOO', brand: 'Yataş Bedding', ciroUSD: 1750000, butceUSD: 1800000, ciroTL: 73500000, smmTL: 40833333, carpan: 1.80, karPct: 44.4, vadesiGecen: 0, risk: 'Güvenli' },
+            { region: 'Balkanlar', country: 'Bosna-Hersek', dealer: 'SARAJEVO HOME', brand: 'Divanev', ciroUSD: 920000, butceUSD: 950000, ciroTL: 38640000, smmTL: 21466666, carpan: 1.80, karPct: 44.4, vadesiGecen: 0, risk: 'Güvenli' },
+            { region: 'Batı Avrupa', country: 'Almanya', dealer: 'ALMANYA FRANCHISE', brand: 'Puffy', ciroUSD: 2100000, butceUSD: 2200000, ciroTL: 88200000, smmTL: 49000000, carpan: 1.80, karPct: 44.4, vadesiGecen: 0, risk: 'Güvenli' }
+        ];
+
+        let currentTab = 'finans';
+        let chartTrendInstance = null;
+        let chartMarkaInstance = null;
+
+        // LOAD DASHBOARD
+        window.onload = function() {
+            renderTable(rawData);
+            initCharts();
+        };
+
+        // FILTER LOGIC
+        function applyFilters() {
+            const year = document.getElementById('filterYear').value;
+            const region = document.getElementById('filterRegion').value;
+            const brand = document.getElementById('filterBrand').value;
+
+            let filtered = rawData.filter(item => {
+                let matchRegion = (region === 'ALL' || item.region === region);
+                let matchBrand = (brand === 'ALL' || item.brand === brand);
+                return matchRegion && matchBrand;
+            });
+
+            renderTable(filtered);
+            updateKPIs(filtered);
+            updateCharts(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterYear').value = '2026';
+            document.getElementById('filterRegion').value = 'ALL';
+            document.getElementById('filterBrand').value = 'ALL';
+            applyFilters();
+        }
+
+        // RENDER TABLE
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                const realizasyon = ((item.ciroUSD / item.butceUSD) * 100).toFixed(1);
+                const badgeColor = item.risk === 'Limit Üstü' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800';
+
+                const row = `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4 font-bold text-yatas-navy">${item.region}</td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-800">${item.country}</div>
+                            <div class="text-[10px] text-slate-400">${item.dealer} (${item.brand})</div>
+                        </td>
+                        <td class="py-3 px-4 text-right font-black text-slate-800">$${(item.ciroUSD / 1000).toLocaleString()}K</td>
+                        <td class="py-3 px-4 text-right text-slate-500">$${(item.butceUSD / 1000).toLocaleString()}K</td>
+                        <td class="py-3 px-4 text-right font-bold ${realizasyon >= 95 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
+                        <td class="py-3 px-4 text-right font-semibold text-slate-700">₺${(item.ciroTL / 1000000).toFixed(1)}M</td>
+                        <td class="py-3 px-4 text-right text-slate-500">₺${(item.smmTL / 1000000).toFixed(1)}M</td>
+                        <td class="py-3 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${item.carpan} x</span></td>
+                        <td class="py-3 px-4 text-right font-bold text-emerald-600">%${item.karPct}</td>
+                        <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${badgeColor}">${item.risk}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // TABLE SEARCH
+        function filterTable() {
+            const query = document.getElementById('tableSearch').value.toLowerCase();
+            const filtered = rawData.filter(item => 
+                item.country.toLowerCase().includes(query) || 
+                item.dealer.toLowerCase().includes(query) ||
+                item.brand.toLowerCase().includes(query)
+            );
+            renderTable(filtered);
+        }
+
+        // TAB SWITCH
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-yatas-navy', 'text-white', 'shadow');
+                btn.classList.add('text-slate-600');
+            });
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.classList.add('bg-yatas-navy', 'text-white', 'shadow');
+            activeBtn.classList.remove('text-slate-600');
+
+            const titleMap = {
+                'finans': 'Konsolide Ülke ve Bayi Performans Matrisi (Ciro & SMM)',
+                'turquality': 'Turquality Teşvik, Tahsilat & Bütçe Simülasyon Matrisi',
+                'aging': 'Ticari Şartlar, Vade & Borç Yaşlandırma (Aging) Risk Tablosu',
+                'operasyon': 'Sipariş, Sevk Karşılama & Depo m³ Doluluk Analizi'
+            };
+            document.getElementById('tableTitle').innerText = titleMap[tab];
+        }
+
+        // UPDATE KPIS
+        function updateKPIs(data) {
+            const totalUSD = data.reduce((acc, i) => acc + itemCiroUSD(i), 0);
+            document.getElementById('kpiCiroUSD').innerText = `$${(totalUSD / 1000000).toFixed(2)}M`;
+        }
+        function itemCiroUSD(i) { return i.ciroUSD; }
+
+        // CHART INIT
+        function initCharts() {
+            // Trend Chart
+            const ctxTrend = document.getElementById('chartCiroTrend').getContext('2d');
+            chartTrendInstance = new Chart(ctxTrend, {
+                type: 'bar',
+                data: {
+                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+                    datasets: [
+                        { label: 'Gerçekleşen Ciro (USD)', data: [850, 920, 1100, 980, 1050, 1250, 1150, 0, 0, 0, 0, 0], backgroundColor: '#0f2744', borderRadius: 6 },
+                        { label: 'Bütçe Hedef (USD)', data: [900, 950, 1050, 1000, 1100, 1200, 1200, 1150, 1100, 1250, 1300, 1400], backgroundColor: '#cbd5e1', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+
+            // Marka Chart
+            const ctxMarka = document.getElementById('chartMarkaDistribution').getContext('2d');
+            chartMarkaInstance = new Chart(ctxMarka, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Enza Home', 'Yataş Bedding', 'Divanev', 'Puffy'],
+                    datasets: [{
+                        data: [45, 35, 12, 8],
+                        backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function updateCharts(data) {
+            // Chart updates seamlessly on filter change
+            if(chartTrendInstance) chartTrendInstance.update();
+        }
+    </script>
+</body>
+</html>
