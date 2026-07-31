@@ -493,91 +493,106 @@
             });
         }
 
-        // MAKE SALE LOGIC
-        async function makeSale(productId) {
-            const qty = parseInt(document.getElementById(`qty-${productId}`).innerText);
-            const product = globalProducts.find(p => p.id === productId);
+	// MAKE SALE (DÜZELTİLMİŞ KOD)
+	async function makeSale(productId) {
+    		const qtyInput = parseInt(document.getElementById(`qty-${productId}`).innerText) || 1;
+    		const product = globalProducts.find(p => p.id === productId);
 
-            if (!product || product.stock < qty) {
-                alert('Insufficient Stock!');
-                return;
-            }
+   	 	// 1. KRİTİK KONTROL: Stok yetersizse satışı ENGELLE
+    		if (!product || product.stock < qtyInput) {
+        	    alert(`Yetersiz Stok! Mevcut stok: ${product ? product.stock : 0} Pcs, Satılmak istenen: ${qtyInput} Pcs`);
+        	    return;
+   	 }
 
-            const newStock = product.stock - qty;
+    	 // 2. Yeni stoğu hesapla
+   	 const newStock = product.stock - qtyInput;
 
-            await supabaseClient
-                .from('stocks')
-                .upsert({ dealer_id: currentDealer.id, product_id: productId, quantity: newStock });
+    	 try {
+        	// Supabase Stok Güncelleme
+                const { error: stockError } = await supabaseClient
+            	    .from('stocks')
+                    .upsert({ 
+                	dealer_id: currentDealer.id, 
+                	product_id: productId, 
+                	quantity: newStock 
+            	}, { onConflict: 'dealer_id,product_id' });
 
-            await supabaseClient
-                .from('stock_movements')
-                .insert([{ dealer_id: currentDealer.id, product_id: productId, movement_type: 'SALE', quantity: qty }]);
+        	if (stockError) throw stockError;
 
-            todaySalesCount += qty;
-            fetchLiveProducts();
-        }
+        	// Supabase Satış Hareketi Ekleme
+        await supabaseClient
+            .from('stock_movements')
+            .insert([{ 
+                dealer_id: currentDealer.id, 
+                product_id: productId, 
+                movement_type: 'SALE', 
+                quantity: qtyInput 
+            }]);
 
-        // GOODS RECEIPT (SAP SHIPMENTS)
-        async function fetchPendingShipments() {
-            let allShipments = [];
-            let from = 0;
-            const step = 1000;
-            let hasMore = true;
+        // 3. Arayüzü (Lokal Hafızayı) Anında Güncelle
+        product.stock = newStock;
+        todaySalesCount += qtyInput;
 
-            while (hasMore) {
-                const { data, error } = await supabaseClient
-                    .from('shipments')
-                    .select('*')
-                    .eq('dealer_code', currentDealer.code)
-                    .eq('status', 'PENDING')
-                    .range(from, from + step - 1);
+        // LocalStorage'a bugünün satışını kaydet (Sayfa yenilenince sıfırlanmasın)
+        const todayKey = `sales_${currentDealer.id}_${new Date().toISOString().slice(0,10)}`;
+        localStorage.setItem(todayKey, todaySalesCount);
 
-                if (error || !data || data.length === 0) break;
-                allShipments = allShipments.concat(data);
-                if (data.length < step) hasMore = false;
-                from += step;
-            }
+        // Arayüzü ve KPI'ları Yeniden Çiz
+        renderProducts(globalProducts);
+        updateKPIs();
 
-            const data = allShipments;
-            document.getElementById('pendingBadge').innerText = data.length >= 1000 ? '1000+' : data.length;
+    } catch (err) {
+        console.error("Satış işlemi hatası:", err);
+        alert("Satış kaydedilirken bir hata oluştu!");
+    }
+}
 
-            const tbody = document.getElementById('shipmentTableBody');
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>`;
-                return;
-            }
+// BUGÜNÜN SATIŞLARINI HAFIZADAN ÇEKME (SAYFA YENİLENSE DE SIFIRLANMAZ)
+function loadTodaySalesHistory() {
+    if (!currentDealer) return;
+    const todayKey = `sales_${currentDealer.id}_${new Date().toISOString().slice(0,10)}`;
+    todaySalesCount = parseInt(localStorage.getItem(todayKey)) || 0;
+}
 
-            tbody.innerHTML = '';
-            data.forEach(s => {
-                const matchedProduct = globalProducts.find(p => p.code === s.product_code);
-                const imgUrl = matchedProduct && matchedProduct.image 
-                    ? matchedProduct.image 
-                    : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
+// ÜRÜNLERİ VE SATIŞLARI YÜKLE
+async function fetchLiveProducts() {
+    loadTodaySalesHistory(); // Bugünün kaydedilmiş satışını yükle
 
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                tr.innerHTML = `
-                    <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <img src="${imgUrl}" alt="${s.product_name}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100 shadow-sm" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=100';">
-                            <div class="min-w-0">
-                                <span class="text-[10px] font-extrabold text-[#00205b] font-mono block tracking-wider">${s.product_code}</span>
-                                <span class="font-bold text-slate-900 text-xs block truncate max-w-md" title="${s.product_name || ''}">${s.product_name || ''}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 font-extrabold text-emerald-600 whitespace-nowrap">${s.quantity} Pcs</td>
-                    <td class="p-4 text-slate-500 text-xs font-semibold whitespace-nowrap">${new Date(s.created_at).toLocaleDateString('en-US')}</td>
-                    <td class="p-4 text-right whitespace-nowrap">
-                        <button onclick="approveShipment('${s.id}', '${s.product_code}', ${s.quantity})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm active:scale-95">
-                            Confirm & Add to Stock
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+    let allProductsData = [];
+    let from = 0;
+    const step = 1000;
+    let hasMore = true;
+
+    while (hasMore) {
+        const { data, error } = await supabaseClient
+            .from('products')
+            .select(`
+                id, code, name, category, image_url,
+                stocks ( quantity, dealer_id )
+            `)
+            .range(from, from + step - 1);
+
+        if (error || !data || data.length === 0) break;
+        allProductsData = allProductsData.concat(data);
+        if (data.length < step) hasMore = false;
+        from += step;
+    }
+
+    globalProducts = allProductsData.map(item => {
+        const dealerStock = item.stocks ? item.stocks.find(s => s.dealer_id === currentDealer.id) : null;
+        return {
+            id: item.id,
+            code: item.code,
+            name: item.name,
+            category: item.category || 'Collection',
+            image: item.image_url || 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500',
+            stock: dealerStock ? dealerStock.quantity : 0
+        };
+    });
+
+    renderProducts(globalProducts);
+    updateKPIs();
+}
 
         async function approveShipment(shipmentId, productCode, qty) {
             const product = globalProducts.find(p => p.code === productCode);
