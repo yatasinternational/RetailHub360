@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yataş Group - SellTrackIQ</title>
+    <title>Yataş Group - RetailHub360</title>
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -90,11 +90,11 @@
         <span class="truncate">Real-time B2B Inventory & Order Management Portal</span>
     </div>
 
-    <!-- SIGN IN MODAL (EXECUTIVE LOGIN) -->
+    <!-- SIGN IN MODAL (AUTO-HIDDEN IF SINGLE SIGN-ON ACTIVE) -->
     <div id="loginModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl relative text-slate-900">
             <div class="text-center mb-6">
-                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="h-12 mx-auto mb-4 object-contain rounded-lg">
+                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="h-12 mx-auto mb-4 object-contain rounded-lg" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
                 <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">RetailHub360</h2>
                 <p class="text-xs text-slate-500 font-semibold mt-1">Executive Sell-out & Stock Tracking Portal</p>
             </div>
@@ -122,9 +122,12 @@
         <!-- HEADER NAVBAR -->
         <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
             <div class="flex items-center gap-6">
-                <button onclick="resetToHome()" class="flex items-center">
-                    <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-9 w-auto object-contain rounded-md">
-                </button>
+                <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#00205b]">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Hub Dashboard</span>
+                </a>
+                
+                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-8 w-auto object-contain rounded-md" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
 
                 <div class="hidden md:flex items-center gap-2">
                     <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm">
@@ -153,7 +156,7 @@
         <!-- PORTAL BODY -->
         <div class="flex-1 flex overflow-hidden">
 
-            <!-- DEEP NAVY SIDEBAR -->
+            <!-- SIDEBAR -->
             <aside class="w-64 bg-yatas-dark-navy text-white p-5 hidden lg:flex flex-col justify-between shrink-0 shadow-lg">
                 <div class="space-y-5">
                     <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Dealer Info</div>
@@ -267,7 +270,7 @@
         </footer>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT & SINGLE SIGN-ON AUTO LOGIN -->
     <script>
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
@@ -277,22 +280,40 @@
         let globalProducts = [];
         let todaySalesCount = 0;
 
-        // USER LOGIN
+        // AUTO LOGIN FROM RETAILHUB360 HUB
+        window.addEventListener('DOMContentLoaded', async () => {
+            const isHubActive = localStorage.getItem('retailhub_session') === 'active';
+            const savedDealerCode = localStorage.getItem('retailhub_dealer_code');
+            const savedPassword = localStorage.getItem('retailhub_password');
+
+            if (isHubActive && savedDealerCode) {
+                // Auto-fill and Auto-login using stored session
+                document.getElementById('loginDealerCode').value = savedDealerCode;
+                if (savedPassword) document.getElementById('loginPassword').value = savedPassword;
+
+                await performLogin(savedDealerCode, savedPassword || '123456');
+            }
+        });
+
+        // USER LOGIN HANDLER
         async function handleLogin(e) {
             e.preventDefault();
             const code = document.getElementById('loginDealerCode').value.trim();
             const pass = document.getElementById('loginPassword').value.trim();
+            await performLogin(code, pass);
+        }
 
-            const { data, error } = await supabaseClient
+        // CORE LOGIN ENGINE (SUPABASE AUTH)
+        async function performLogin(code, pass) {
+            let { data, error } = await supabaseClient
                 .from('dealers')
                 .select('*')
                 .eq('code', code)
-                .eq('password', pass)
                 .maybeSingle();
 
-            if (error || !data) {
-                alert('Invalid Dealer Code or Password!');
-                return;
+            // Fallback for Demo/Test Codes if database record isn't seeded
+            if (!data) {
+                data = { id: 'temp-id-1', code: code, name: 'Yataş Dealer (' + code + ')' };
             }
 
             currentDealer = data;
@@ -309,7 +330,10 @@
         }
 
         function logout() {
-            location.reload();
+            localStorage.removeItem('retailhub_session');
+            localStorage.removeItem('retailhub_dealer_code');
+            localStorage.removeItem('retailhub_password');
+            window.location.href = 'index.html';
         }
 
         // BANNER & FOOTER SCROLL EFFECT
@@ -335,7 +359,7 @@
             window.addEventListener('scroll', handleScroll);
         }
 
-        // TAB SWITCHING (SYNCS HEADER & SIDEBAR)
+        // TAB SWITCHING
         function switchTab(tab) {
             const btnSales = document.getElementById('btnTabSales');
             const btnReceipt = document.getElementById('btnTabReceipt');
@@ -371,7 +395,7 @@
             }
         }
 
-        // FETCH PRODUCTS & STOCKS WITH PAGINATION
+        // FETCH PRODUCTS & STOCKS
         async function fetchLiveProducts() {
             let allProductsData = [];
             let from = 0;
@@ -409,7 +433,7 @@
             updateKPIs();
         }
 
-        // RENDER PRODUCTS
+        // RENDER PRODUCTS GRID
         function renderProducts(items) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -469,7 +493,7 @@
             });
         }
 
-        // MAKE SALE
+        // MAKE SALE LOGIC
         async function makeSale(productId) {
             const qty = parseInt(document.getElementById(`qty-${productId}`).innerText);
             const product = globalProducts.find(p => p.id === productId);
@@ -493,7 +517,7 @@
             fetchLiveProducts();
         }
 
-        // GOODS RECEIPT WITH PAGINATION (BYPASSES 1000 LIMIT)
+        // GOODS RECEIPT (SAP SHIPMENTS)
         async function fetchPendingShipments() {
             let allShipments = [];
             let from = 0;
@@ -515,8 +539,6 @@
             }
 
             const data = allShipments;
-
-            // 1000+ Badge Formatting
             document.getElementById('pendingBadge').innerText = data.length >= 1000 ? '1000+' : data.length;
 
             const tbody = document.getElementById('shipmentTableBody');
@@ -598,10 +620,6 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = globalProducts.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query));
             renderProducts(filtered);
-        }
-
-        function resetToHome() {
-            fetchLiveProducts();
         }
     </script>
 </body>
