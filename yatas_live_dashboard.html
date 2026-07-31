@@ -29,7 +29,7 @@
         
         /* Glassmorphism Cards */
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(226, 232, 240, 0.8);
             box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.05), 0 8px 10px -6px rgba(15, 39, 68, 0.01);
@@ -44,20 +44,10 @@
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -75,7 +65,7 @@
                     <h1 class="font-bold text-lg leading-snug tracking-wide">Uluslararası Satışlar ve Operasyon Direktörlüğü</h1>
                     <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Canlı Karar Destek ve B2B Performans Paneli (Power BI Mode)
+                        Supabase Bulut Entegre Canlı B2B Karar Destek Paneli
                     </p>
                 </div>
             </div>
@@ -83,11 +73,14 @@
             <!-- Header Actions -->
             <div class="flex items-center gap-4">
                 <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
-                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-yatas-gold"></i>
-                    <span>Son Senkronizasyon: <b>Bugün, Live SAP Engine</b></span>
+                    <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-yatas-gold"></i>
+                    <span id="dataStatus">Supabase Bağlanıyor...</span>
                 </div>
-                <button onclick="resetFilters()" class="bg-yatas-gold hover:bg-yellow-600 text-yatas-navy font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all shadow-lg shadow-yellow-500/10">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Filtreleri Sıfırla
+                <button onclick="fetchSupabaseData()" class="bg-yatas-gold hover:bg-yellow-600 text-yatas-navy font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all shadow-lg shadow-yellow-500/10">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Canlı Yenile (F5)
+                </button>
+                <button onclick="resetFilters()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Sıfırla
                 </button>
             </div>
         </div>
@@ -110,21 +103,18 @@
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] uppercase font-bold text-slate-400">Yıl Seçimi</label>
                         <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
-                            <option value="ALL">Tüm Yıllar (2024-2026)</option>
-                            <option value="2026" selected>2026 (Konsolide)</option>
+                            <option value="ALL">Tüm Yıllar</option>
+                            <option value="2026" selected>2026</option>
                             <option value="2025">2025</option>
                             <option value="2024">2024</option>
                         </select>
                     </div>
 
-                    <!-- Region / Country Selector -->
+                    <!-- Region Selector -->
                     <div class="flex flex-col gap-1">
-                        <label class="text-[10px] uppercase font-bold text-slate-400">Bölge / Ülke</label>
+                        <label class="text-[10px] uppercase font-bold text-slate-400">Bölge</label>
                         <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
-                            <option value="ALL">Tüm Bölgeler & Ülkeler</option>
-                            <option value="Batı Avrupa">Batı Avrupa (İngiltere/Almanya)</option>
-                            <option value="CEE">Doğu Avrupa / CEE (Romanya)</option>
-                            <option value="Balkanlar">Balkanlar (Sırbistan/Bosna)</option>
+                            <option value="ALL">Tüm Bölgeler</option>
                         </select>
                     </div>
 
@@ -133,10 +123,14 @@
                         <label class="text-[10px] uppercase font-bold text-slate-400">Marka</label>
                         <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
                             <option value="ALL">Tüm Markalar</option>
-                            <option value="Enza Home">Enza Home</option>
-                            <option value="Yataş Bedding">Yataş Bedding</option>
-                            <option value="Divanev">Divanev</option>
-                            <option value="Puffy">Puffy</option>
+                        </select>
+                    </div>
+
+                    <!-- Channel Selector -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] uppercase font-bold text-slate-400">Kanal</label>
+                        <select id="filterKanal" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
+                            <option value="ALL">Tüm Kanallar</option>
                         </select>
                     </div>
                 </div>
@@ -169,10 +163,10 @@
                     <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (USD)</span>
                     <i data-lucide="dollar-sign" class="w-5 h-5 text-yatas-navy"></i>
                 </div>
-                <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy">$11.40M</div>
+                <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy">$0.00M</div>
                 <div class="mt-2 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-500">Bütçe Hedef: <b id="kpiCiroUSDButce">$11.80M</b></span>
-                    <span id="kpiCiroUSDReal" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">%96.6</span>
+                    <span class="text-slate-500">Bütçe Hedef: <b id="kpiCiroUSDButce">$0.00M</b></span>
+                    <span id="kpiCiroUSDReal" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">%0.0</span>
                 </div>
             </div>
 
@@ -182,9 +176,9 @@
                     <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (TL)</span>
                     <i data-lucide="trending-up" class="w-5 h-5 text-yatas-gold"></i>
                 </div>
-                <div id="kpiCiroTL" class="text-2xl font-black text-slate-800">₺478.8M</div>
+                <div id="kpiCiroTL" class="text-2xl font-black text-slate-800">₺0.0M</div>
                 <div class="mt-2 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-500">SMM (TL): <b id="kpiSmmTL">₺266.0M</b></span>
+                    <span class="text-slate-500">SMM (TL): <b id="kpiSmmTL">₺0.0M</b></span>
                     <span class="font-bold text-yatas-navy bg-amber-50 px-2 py-0.5 rounded-md">TL Bazlı</span>
                 </div>
             </div>
@@ -195,36 +189,36 @@
                     <span class="text-[11px] font-bold uppercase tracking-wider">Çarpan (Markup) & Marj</span>
                     <i data-lucide="pie-chart" class="w-5 h-5 text-emerald-600"></i>
                 </div>
-                <div id="kpiCarpan" class="text-2xl font-black text-emerald-600">1.80 x</div>
+                <div id="kpiCarpan" class="text-2xl font-black text-emerald-600">0.00 x</div>
                 <div class="mt-2 flex items-center justify-between text-[11px]">
                     <span class="text-slate-500">Brüt Kâr Marjı:</span>
-                    <span id="kpiKarMarji" class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">%44.4</span>
+                    <span id="kpiKarMarji" class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">%0.0</span>
                 </div>
             </div>
 
             <!-- KPI 4 -->
             <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-sky-500">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-[11px] font-bold uppercase tracking-wider">Turquality Tahsilat</span>
-                    <i data-lucide="shield-check" class="w-5 h-5 text-sky-600"></i>
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Satış Adedi</span>
+                    <i data-lucide="package" class="w-5 h-5 text-sky-600"></i>
                 </div>
-                <div id="kpiTurquality" class="text-2xl font-black text-sky-700">$540.0K</div>
+                <div id="kpiAdet" class="text-2xl font-black text-sky-700">0 Adet</div>
                 <div class="mt-2 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-500">Gelir Tahsilat Oranı:</span>
-                    <span class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">%91.2</span>
+                    <span class="text-slate-500">Bütçe Adedi: <b id="kpiAdetButce">0</b></span>
+                    <span id="kpiAdetOran" class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">%0.0</span>
                 </div>
             </div>
 
             <!-- KPI 5 -->
             <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-rose-500">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-[11px] font-bold uppercase tracking-wider">Risk / Vadesi Geçen</span>
-                    <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-500"></i>
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Aktif Müşteri / Bölge</span>
+                    <i data-lucide="globe" class="w-5 h-5 text-rose-500"></i>
                 </div>
-                <div id="kpiVadesiGecen" class="text-2xl font-black text-rose-600">$97.5K</div>
+                <div id="kpiMusteriSayisi" class="text-2xl font-black text-rose-600">0 Müşteri</div>
                 <div class="mt-2 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-500">Limit Üstü Tutar:</span>
-                    <span class="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">$45.0K</span>
+                    <span class="text-slate-500">Bölge Sayısı:</span>
+                    <span id="kpiBolgeSayisi" class="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">0 Bölge</span>
                 </div>
             </div>
 
@@ -238,7 +232,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Aylık Ciro Performansı: Bütçe vs. Gerçekleşen (USD)</h3>
-                        <p class="text-xs text-slate-400">Canlı SAP sevk verisi ile bütçelenen hedeflerin aylık karşılaştırması</p>
+                        <p class="text-xs text-slate-400">Supabase bulut veritabanından anlık sevk ve bütçe kıyaslaması</p>
                     </div>
                     <span class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1 rounded-lg">LFL Trend</span>
                 </div>
@@ -247,7 +241,7 @@
                 </div>
             </div>
 
-            <!-- Donut / Secondary Chart (1 Col) -->
+            <!-- Donut Chart (1 Col) -->
             <div class="glass-card rounded-2xl p-6 border border-slate-200">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -267,8 +261,8 @@
         <section class="glass-card rounded-2xl p-6 border border-slate-200">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
-                    <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi</h3>
-                    <p class="text-xs text-slate-400">Seçili filtrelere göre dinamik türetilen C-Level detay dökümü</p>
+                    <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi (Ciro & SMM)</h3>
+                    <p class="text-xs text-slate-400">Supabase bulut veritabanından canlı türetilen C-Level detay matrisi</p>
                 </div>
                 
                 <div class="flex items-center gap-3">
@@ -277,9 +271,6 @@
                         <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
                         <input type="text" id="tableSearch" onkeyup="filterTable()" placeholder="Bayi veya Ülke Ara..." class="bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-4 py-1.5 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy w-64">
                     </div>
-                    <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Excel Export
-                    </button>
                 </div>
             </div>
 
@@ -288,16 +279,17 @@
                 <table class="w-full text-left border-collapse" id="mainDataTable">
                     <thead>
                         <tr class="bg-slate-100 text-yatas-navy text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200">
-                            <th class="py-3.5 px-4 rounded-l-xl">Kanal / Bölge</th>
-                            <th class="py-3.5 px-4">Ülke & Bayi</th>
-                            <th class="py-3.5 px-4 text-right">2026 Ciro (USD)</th>
+                            <th class="py-3.5 px-4 rounded-l-xl">Yıl / Ay</th>
+                            <th class="py-3.5 px-4">Bölge & Ülke</th>
+                            <th class="py-3.5 px-4">Müşteri / Bayi</th>
+                            <th class="py-3.5 px-4">Marka</th>
+                            <th class="py-3.5 px-4 text-right">Ciro (USD)</th>
                             <th class="py-3.5 px-4 text-right">Bütçe (USD)</th>
-                            <th class="py-3.5 px-4 text-right">Bütçe Başarı %</th>
+                            <th class="py-3.5 px-4 text-right">Başarı %</th>
                             <th class="py-3.5 px-4 text-right">Ciro (TL)</th>
                             <th class="py-3.5 px-4 text-right">SMM (TL)</th>
-                            <th class="py-3.5 px-4 text-center">SMM Çarpanı</th>
-                            <th class="py-3.5 px-4 text-right">Brüt Kâr Marjı</th>
-                            <th class="py-3.5 px-4 text-center rounded-r-xl">Risk / Durum</th>
+                            <th class="py-3.5 px-4 text-center">Çarpan</th>
+                            <th class="py-3.5 px-4 text-center rounded-r-xl">Kanal</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="text-xs font-semibold divide-y divide-slate-100 text-slate-700">
@@ -311,99 +303,255 @@
 
     <!-- FOOTER -->
     <footer class="max-w-[1700px] mx-auto px-6 mt-8 text-center text-xs text-slate-400">
-        <p>© 2026 Yataş Group - Uluslararası Satışlar ve Operasyon Direktörlüğü | B2B Live Executive Cockpit</p>
+        <p>© 2026 Yataş Group - Uluslararası Satışlar ve Operasyon Direktörlüğü | Supabase Cloud Executive Cockpit</p>
     </footer>
 
     <!-- INTERACTIVE JAVASCRIPT LOGIC -->
     <script>
-        // Init Lucide Icons
         lucide.createIcons();
 
-        // MOCK MASTER DATA
-        const rawData = [
-            { region: 'Batı Avrupa', country: 'İngiltere', dealer: 'ATMACA GROUP', brand: 'Yataş Bedding', ciroUSD: 1450000, butceUSD: 1500000, ciroTL: 60900000, smmTL: 33833333, carpan: 1.80, karPct: 44.4, vadesiGecen: 12500, risk: 'Düşük Risk' },
-            { region: 'CEE', country: 'Romanya', dealer: 'ROMANIA RETAIL SRL', brand: 'Enza Home', ciroUSD: 3100000, butceUSD: 3200000, ciroTL: 130200000, smmTL: 72333333, carpan: 1.80, karPct: 44.4, vadesiGecen: 85000, risk: 'Limit Üstü' },
-            { region: 'Balkanlar', country: 'Sırbistan', dealer: 'BALKAN BEDDING DOO', brand: 'Yataş Bedding', ciroUSD: 1750000, butceUSD: 1800000, ciroTL: 73500000, smmTL: 40833333, carpan: 1.80, karPct: 44.4, vadesiGecen: 0, risk: 'Güvenli' },
-            { region: 'Balkanlar', country: 'Bosna-Hersek', dealer: 'SARAJEVO HOME', brand: 'Divanev', ciroUSD: 920000, butceUSD: 950000, ciroTL: 38640000, smmTL: 21466666, carpan: 1.80, karPct: 44.4, vadesiGecen: 0, risk: 'Güvenli' },
-            { region: 'Batı Avrupa', country: 'Almanya', dealer: 'ALMANYA FRANCHISE', brand: 'Puffy', ciroUSD: 2100000, butceUSD: 2200000, ciroTL: 88200000, smmTL: 49000000, carpan: 1.80, karPct: 44.4, vadesiGecen: 0, risk: 'Güvenli' }
-        ];
+        // SUPABASE CANLI BULUT VERİTABANI BAĞLANTI PARAMETRELERİ
+        const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co/rest/v1/executive_master_report?select=*';
+        const SUPABASE_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
 
-        let currentTab = 'finans';
+        let masterData = [];
+        let filteredData = [];
         let chartTrendInstance = null;
         let chartMarkaInstance = null;
+        let currentTab = 'finans';
 
-        // LOAD DASHBOARD
+        // SUPABASE VERİ ÇEKME FONKSİYONU
+        async function fetchSupabaseData() {
+            document.getElementById('dataStatus').innerText = "Supabase Canlı Veri Çekiliyor...";
+            try {
+                const res = await fetch(SUPABASE_URL, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY
+                    }
+                });
+                
+                const data = await res.json();
+                
+                // Supabase küçük harf veritabanı kolonlarını Dashboard biçimine eşle
+                masterData = data.map(i => ({
+                    Yil: i.yil,
+                    Ay: i.ay,
+                    Kanal: i.kanal || 'Diğer',
+                    Bolge_Adı: i.bolge_adi || 'Diğer',
+                    Ulke: i.ulke || 'Diğer',
+                    Musteri_Kodu: i.musteri_kodu,
+                    Musteri_Adi: i.musteri_adi || 'Diğer',
+                    Marka: i.marka || 'Diğer',
+                    Satis_Adet_Gerceklesen: Number(i.satis_adet_gerceklesen) || 0,
+                    Ciro_USD_Gerceklesen: Number(i.ciro_usd_gerceklesen) || 0,
+                    Ciro_TL_Gerceklesen: Number(i.ciro_tl_gerceklesen) || 0,
+                    SMM_TL_Gerceklesen: Number(i.smm_tl_gerceklesen) || 0,
+                    Ciro_USD_Butce: Number(i.ciro_usd_butce) || 0,
+                    Ciro_TL_Butce: Number(i.ciro_tl_butce) || 0,
+                    Satis_Adet_Butce: Number(i.satis_adet_butce) || 0,
+                    SMM_TL_Butce: Number(i.smm_tl_butce) || 0,
+                    Veri_Kaynagi: 'SUPABASE CANLI'
+                }));
+
+                document.getElementById('dataStatus').innerText = `Supabase Canlı: ${masterData.length.toLocaleString()} Kayıt`;
+                populateDropdowns();
+                applyFilters();
+            } catch (err) {
+                console.error("Supabase Bağlantı Hatası:", err);
+                document.getElementById('dataStatus').innerText = "Supabase canlı veri okunamadı!";
+            }
+        }
+
         window.onload = function() {
-            renderTable(rawData);
-            initCharts();
+            fetchSupabaseData();
         };
 
-        // FILTER LOGIC
+        function populateDropdowns() {
+            const regions = [...new Set(masterData.map(i => i.Bolge_Adı).filter(Boolean))].sort();
+            const brands = [...new Set(masterData.map(i => i.Marka).filter(Boolean))].sort();
+            const kanals = [...new Set(masterData.map(i => i.Kanal).filter(Boolean))].sort();
+
+            const regSel = document.getElementById('filterRegion');
+            regSel.innerHTML = '<option value="ALL">Tüm Bölgeler</option>' + regions.map(r => `<option value="${r}">${r}</option>`).join('');
+
+            const brSel = document.getElementById('filterBrand');
+            brSel.innerHTML = '<option value="ALL">Tüm Markalar</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+
+            const knSel = document.getElementById('filterKanal');
+            knSel.innerHTML = '<option value="ALL">Tüm Kanallar</option>' + kanals.map(k => `<option value="${k}">${k}</option>`).join('');
+        }
+
         function applyFilters() {
             const year = document.getElementById('filterYear').value;
             const region = document.getElementById('filterRegion').value;
             const brand = document.getElementById('filterBrand').value;
+            const kanal = document.getElementById('filterKanal').value;
 
-            let filtered = rawData.filter(item => {
-                let matchRegion = (region === 'ALL' || item.region === region);
-                let matchBrand = (brand === 'ALL' || item.brand === brand);
-                return matchRegion && matchBrand;
+            filteredData = masterData.filter(i => {
+                let matchYear = (year === 'ALL' || String(i.Yil) === year);
+                let matchReg = (region === 'ALL' || i.Bolge_Adı === region);
+                let matchBr = (brand === 'ALL' || i.Marka === brand);
+                let matchKn = (kanal === 'ALL' || i.Kanal === kanal);
+                return matchYear && matchReg && matchBr && matchKn;
             });
 
-            renderTable(filtered);
-            updateKPIs(filtered);
-            updateCharts(filtered);
+            updateKPIs(filteredData);
+            updateCharts(filteredData);
+            renderTable(filteredData);
         }
 
         function resetFilters() {
             document.getElementById('filterYear').value = '2026';
             document.getElementById('filterRegion').value = 'ALL';
             document.getElementById('filterBrand').value = 'ALL';
+            document.getElementById('filterKanal').value = 'ALL';
             applyFilters();
         }
 
-        // RENDER TABLE
+        function updateKPIs(data) {
+            const ciroUSD = data.reduce((a, b) => a + b.Ciro_USD_Gerceklesen, 0);
+            const butceUSD = data.reduce((a, b) => a + b.Ciro_USD_Butce, 0);
+            
+            const ciroTL = data.reduce((a, b) => a + b.Ciro_TL_Gerceklesen, 0);
+            const smmTL = data.reduce((a, b) => a + b.SMM_TL_Gerceklesen, 0);
+
+            const adet = data.reduce((a, b) => a + b.Satis_Adet_Gerceklesen, 0);
+            const butceAdet = data.reduce((a, b) => a + b.Satis_Adet_Butce, 0);
+
+            const uniqueCustomers = new Set(data.map(i => i.Musteri_Adi).filter(Boolean)).size;
+            const uniqueRegions = new Set(data.map(i => i.Bolge_Adı).filter(Boolean)).size;
+
+            const usdOran = butceUSD > 0 ? ((ciroUSD / butceUSD) * 100).toFixed(1) : '0.0';
+            const carpan = smmTL > 0 ? (ciroTL / smmTL).toFixed(2) : '0.00';
+            const karMarji = ciroTL > 0 ? (((ciroTL - smmTL) / ciroTL) * 100).toFixed(1) : '0.0';
+            const adetOran = butceAdet > 0 ? ((adet / butceAdet) * 100).toFixed(1) : '0.0';
+
+            document.getElementById('kpiCiroUSD').innerText = `$${(ciroUSD / 1000000).toFixed(2)}M`;
+            document.getElementById('kpiCiroUSDButce').innerText = `$${(butceUSD / 1000000).toFixed(2)}M`;
+            document.getElementById('kpiCiroUSDReal').innerText = `%${usdOran}`;
+
+            document.getElementById('kpiCiroTL').innerText = `₺${(ciroTL / 1000000).toFixed(1)}M`;
+            document.getElementById('kpiSmmTL').innerText = `₺${(smmTL / 1000000).toFixed(1)}M`;
+
+            document.getElementById('kpiCarpan').innerText = `${carpan} x`;
+            document.getElementById('kpiKarMarji').innerText = `%${karMarji}`;
+
+            document.getElementById('kpiAdet').innerText = `${adet.toLocaleString()} Adet`;
+            document.getElementById('kpiAdetButce').innerText = `${butceAdet.toLocaleString()}`;
+            document.getElementById('kpiAdetOran').innerText = `%${adetOran}`;
+
+            document.getElementById('kpiMusteriSayisi').innerText = `${uniqueCustomers} Müşteri`;
+            document.getElementById('kpiBolgeSayisi').innerText = `${uniqueRegions} Bölge`;
+        }
+
+        function updateCharts(data) {
+            const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+            const monthlyActual = new Array(12).fill(0);
+            const monthlyBudget = new Array(12).fill(0);
+
+            data.forEach(item => {
+                const mIdx = (Number(item.Ay) || 1) - 1;
+                if (mIdx >= 0 && mIdx < 12) {
+                    monthlyActual[mIdx] += item.Ciro_USD_Gerceklesen / 1000;
+                    monthlyBudget[mIdx] += item.Ciro_USD_Butce / 1000;
+                }
+            });
+
+            if (chartTrendInstance) chartTrendInstance.destroy();
+
+            const ctxTrend = document.getElementById('chartCiroTrend').getContext('2d');
+            chartTrendInstance = new Chart(ctxTrend, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        { label: 'Gerçekleşen Ciro (Bin $)', data: monthlyActual, backgroundColor: '#0f2744', borderRadius: 6 },
+                        { label: 'Bütçe Hedef (Bin $)', data: monthlyBudget, backgroundColor: '#cbd5e1', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+
+            const brandTotals = {};
+            data.forEach(item => {
+                const bName = item.Marka || 'Diğer';
+                brandTotals[bName] = (brandTotals[bName] || 0) + item.Ciro_USD_Gerceklesen;
+            });
+
+            const brandLabels = Object.keys(brandTotals);
+            const brandValues = Object.values(brandTotals);
+
+            if (chartMarkaInstance) chartMarkaInstance.destroy();
+
+            const ctxMarka = document.getElementById('chartMarkaDistribution').getContext('2d');
+            chartMarkaInstance = new Chart(ctxMarka, {
+                type: 'doughnut',
+                data: {
+                    labels: brandLabels.length ? brandLabels : ['Veri Yok'],
+                    datasets: [{
+                        data: brandValues.length ? brandValues : [1],
+                        backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981', '#f59e0b', '#6366f1']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            data.forEach(item => {
-                const realizasyon = ((item.ciroUSD / item.butceUSD) * 100).toFixed(1);
-                const badgeColor = item.risk === 'Limit Üstü' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800';
+            data.slice(0, 150).forEach(item => {
+                const ciroUSD = item.Ciro_USD_Gerceklesen;
+                const butceUSD = item.Ciro_USD_Butce;
+                const ciroTL = item.Ciro_TL_Gerceklesen;
+                const smmTL = item.SMM_TL_Gerceklesen;
+                
+                const realizasyon = butceUSD > 0 ? ((ciroUSD / butceUSD) * 100).toFixed(1) : '0.0';
+                const carpan = smmTL > 0 ? (ciroTL / smmTL).toFixed(2) : '0.00';
 
                 const row = `
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="py-3 px-4 font-bold text-yatas-navy">${item.region}</td>
+                        <td class="py-3 px-4 font-bold text-yatas-navy">${item.Yil || ''} / ${item.Ay || ''}</td>
                         <td class="py-3 px-4">
-                            <div class="font-bold text-slate-800">${item.country}</div>
-                            <div class="text-[10px] text-slate-400">${item.dealer} (${item.brand})</div>
+                            <div class="font-bold text-slate-800">${item.Bolge_Adı || '-'}</div>
+                            <div class="text-[10px] text-slate-400">${item.Ulke || ''}</div>
                         </td>
-                        <td class="py-3 px-4 text-right font-black text-slate-800">$${(item.ciroUSD / 1000).toLocaleString()}K</td>
-                        <td class="py-3 px-4 text-right text-slate-500">$${(item.butceUSD / 1000).toLocaleString()}K</td>
-                        <td class="py-3 px-4 text-right font-bold ${realizasyon >= 95 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
-                        <td class="py-3 px-4 text-right font-semibold text-slate-700">₺${(item.ciroTL / 1000000).toFixed(1)}M</td>
-                        <td class="py-3 px-4 text-right text-slate-500">₺${(item.smmTL / 1000000).toFixed(1)}M</td>
-                        <td class="py-3 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${item.carpan} x</span></td>
-                        <td class="py-3 px-4 text-right font-bold text-emerald-600">%${item.karPct}</td>
-                        <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${badgeColor}">${item.risk}</span></td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.Musteri_Adi || '-'}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.Marka || '-'}</td>
+                        <td class="py-3 px-4 text-right font-black text-yatas-navy">$${ciroUSD.toLocaleString()}</td>
+                        <td class="py-3 px-4 text-right text-slate-400">$${butceUSD.toLocaleString()}</td>
+                        <td class="py-3 px-4 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
+                        <td class="py-3 px-4 text-right font-semibold text-slate-700">₺${(ciroTL / 1000000).toFixed(2)}M</td>
+                        <td class="py-3 px-4 text-right text-slate-500">₺${(smmTL / 1000000).toFixed(2)}M</td>
+                        <td class="py-3 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${carpan} x</span></td>
+                        <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-slate-100 text-slate-700">${item.Kanal || '-'}</span></td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
             });
         }
 
-        // TABLE SEARCH
         function filterTable() {
             const query = document.getElementById('tableSearch').value.toLowerCase();
-            const filtered = rawData.filter(item => 
-                item.country.toLowerCase().includes(query) || 
-                item.dealer.toLowerCase().includes(query) ||
-                item.brand.toLowerCase().includes(query)
+            const searchFiltered = filteredData.filter(item => 
+                (item.Musteri_Adi && item.Musteri_Adi.toLowerCase().includes(query)) ||
+                (item.Ulke && item.Ulke.toLowerCase().includes(query)) ||
+                (item.Bolge_Adı && item.Bolge_Adı.toLowerCase().includes(query)) ||
+                (item.Marka && item.Marka.toLowerCase().includes(query))
             );
-            renderTable(filtered);
+            renderTable(searchFiltered);
         }
 
-        // TAB SWITCH
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -421,57 +569,6 @@
                 'operasyon': 'Sipariş, Sevk Karşılama & Depo m³ Doluluk Analizi'
             };
             document.getElementById('tableTitle').innerText = titleMap[tab];
-        }
-
-        // UPDATE KPIS
-        function updateKPIs(data) {
-            const totalUSD = data.reduce((acc, i) => acc + itemCiroUSD(i), 0);
-            document.getElementById('kpiCiroUSD').innerText = `$${(totalUSD / 1000000).toFixed(2)}M`;
-        }
-        function itemCiroUSD(i) { return i.ciroUSD; }
-
-        // CHART INIT
-        function initCharts() {
-            // Trend Chart
-            const ctxTrend = document.getElementById('chartCiroTrend').getContext('2d');
-            chartTrendInstance = new Chart(ctxTrend, {
-                type: 'bar',
-                data: {
-                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
-                    datasets: [
-                        { label: 'Gerçekleşen Ciro (USD)', data: [850, 920, 1100, 980, 1050, 1250, 1150, 0, 0, 0, 0, 0], backgroundColor: '#0f2744', borderRadius: 6 },
-                        { label: 'Bütçe Hedef (USD)', data: [900, 950, 1050, 1000, 1100, 1200, 1200, 1150, 1100, 1250, 1300, 1400], backgroundColor: '#cbd5e1', borderRadius: 6 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } }
-                }
-            });
-
-            // Marka Chart
-            const ctxMarka = document.getElementById('chartMarkaDistribution').getContext('2d');
-            chartMarkaInstance = new Chart(ctxMarka, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Enza Home', 'Yataş Bedding', 'Divanev', 'Puffy'],
-                    datasets: [{
-                        data: [45, 35, 12, 8],
-                        backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-        }
-
-        function updateCharts(data) {
-            // Chart updates seamlessly on filter change
-            if(chartTrendInstance) chartTrendInstance.update();
         }
     </script>
 </body>
