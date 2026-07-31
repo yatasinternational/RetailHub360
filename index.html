@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetailHub360 - Yataş Group</title>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Yataş Group - RetailHub360</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            --sidebar-bg: rgba(255, 255, 255, 0.65);
-            --text-main: #2c3e50;
-            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --glass-shadow: 0 20px 40px rgba(0, 32, 91, 0.08);
+            --sidebar-bg: rgba(255, 255, 255, 0.75);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --yatas-navy: #00205b;
             --accent-blue: #007bff;
-            --accent-green: #28a745;
+            --accent-green: #10b981;
             --accent-purple: #6f42c1;
         }
 
@@ -26,7 +30,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         }
 
         body {
@@ -37,7 +41,7 @@
             overflow-x: hidden;
         }
 
-        /* LOGIN OVERLAY (Giriş Ekranı) */
+        /* LOGIN OVERLAY */
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -54,73 +58,78 @@
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 30px 60px rgba(0, 32, 91, 0.12);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
         }
 
         .login-card img {
             max-width: 180px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
         }
 
         .login-card h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 800;
             margin-bottom: 20px;
-            color: var(--text-main);
+            color: var(--yatas-navy);
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             text-align: left;
         }
 
         .input-group label {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 5px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 6px;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
             border: 1px solid rgba(0, 0, 0, 0.1);
             background: rgba(255, 255, 255, 0.9);
             outline: none;
             font-size: 0.95rem;
+            font-weight: 600;
             transition: border-color 0.2s;
         }
 
         .input-group input:focus {
-            border-color: var(--accent-blue);
+            border-color: var(--yatas-navy);
         }
 
         .btn-login {
             width: 100%;
             padding: 14px;
             border: none;
-            border-radius: 10px;
-            background: #111827;
+            border-radius: 12px;
+            background: var(--yatas-navy);
             color: #fff;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 800;
             cursor: pointer;
             margin-top: 10px;
             transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(0, 32, 91, 0.2);
         }
 
         .btn-login:hover {
-            background: #1f2937;
+            background: #00143d;
             transform: translateY(-1px);
         }
 
@@ -133,9 +142,9 @@
 
         /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 270px;
             background: var(--sidebar-bg);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
             border-right: 1px solid var(--glass-border);
             display: flex;
             flex-direction: column;
@@ -155,9 +164,10 @@
         }
 
         .brand-logo {
-            max-width: 160px;
+            max-width: 170px;
             height: auto;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
+            border-radius: 6px;
         }
 
         .nav-menu {
@@ -176,16 +186,16 @@
             padding: 12px 16px;
             color: var(--text-main);
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 14px;
             transition: all 0.2s ease;
         }
 
         .nav-link:hover, .nav-link.active {
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            color: #000;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 32, 91, 0.06);
+            color: var(--yatas-navy);
         }
 
         .sidebar-bottom {
@@ -198,11 +208,12 @@
             gap: 12px;
             width: 100%;
             padding: 12px 16px;
-            background: rgba(220, 53, 69, 0.1);
+            background: rgba(220, 53, 69, 0.08);
             color: #dc3545;
             border: 1px solid rgba(220, 53, 69, 0.2);
-            border-radius: 12px;
-            font-weight: 600;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.88rem;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -214,37 +225,68 @@
 
         /* MAIN CONTENT AREA */
         .main-content {
-            margin-left: 260px;
+            margin-left: 270px;
             flex: 1;
             padding: 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
+        }
+
+        /* TOP RIGHT CONTROLS (LANGUAGE SELECTOR) */
+        .top-right-bar {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-selector {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            outline: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .lang-selector:hover {
+            border-color: var(--yatas-navy);
         }
 
         .header-title {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .header-title h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #111827;
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--yatas-navy);
             letter-spacing: -0.5px;
         }
 
         .header-title p {
             color: var(--text-muted);
             font-size: 1rem;
-            margin-top: 5px;
+            font-weight: 600;
+            margin-top: 6px;
         }
 
-        /* WINDOWS 8 STYLE GLASS TILES GRID */
+        /* WINDOWS 8 METRO TILES GRID */
         .tiles-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
-            max-width: 1200px;
+            max-width: 1250px;
         }
 
         .tile-card {
@@ -252,14 +294,14 @@
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 35px 25px;
+            border-radius: 22px;
+            padding: 35px 28px;
             text-decoration: none;
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 280px;
+            min-height: 290px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -267,35 +309,35 @@
 
         .tile-card:hover {
             transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.65);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+            background: rgba(255, 255, 255, 0.75);
+            box-shadow: 0 30px 60px rgba(0, 32, 91, 0.14);
+            border-color: var(--yatas-navy);
         }
 
-        /* Visual Glass Accents for Tiles */
         .tile-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 6px;
         }
 
         .tile-1::before { background: linear-gradient(90deg, #007bff, #00c6ff); }
-        .tile-2::before { background: linear-gradient(90deg, #28a745, #a8ff78); }
+        .tile-2::before { background: linear-gradient(90deg, #10b981, #a8ff78); }
         .tile-3::before { background: linear-gradient(90deg, #6f42c1, #f78ca0); }
 
         .tile-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.8);
+            width: 62px;
+            height: 62px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.85);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-            margin-bottom: 20px;
+            font-size: 1.7rem;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+            margin-bottom: 22px;
         }
 
         .tile-1 .tile-icon { color: var(--accent-blue); }
@@ -304,25 +346,26 @@
 
         .tile-info h3 {
             font-size: 1.35rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 10px;
-            color: #1f2937;
+            color: var(--text-main);
         }
 
         .tile-info p {
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.55;
+            font-weight: 500;
         }
 
         .tile-action {
-            margin-top: 20px;
+            margin-top: 22px;
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 0.85rem;
-            font-weight: 600;
-            color: #111827;
+            font-weight: 800;
+            color: var(--yatas-navy);
         }
 
         .tile-action i {
@@ -330,40 +373,40 @@
         }
 
         .tile-card:hover .tile-action i {
-            transform: translateX(5px);
+            transform: translateX(6px);
         }
 
         /* Responsive Breakpoints */
-        @media (max-width: 1024px) {
+        @media (max-width: 1100px) {
             .tiles-grid {
                 grid-template-columns: repeat(1, 1fr);
             }
             .sidebar {
-                width: 200px;
+                width: 220px;
             }
             .main-content {
-                margin-left: 200px;
+                margin-left: 220px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN MODAL / OVERLAY -->
+    <!-- LOGIN OVERLAY -->
     <div id="loginOverlay">
         <div class="login-card">
-            <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo">
+            <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
             <h2>RetailHub360</h2>
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="input-group">
-                    <label for="username">Kullanıcı Adı</label>
-                    <input type="text" id="username" placeholder="ornek@yatas.com.tr" required>
+                    <label for="username" data-i18n="lbl_username">Username / Dealer Code</label>
+                    <input type="text" id="username" placeholder="e.g. 4000001368 or admin" required>
                 </div>
                 <div class="input-group">
-                    <label for="password">Şifre</label>
+                    <label for="password" data-i18n="lbl_password">Password</label>
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-login">Giriş Yap</button>
+                <button type="submit" class="btn-login" data-i18n="btn_login">Sign In</button>
             </form>
         </div>
     </div>
@@ -374,24 +417,36 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-top">
-                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="brand-logo">
+                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="brand-logo" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="#" class="nav-link active">
+                        <a href="index.html" class="nav-link active">
                             <i class="fa-solid fa-house"></i>
-                            <span>Ana Sayfa</span>
+                            <span data-i18n="nav_home">Home Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="SellTrackIQ.html" class="nav-link">
                             <i class="fa-solid fa-chart-line"></i>
-                            <span>Performans</span>
+                            <span data-i18n="nav_sellout">Sales & Stock</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" class="nav-link">
+                            <i class="fa-solid fa-cart-flatbed"></i>
+                            <span data-i18n="nav_b2b">Order Portal</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" class="nav-link">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span data-i18n="nav_catalog">Catalogues</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="Admin.html" class="nav-link">
                             <i class="fa-solid fa-sliders"></i>
-                            <span>Master Data</span>
+                            <span data-i18n="nav_admin">Master Data & KPI</span>
                         </a>
                     </li>
                 </ul>
@@ -400,68 +455,79 @@
             <div class="sidebar-bottom">
                 <button class="btn-logout" onclick="handleLogout()">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Çıkış Yap</span>
+                    <span data-i18n="btn_logout">Sign Out</span>
                 </button>
             </div>
         </aside>
 
         <!-- CONTENT AREA -->
         <main class="main-content">
+            
+            <!-- TOP RIGHT LANGUAGE SELECTOR -->
+            <div class="top-right-bar">
+                <select class="lang-selector" id="langSelect" onchange="changeLanguage(this.value)">
+                    <option value="EN" selected>EN</option>
+                    <option value="TR">TR</option>
+                    <option value="DE">DE</option>
+                    <option value="RU">RU</option>
+                </select>
+            </div>
+
             <div class="header-title">
                 <h1>RetailHub360</h1>
-                <p>Yataş Group Kurumsal Satış, Sipariş ve Katalog Yönetim Portalı</p>
+                <p data-i18n="header_sub">Yataş Group International Sales, Order & Master Data Portal</p>
             </div>
 
             <!-- TILES GRID -->
             <div class="tiles-grid">
                 
                 <!-- Tile 1: SellTrackIQ -->
-                <a href="#" class="tile-card tile-1" id="link-selltrack">
+                <a href="SellTrackIQ.html" class="tile-card tile-1">
                     <div>
                         <div class="tile-icon">
                             <i class="fa-solid fa-chart-pie"></i>
                         </div>
                         <div class="tile-info">
-                            <h3>SellTrackIQ Portal</h3>
-                            <p>Canlı satış analizleri, bölgesel stok takibi ve anlık performans metrikleri.</p>
+                            <h3 data-i18n="tile1_title">SellTrackIQ Portal</h3>
+                            <p data-i18n="tile1_desc">Real-time sell-out analytics, regional stock deduction, and live KPI tracking.</p>
                         </div>
                     </div>
                     <div class="tile-action">
-                        <span>Portala Git</span>
+                        <span data-i18n="go_to_portal">Launch Portal</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
 
                 <!-- Tile 2: B2B Order Portal -->
-                <a href="#" class="tile-card tile-2" id="link-b2b">
+                <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" class="tile-card tile-2">
                     <div>
                         <div class="tile-icon">
                             <i class="fa-solid fa-cart-flatbed"></i>
                         </div>
                         <div class="tile-info">
-                            <h3>B2B Order Portal</h3>
-                            <p>Sipariş oluşturma, bayi sözleşme yönetimleri ve ürün teslimat durumları.</p>
+                            <h3 data-i18n="tile2_title">B2B Order Portal</h3>
+                            <p data-i18n="tile2_desc">Interactive B2B order building, Excel exports with photos, and container volume calculations.</p>
                         </div>
                     </div>
                     <div class="tile-action">
-                        <span>Portala Git</span>
+                        <span data-i18n="go_to_portal">Launch Portal</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
 
                 <!-- Tile 3: Brands' Catalogues -->
-                <a href="#" class="tile-card tile-3" id="link-catalogues">
+                <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" class="tile-card tile-3">
                     <div>
                         <div class="tile-icon">
                             <i class="fa-solid fa-book-open"></i>
                         </div>
                         <div class="tile-info">
-                            <h3>Brands' Catalogues</h3>
-                            <p>Güncel Yataş Bedding, Enza Home dijital katalogları ve kurumsal sunumlar.</p>
+                            <h3 data-i18n="tile3_title">Brands' Catalogues & Decks</h3>
+                            <p data-i18n="tile3_desc">Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.</p>
                         </div>
                     </div>
                     <div class="tile-action">
-                        <span>Portala Git</span>
+                        <span data-i18n="go_to_portal">Launch Portal</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
@@ -470,10 +536,104 @@
         </main>
     </div>
 
-    <!-- SIMPLE AUTH SCRIPT -->
+    <!-- TRANSLATION DICTIONARY & AUTH SCRIPT -->
     <script>
-        // Sayfa yüklendiğinde Oturum Kontrolü
+        const i18n = {
+            EN: {
+                lbl_username: "Username / Dealer Code",
+                lbl_password: "Password",
+                btn_login: "Sign In",
+                nav_home: "Home Dashboard",
+                nav_sellout: "Sales & Stock",
+                nav_b2b: "Order Portal",
+                nav_catalog: "Catalogues",
+                nav_admin: "Master Data & KPI",
+                btn_logout: "Sign Out",
+                header_sub: "Yataş Group International Sales, Order & Master Data Portal",
+                tile1_title: "SellTrackIQ Portal",
+                tile1_desc: "Real-time sell-out analytics, regional stock deduction, and live KPI tracking.",
+                tile2_title: "B2B Order Portal",
+                tile2_desc: "Interactive B2B order building, Excel exports with photos, and container volume calculations.",
+                tile3_title: "Brands' Catalogues & Decks",
+                tile3_desc: "Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.",
+                go_to_portal: "Launch Portal"
+            },
+            TR: {
+                lbl_username: "Kullanıcı Adı / Bayi Kodu",
+                lbl_password: "Şifre",
+                btn_login: "Giriş Yap",
+                nav_home: "Ana Sayfa",
+                nav_sellout: "Satış & Stok Takip",
+                nav_b2b: "Sipariş Portalı",
+                nav_catalog: "Kataloglar",
+                nav_admin: "Master Data & KPI",
+                btn_logout: "Çıkış Yap",
+                header_sub: "Yataş Group Uluslararası Satış, Sipariş ve Master Data Yönetim Portalı",
+                tile1_title: "SellTrackIQ Portal",
+                tile1_desc: "Canlı satış analizleri, bölgesel stok düşümleri ve anlık KPI takibi.",
+                tile2_title: "B2B Order Portal",
+                tile2_desc: "İnteraktif B2B sipariş oluşturma, fotoğraflı Excel çıktısı ve konteyner hacim hesabı.",
+                tile3_title: "Brands' Catalogues & Decks",
+                tile3_desc: "Güncel 2026 Yataş Bedding, Enza Home PDF katalogları ve kurumsal sunumlar.",
+                go_to_portal: "Portala Git"
+            },
+            DE: {
+                lbl_username: "Benutzername / Händlercode",
+                lbl_password: "Passwort",
+                btn_login: "Anmelden",
+                nav_home: "Haupt-Dashboard",
+                nav_sellout: "Verkauf & Bestand",
+                nav_b2b: "Bestellportal",
+                nav_catalog: "Kataloge",
+                nav_admin: "Stammdaten & KPI",
+                btn_logout: "Abmelden",
+                header_sub: "Yataş Group Internationales Verkaufs-, Bestell- und Stammdatenportal",
+                tile1_title: "SellTrackIQ Portal",
+                tile1_desc: "Echtzeit-Verkaufsanalysen, regionaler Bestandsabbau und Live-KPI-Tracking.",
+                tile2_title: "B2B Order Portal",
+                tile2_desc: "Interaktive B2B-Bestellerstellung, Excel-Exporte mit Fotos und Containerberechnungen.",
+                tile3_title: "Brands' Catalogues & Decks",
+                tile3_desc: "Interaktive Yataş Bedding- und Enza Home PDF-Kataloge 2026 sowie Präsentationen.",
+                go_to_portal: "Portal Öffnen"
+            },
+            RU: {
+                lbl_username: "Имя пользователя / Код дилера",
+                lbl_password: "Пароль",
+                btn_login: "Войти",
+                nav_home: "Главная панель",
+                nav_sellout: "Продажи и остатки",
+                nav_b2b: "Портал заказов",
+                nav_catalog: "Каталоги",
+                nav_admin: "Мастер-данные и KPI",
+                btn_logout: "Выйти",
+                header_sub: "Международный портал продаж, заказов и мастер-данных Yataş Group",
+                tile1_title: "SellTrackIQ Portal",
+                tile1_desc: "Аналитика продаж в реальном времени, списание остатков и отслеживание KPI.",
+                tile2_title: "B2B Order Portal",
+                tile2_desc: "Интерактивное создание B2B-заказов, экспорт в Excel с фото и расчет контейнеров.",
+                tile3_title: "Brands' Catalogues & Decks",
+                tile3_desc: "Интерактивные PDF-каталоги Yataş Bedding и Enza Home 2026 и презентации.",
+                go_to_portal: "Открыть портал"
+            }
+        };
+
+        // Automatic Language Switcher
+        function changeLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerText = i18n[lang][key];
+                }
+            });
+            localStorage.setItem('retailhub_lang', lang);
+        }
+
+        // Session check on load
         window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('retailhub_lang') || 'EN';
+            document.getElementById('langSelect').value = savedLang;
+            changeLanguage(savedLang);
+
             const isLoggedIn = localStorage.getItem('retailhub_session');
             const overlay = document.getElementById('loginOverlay');
             if (isLoggedIn === 'active') {
@@ -483,10 +643,9 @@
             }
         });
 
-        // Giriş Yap İşlemi
+        // Login Handler
         function handleLogin(e) {
             e.preventDefault();
-            // Basit session simülasyonu
             localStorage.setItem('retailhub_session', 'active');
             const overlay = document.getElementById('loginOverlay');
             overlay.style.opacity = '0';
@@ -495,7 +654,7 @@
             }, 400);
         }
 
-        // Çıkış Yap İşlemi
+        // Logout Handler
         function handleLogout() {
             localStorage.removeItem('retailhub_session');
             location.reload();
