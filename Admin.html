@@ -17,17 +17,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #0f172a; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        body { 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+            background-color: #f8fafc; 
+            color: #0f172a; 
+        }
+        
+        /* Yataş Corporate Colors */
         .bg-yatas-navy { background-color: #0f2744; }
         .text-yatas-navy { color: #0f2744; }
+        .border-yatas-navy { border-color: #0f2744; }
+        
         .bg-yatas-gold { background-color: #c59b27; }
         .text-yatas-gold { color: #c59b27; }
 
+        /* Glassmorphism Ultra Executive Cards */
         .glass-card {
             background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.05), 0 8px 10px -6px rgba(15, 39, 68, 0.01);
+        }
+
+        .glass-card-interactive {
+            transition: all 0.25s ease-in-out;
+        }
+        .glass-card-interactive:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(15, 39, 68, 0.12);
         }
 
         .admin-tab-btn.active {
@@ -35,10 +54,12 @@
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(15, 39, 68, 0.15);
         }
-        
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
@@ -85,13 +106,13 @@
                         <h1 class="font-bold text-lg leading-snug tracking-wide">Kaptan Köşkü & Master Data Yönetimi</h1>
                         <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span id="dataStatus">Supabase Bağlanıyor...</span>
+                            <span id="dataStatus">Supabase Canlı Veri Bekleniyor...</span>
                         </p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <button onclick="loadLiveSupabaseData()" class="bg-yatas-gold hover:bg-yellow-600 text-yatas-navy font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow">
+                    <button onclick="loadLiveSupabaseData()" class="bg-yatas-gold hover:bg-yellow-600 text-yatas-navy font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-yellow-500/10">
                         <i class="fa-solid fa-rotate"></i>
                         <span>Yenile (F5)</span>
                     </button>
@@ -111,6 +132,7 @@
 
         <!-- DASHBOARD TAB CONTENT -->
         <main id="tab-content-live" class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6 pb-12 flex-1 w-full">
+            
             <!-- DYNAMIC FILTER BAR -->
             <section class="glass-card rounded-2xl p-5 border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4">
@@ -121,7 +143,7 @@
                         
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Yıl Seçimi</label>
-                            <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                            <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
                                 <option value="ALL">Tüm Yıllar (2024-2026)</option>
                                 <option value="2026" selected>2026 (Konsolide)</option>
                                 <option value="2025">2025</option>
@@ -131,102 +153,177 @@
 
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Bölge</label>
-                            <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                            <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
                                 <option value="ALL">Tüm Bölgeler</option>
                             </select>
                         </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Marka</label>
-                            <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                            <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
                                 <option value="ALL">Tüm Markalar</option>
                             </select>
                         </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Kanal</label>
-                            <select id="filterKanal" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                            <select id="filterKanal" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
                                 <option value="ALL">Tüm Kanallar</option>
                             </select>
                         </div>
                     </div>
 
-                    <button onclick="resetFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition">
-                        <i class="fa-solid fa-rotate-left"></i> Filtreleri Sıfırla
-                    </button>
+                    <!-- View Mode Tabs -->
+                    <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                        <button onclick="switchSubTab('finans')" id="tab-finans" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-yatas-navy text-white shadow">
+                            Finans & LFL Ciro
+                        </button>
+                        <button onclick="switchSubTab('turquality')" id="tab-turquality" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-yatas-navy transition-all">
+                            Turquality & Teşvik
+                        </button>
+                        <button onclick="switchSubTab('aging')" id="tab-aging" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-yatas-navy transition-all">
+                            Ticari Aging & Risk
+                        </button>
+                        <button onclick="switchSubTab('operasyon')" id="tab-operasyon" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-yatas-navy transition-all">
+                            Sipariş / Sevk & m³ Depo
+                        </button>
+                    </div>
                 </div>
             </section>
 
-            <!-- KPI BANDS -->
+            <!-- EXECUTIVE GLASSMORPHISM KPI CARDS GRID -->
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-yatas-navy">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">Gerçekleşen Ciro (USD)</span>
-                    <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy mt-1">$0.00M</div>
-                    <div class="mt-2 text-[11px] text-slate-500">Bütçe: <b id="kpiButceUSD">$0.00M</b> (<span id="kpiAchievementPct" class="font-bold text-emerald-600">%0</span>)</div>
+                
+                <!-- KPI 1 -->
+                <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-yatas-navy">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (USD)</span>
+                        <i class="fa-solid fa-dollar-sign text-yatas-navy text-lg"></i>
+                    </div>
+                    <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy">$0.00M</div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span class="text-slate-500">Bütçe Hedef: <b id="kpiButceUSD">$0.00M</b></span>
+                        <span id="kpiAchievementPct" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">%0.0</span>
+                    </div>
                 </div>
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-yatas-gold">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">Net Ciro (TL)</span>
-                    <div id="kpiCiroTL" class="text-2xl font-black text-slate-800 mt-1">₺0.00M</div>
-                    <div class="mt-2 text-[11px] text-slate-500">SMM (TL): <b id="kpiSmmTL">₺0.00M</b></div>
+
+                <!-- KPI 2 -->
+                <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-yatas-gold">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (TL)</span>
+                        <i class="fa-solid fa-chart-line text-yatas-gold text-lg"></i>
+                    </div>
+                    <div id="kpiCiroTL" class="text-2xl font-black text-slate-800">₺0.0M</div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span class="text-slate-500">SMM (TL): <b id="kpiSmmTL">₺0.0M</b></span>
+                        <span class="font-bold text-yatas-navy bg-amber-50 px-2 py-0.5 rounded-md">TL Bazlı</span>
+                    </div>
                 </div>
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">SMM Çarpanı (Markup)</span>
-                    <div id="kpiCarpan" class="text-2xl font-black text-emerald-600 mt-1">0.00 x</div>
-                    <div class="mt-2 text-[11px] text-slate-500">Brüt Marj: <b id="kpiBrutMarj" class="text-emerald-700">%0.0</b></div>
+
+                <!-- KPI 3 -->
+                <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-emerald-500">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Çarpan (Markup) & Marj</span>
+                        <i class="fa-solid fa-chart-pie text-emerald-600 text-lg"></i>
+                    </div>
+                    <div id="kpiCarpan" class="text-2xl font-black text-emerald-600">0.00 x</div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span class="text-slate-500">Brüt Kâr Marjı:</span>
+                        <span id="kpiBrutMarj" class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">%0.0</span>
+                    </div>
                 </div>
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-sky-500">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">Toplam Satış Adedi</span>
-                    <div id="kpiTotalUnits" class="text-2xl font-black text-sky-700 mt-1">0 Pcs</div>
+
+                <!-- KPI 4 -->
+                <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-sky-500">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Satış Adedi</span>
+                        <i class="fa-solid fa-box text-sky-600 text-lg"></i>
+                    </div>
+                    <div id="kpiTotalUnits" class="text-2xl font-black text-sky-700">0 Pcs</div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span class="text-slate-500">Top. Ürün Hacmi</span>
+                        <span class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">Adet</span>
+                    </div>
                 </div>
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-purple-500">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">Aktif Bayi / Bölge</span>
-                    <div id="kpiActiveDealers" class="text-2xl font-black text-purple-700 mt-1">0 Bayi</div>
+
+                <!-- KPI 5 -->
+                <div class="glass-card glass-card-interactive rounded-2xl p-5 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Aktif Bayi / Bölge</span>
+                        <i class="fa-solid fa-globe text-purple-600 text-lg"></i>
+                    </div>
+                    <div id="kpiActiveDealers" class="text-2xl font-black text-purple-700">0 Bayi</div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span class="text-slate-500">Bölge Sayısı:</span>
+                        <span id="kpiBolgeSayisi" class="font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">0 Bölge</span>
+                    </div>
                 </div>
+
             </section>
 
             <!-- CHARTS SECTION GRID -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Trend Bar Chart (2 Cols) -->
                 <div class="glass-card rounded-2xl p-6 lg:col-span-2 border border-slate-200">
-                    <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider mb-4">Aylık Ciro Performansı: Bütçe vs. Gerçekleşen (USD)</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Aylık Ciro Performansı: Bütçe vs. Gerçekleşen (USD)</h3>
+                            <p class="text-xs text-slate-400">Supabase bulut veritabanından anlık sevk ve bütçe kıyaslaması</p>
+                        </div>
+                        <span class="text-xs bg-slate-100 text-slate-600 font-bold px-3 py-1 rounded-lg">LFL Trend</span>
+                    </div>
                     <div class="h-72 w-full">
                         <canvas id="chartCiroTrend"></canvas>
                     </div>
                 </div>
 
+                <!-- Marka Doughnut Chart (1 Col) -->
                 <div class="glass-card rounded-2xl p-6 border border-slate-200">
-                    <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider mb-4">Marka Bazlı Ciro Dağılımı</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Marka Bazlı Ciro Dağılımı</h3>
+                            <p class="text-xs text-slate-400">Konsolide uluslararası ciro payı</p>
+                        </div>
+                        <i class="fa-solid fa-chart-pie text-yatas-gold"></i>
+                    </div>
                     <div class="h-72 w-full flex items-center justify-center">
                         <canvas id="chartMarkaDistribution"></canvas>
                     </div>
                 </div>
             </section>
 
-            <!-- PERFORMANCE TABLE -->
+            <!-- PERFORMANCE TABLE MATRIX -->
             <section class="glass-card rounded-2xl p-6 border border-slate-200">
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-                    <h3 class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi</h3>
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3 top-2.5 text-xs"></i>
-                        <input type="text" id="tableSearch" onkeyup="filterTableSearch()" placeholder="Bayi veya Ülke Ara..." class="bg-slate-50 border border-slate-300 rounded-xl pl-8 pr-4 py-1.5 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy w-64">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi (Ciro & SMM)</h3>
+                        <p class="text-xs text-slate-400">Seçili filtrelere göre dinamik türetilen C-Level detay dökümü</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3 top-2.5 text-xs"></i>
+                            <input type="text" id="tableSearch" onkeyup="filterTableSearch()" placeholder="Bayi veya Ülke Ara..." class="bg-slate-50 border border-slate-300 rounded-xl pl-8 pr-4 py-1.5 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy w-64">
+                        </div>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs divide-y divide-slate-200">
-                        <thead class="bg-slate-100 text-yatas-navy font-bold uppercase">
-                            <tr>
-                                <th class="p-3">Bölge</th>
-                                <th class="p-3">Ülke & Bayi</th>
-                                <th class="p-3">Marka</th>
-                                <th class="p-3 text-right">Ciro (USD)</th>
-                                <th class="p-3 text-right">Bütçe (USD)</th>
-                                <th class="p-3 text-right">Başarı %</th>
-                                <th class="p-3 text-right">Ciro (TL)</th>
-                                <th class="p-3 text-right">SMM (TL)</th>
-                                <th class="p-3 text-center">Çarpan</th>
+                    <table class="w-full text-left border-collapse" id="mainDataTable">
+                        <thead>
+                            <tr class="bg-slate-100 text-yatas-navy text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200">
+                                <th class="py-3.5 px-4 rounded-l-xl">Bölge</th>
+                                <th class="py-3.5 px-4">Ülke & Bayi</th>
+                                <th class="py-3.5 px-4">Marka</th>
+                                <th class="py-3.5 px-4 text-right">Ciro (USD)</th>
+                                <th class="py-3.5 px-4 text-right">Bütçe (USD)</th>
+                                <th class="py-3.5 px-4 text-right">Başarı %</th>
+                                <th class="py-3.5 px-4 text-right">Ciro (TL)</th>
+                                <th class="py-3.5 px-4 text-right">SMM (TL)</th>
+                                <th class="py-3.5 px-4 text-center rounded-r-xl">Çarpan</th>
                             </tr>
                         </thead>
-                        <tbody id="adminTableBody" class="divide-y divide-slate-100 font-semibold"></tbody>
+                        <tbody id="adminTableBody" class="text-xs font-semibold divide-y divide-slate-100 text-slate-700"></tbody>
                     </table>
                 </div>
             </section>
@@ -243,6 +340,7 @@
         </main>
     </div>
 
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
     <script>
         const ADMIN_MASTER_PASS = "Yatas2026*";
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
@@ -354,6 +452,7 @@
             const totSmmTL = data.reduce((acc, i) => acc + (Number(i.smm_tl_gerceklesen) || 0), 0);
             const totUnits = data.reduce((acc, i) => acc + (Number(i.satis_adet_gerceklesen) || 0), 0);
             const uniqueDealers = new Set(data.map(i => i.musteri_kodu)).size;
+            const uniqueRegions = new Set(data.map(i => i.bolge_adi)).size;
 
             const carpan = totSmmTL > 0 ? (totCiroTL / totSmmTL) : 0;
             const brutMarj = totCiroTL > 0 ? (((totCiroTL - totSmmTL) / totCiroTL) * 100) : 0;
@@ -370,6 +469,7 @@
             document.getElementById('kpiBrutMarj').innerText = `%${brutMarj.toFixed(1)}`;
             document.getElementById('kpiTotalUnits').innerText = `${totUnits.toLocaleString()} Pcs`;
             document.getElementById('kpiActiveDealers').innerText = `${uniqueDealers} Bayi`;
+            document.getElementById('kpiBolgeSayisi').innerText = `${uniqueRegions} Bölge`;
         }
 
         function renderTable(data) {
@@ -398,15 +498,18 @@
 
                 return `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-bold text-yatas-navy">${i.region || '-'}</td>
-                        <td class="p-3"><b>${i.ulke || '-'}</b> - ${i.dealer || '-'}</td>
-                        <td class="p-3"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${i.marka || '-'}</span></td>
-                        <td class="p-3 text-right font-black text-yatas-navy">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
-                        <td class="p-3 text-right text-slate-400">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
-                        <td class="p-3 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
-                        <td class="p-3 text-right text-slate-700">₺${(i.ciroTL / 1000000).toFixed(2)}M</td>
-                        <td class="p-3 text-right text-slate-500">₺${(i.smmTL / 1000000).toFixed(2)}M</td>
-                        <td class="p-3 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${carpan} x</span></td>
+                        <td class="py-3 px-4 font-bold text-yatas-navy">${i.region || '-'}</td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-800">${i.ulke || '-'}</div>
+                            <div class="text-[10px] text-slate-400">${i.dealer || '-'}</div>
+                        </td>
+                        <td class="py-3 px-4"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${i.marka || '-'}</span></td>
+                        <td class="py-3 px-4 text-right font-black text-yatas-navy">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                        <td class="py-3 px-4 text-right text-slate-400">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                        <td class="py-3 px-4 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
+                        <td class="py-3 px-4 text-right font-semibold text-slate-700">₺${(i.ciroTL / 1000000).toFixed(2)}M</td>
+                        <td class="py-3 px-4 text-right text-slate-500">₺${(i.smmTL / 1000000).toFixed(2)}M</td>
+                        <td class="py-3 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${carpan} x</span></td>
                     </tr>
                 `;
             }).join('');
@@ -487,6 +590,26 @@
                 btnMaster.className = "admin-tab-btn active px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2";
                 btnLive.className = "admin-tab-btn text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2";
             }
+        }
+
+        function switchSubTab(tab) {
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-yatas-navy', 'text-white', 'shadow');
+                btn.classList.add('text-slate-600');
+            });
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-yatas-navy', 'text-white', 'shadow');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            const titleMap = {
+                'finans': 'Konsolide Ülke ve Bayi Performans Matrisi (Ciro & SMM)',
+                'turquality': 'Turquality Teşvik, Tahsilat & Bütçe Simülasyon Matrisi',
+                'aging': 'Ticari Şartlar, Vade & Borç Yaşlandırma (Aging) Risk Tablosu',
+                'operasyon': 'Sipariş, Sevk Karşılama & Depo m³ Doluluk Analizi'
+            };
+            document.getElementById('tableTitle').innerText = titleMap[tab];
         }
     </script>
 </body>
