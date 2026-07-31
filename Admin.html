@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,11 +35,15 @@
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(15, 39, 68, 0.15);
         }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
 
-    <!-- ADMIN SECURE LOGIN GATE (VERİLERİ TAM KORUYAN SHIELD) -->
+    <!-- ADMIN SECURE LOGIN GATE -->
     <div id="adminAuthGate" class="fixed inset-0 bg-slate-100/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="w-16 h-16 bg-[#0f2744] text-[#c59b27] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-lg">
@@ -81,20 +85,26 @@
                         <h1 class="font-bold text-lg leading-snug tracking-wide">Kaptan Köşkü & Master Data Yönetimi</h1>
                         <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>Canlı Veritabanı Senkronize</span>
+                            <span id="dataStatus">Supabase Bağlanıyor...</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
-                    <button onclick="switchAdminTab('live-dashboard')" id="btn-tab-live" class="admin-tab-btn active px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-yatas-gold"></i>
-                        <span>Executive Live Dashboard</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="loadLiveSupabaseData()" class="bg-yatas-gold hover:bg-yellow-600 text-yatas-navy font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Yenile (F5)</span>
                     </button>
-                    <button onclick="switchAdminTab('master-data')" id="btn-tab-master" class="admin-tab-btn text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
-                        <i class="fa-solid fa-database"></i>
-                        <span>Master Data & SKU Düzenle</span>
-                    </button>
+                    <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
+                        <button onclick="switchAdminTab('live-dashboard')" id="btn-tab-live" class="admin-tab-btn active px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-yatas-gold"></i>
+                            <span>Executive Live Dashboard</span>
+                        </button>
+                        <button onclick="switchAdminTab('master-data')" id="btn-tab-master" class="admin-tab-btn text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
+                            <i class="fa-solid fa-database"></i>
+                            <span>Master Data & SKU Düzenle</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -105,7 +115,9 @@
             <section class="glass-card rounded-2xl p-5 border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-4 flex-1">
-                        <span class="text-xs font-bold text-yatas-navy uppercase tracking-wider pr-2 border-r border-slate-200">Canlı Filtreler:</span>
+                        <span class="text-xs font-bold text-yatas-navy uppercase tracking-wider pr-2 border-r border-slate-200">
+                            <i class="fa-solid fa-filter text-yatas-gold mr-1"></i> Canlı Filtreler:
+                        </span>
                         
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Yıl Seçimi</label>
@@ -130,7 +142,18 @@
                                 <option value="ALL">Tüm Markalar</option>
                             </select>
                         </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] uppercase font-bold text-slate-400">Kanal</label>
+                            <select id="filterKanal" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                                <option value="ALL">Tüm Kanallar</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <button onclick="resetFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition">
+                        <i class="fa-solid fa-rotate-left"></i> Filtreleri Sıfırla
+                    </button>
                 </div>
             </section>
 
@@ -156,7 +179,7 @@
                     <div id="kpiTotalUnits" class="text-2xl font-black text-sky-700 mt-1">0 Pcs</div>
                 </div>
                 <div class="glass-card rounded-2xl p-5 border-l-4 border-purple-500">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">Aktif Bayi Sayısı</span>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Aktif Bayi / Bölge</span>
                     <div id="kpiActiveDealers" class="text-2xl font-black text-purple-700 mt-1">0 Bayi</div>
                 </div>
             </section>
@@ -180,7 +203,14 @@
 
             <!-- PERFORMANCE TABLE -->
             <section class="glass-card rounded-2xl p-6 border border-slate-200">
-                <h3 class="font-bold text-base text-yatas-navy mb-4">Konsolide Ülke ve Bayi Performans Matrisi</h3>
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <h3 class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi</h3>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3 top-2.5 text-xs"></i>
+                        <input type="text" id="tableSearch" onkeyup="filterTableSearch()" placeholder="Bayi veya Ülke Ara..." class="bg-slate-50 border border-slate-300 rounded-xl pl-8 pr-4 py-1.5 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy w-64">
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs divide-y divide-slate-200">
                         <thead class="bg-slate-100 text-yatas-navy font-bold uppercase">
@@ -220,6 +250,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let masterReportData = [];
+        let filteredReportData = [];
         let chartTrendInstance = null;
         let chartMarkaInstance = null;
 
@@ -236,62 +267,92 @@
         }
 
         async function loadLiveSupabaseData() {
+            const statusEl = document.getElementById('dataStatus');
+            statusEl.innerText = "Supabase Canlı Veri Çekiliyor...";
+
             let allData = [];
             let from = 0;
             const step = 1000;
             let hasMore = true;
 
-            while (hasMore) {
-                const { data, error } = await supabaseClient
-                    .from('executive_master_report')
-                    .select('*')
-                    .range(from, from + step - 1);
+            try {
+                while (hasMore) {
+                    const { data, error } = await supabaseClient
+                        .from('executive_master_report')
+                        .select('*')
+                        .range(from, from + step - 1);
 
-                if (error || !data || data.length === 0) break;
-                allData = allData.concat(data);
-                if (data.length < step) hasMore = false;
-                from += step;
+                    if (error) {
+                        console.error("Supabase Error:", error);
+                        statusEl.innerText = "Supabase Bağlantı Hatası!";
+                        break;
+                    }
+
+                    if (!data || data.length === 0) break;
+                    
+                    allData = allData.concat(data);
+                    if (data.length < step) hasMore = false;
+                    from += step;
+                }
+
+                masterReportData = allData;
+                statusEl.innerText = `Supabase Canlı: ${masterReportData.length.toLocaleString()} Kayıt`;
+                populateFilterOptions();
+                applyFilters();
+            } catch (ex) {
+                console.error("Fetch Exception:", ex);
+                statusEl.innerText = "Veri Çekme Hatası!";
             }
-
-            masterReportData = allData;
-            populateFilterOptions();
-            applyFilters();
         }
 
         function populateFilterOptions() {
-            const regions = [...new Set(masterReportData.map(i => i.bolge_adi))].filter(Boolean);
-            const brands = [...new Set(masterReportData.map(i => i.marka))].filter(Boolean);
+            const regions = [...new Set(masterReportData.map(i => i.bolge_adi))].filter(Boolean).sort();
+            const brands = [...new Set(masterReportData.map(i => i.marka))].filter(Boolean).sort();
+            const kanals = [...new Set(masterReportData.map(i => i.kanal))].filter(Boolean).sort();
 
             const regionSelect = document.getElementById('filterRegion');
             regionSelect.innerHTML = '<option value="ALL">Tüm Bölgeler</option>' + regions.map(r => `<option value="${r}">${r}</option>`).join('');
 
             const brandSelect = document.getElementById('filterBrand');
             brandSelect.innerHTML = '<option value="ALL">Tüm Markalar</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+
+            const kanalSelect = document.getElementById('filterKanal');
+            kanalSelect.innerHTML = '<option value="ALL">Tüm Kanallar</option>' + kanals.map(k => `<option value="${k}">${k}</option>`).join('');
         }
 
         function applyFilters() {
             const selectedYear = document.getElementById('filterYear').value;
             const selectedRegion = document.getElementById('filterRegion').value;
             const selectedBrand = document.getElementById('filterBrand').value;
+            const selectedKanal = document.getElementById('filterKanal').value;
 
-            let filtered = masterReportData.filter(i => {
+            filteredReportData = masterReportData.filter(i => {
                 let matchYear = (selectedYear === 'ALL' || String(i.yil) === selectedYear);
                 let matchRegion = (selectedRegion === 'ALL' || i.bolge_adi === selectedRegion);
                 let matchBrand = (selectedBrand === 'ALL' || i.marka === selectedBrand);
-                return matchYear && matchRegion && matchBrand;
+                let matchKanal = (selectedKanal === 'ALL' || i.kanal === selectedKanal);
+                return matchYear && matchRegion && matchBrand && matchKanal;
             });
 
-            updateKPIs(filtered);
-            renderTable(filtered);
-            updateCharts(filtered);
+            updateKPIs(filteredReportData);
+            renderTable(filteredReportData);
+            updateCharts(filteredReportData);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterYear').value = '2026';
+            document.getElementById('filterRegion').value = 'ALL';
+            document.getElementById('filterBrand').value = 'ALL';
+            document.getElementById('filterKanal').value = 'ALL';
+            applyFilters();
         }
 
         function updateKPIs(data) {
-            const totCiroUSD = data.reduce((acc, i) => acc + (i.ciro_usd_gerceklesen || 0), 0);
-            const totButceUSD = data.reduce((acc, i) => acc + (i.ciro_usd_butce || 0), 0);
-            const totCiroTL = data.reduce((acc, i) => acc + (i.ciro_tl_gerceklesen || 0), 0);
-            const totSmmTL = data.reduce((acc, i) => acc + (i.smm_tl_gerceklesen || 0), 0);
-            const totUnits = data.reduce((acc, i) => acc + (i.satis_adet_gerceklesen || 0), 0);
+            const totCiroUSD = data.reduce((acc, i) => acc + (Number(i.ciro_usd_gerceklesen) || 0), 0);
+            const totButceUSD = data.reduce((acc, i) => acc + (Number(i.ciro_usd_butce) || 0), 0);
+            const totCiroTL = data.reduce((acc, i) => acc + (Number(i.ciro_tl_gerceklesen) || 0), 0);
+            const totSmmTL = data.reduce((acc, i) => acc + (Number(i.smm_tl_gerceklesen) || 0), 0);
+            const totUnits = data.reduce((acc, i) => acc + (Number(i.satis_adet_gerceklesen) || 0), 0);
             const uniqueDealers = new Set(data.map(i => i.musteri_kodu)).size;
 
             const carpan = totSmmTL > 0 ? (totCiroTL / totSmmTL) : 0;
@@ -305,7 +366,7 @@
             document.getElementById('kpiCiroTL').innerText = `₺${(totCiroTL / 1000000).toFixed(1)}M`;
             document.getElementById('kpiSmmTL').innerText = `₺${(totSmmTL / 1000000).toFixed(1)}M`;
 
-            document.getElementById('kpiCarpan').innerText = carpan > 0 ? `${carpan.toFixed(2)} x` : 'N/A';
+            document.getElementById('kpiCarpan').innerText = carpan > 0 ? `${carpan.toFixed(2)} x` : '0.00 x';
             document.getElementById('kpiBrutMarj').innerText = `%${brutMarj.toFixed(1)}`;
             document.getElementById('kpiTotalUnits').innerText = `${totUnits.toLocaleString()} Pcs`;
             document.getElementById('kpiActiveDealers').innerText = `${uniqueDealers} Bayi`;
@@ -324,24 +385,24 @@
                         ciroUSD: 0, butceUSD: 0, ciroTL: 0, smmTL: 0
                     };
                 }
-                grouped[key].ciroUSD += (i.ciro_usd_gerceklesen || 0);
-                grouped[key].butceUSD += (i.ciro_usd_butce || 0);
-                grouped[key].ciroTL += (i.ciro_tl_gerceklesen || 0);
-                grouped[key].smmTL += (i.smm_tl_gerceklesen || 0);
+                grouped[key].ciroUSD += (Number(i.ciro_usd_gerceklesen) || 0);
+                grouped[key].butceUSD += (Number(i.ciro_usd_butce) || 0);
+                grouped[key].ciroTL += (Number(i.ciro_tl_gerceklesen) || 0);
+                grouped[key].smmTL += (Number(i.smm_tl_gerceklesen) || 0);
             });
 
             const rows = Object.values(grouped);
-            tbody.innerHTML = rows.slice(0, 100).map(i => {
-                const realizasyon = i.butceUSD > 0 ? ((i.ciroUSD / i.butceUSD) * 100).toFixed(1) : 0;
-                const carpan = i.smmTL > 0 ? (i.ciroTL / i.smmTL).toFixed(2) : '-';
+            tbody.innerHTML = rows.slice(0, 150).map(i => {
+                const realizasyon = i.butceUSD > 0 ? ((i.ciroUSD / i.butceUSD) * 100).toFixed(1) : '0.0';
+                const carpan = i.smmTL > 0 ? (i.ciroTL / i.smmTL).toFixed(2) : '0.00';
 
                 return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-bold text-yatas-navy">${i.region}</td>
-                        <td class="p-3"><b>${i.ulke}</b> - ${i.dealer}</td>
-                        <td class="p-3"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${i.marka}</span></td>
-                        <td class="p-3 text-right font-black">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
-                        <td class="p-3 text-right text-slate-500">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-bold text-yatas-navy">${i.region || '-'}</td>
+                        <td class="p-3"><b>${i.ulke || '-'}</b> - ${i.dealer || '-'}</td>
+                        <td class="p-3"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${i.marka || '-'}</span></td>
+                        <td class="p-3 text-right font-black text-yatas-navy">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                        <td class="p-3 text-right text-slate-400">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
                         <td class="p-3 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
                         <td class="p-3 text-right text-slate-700">₺${(i.ciroTL / 1000000).toFixed(2)}M</td>
                         <td class="p-3 text-right text-slate-500">₺${(i.smmTL / 1000000).toFixed(2)}M</td>
@@ -351,14 +412,26 @@
             }).join('');
         }
 
+        function filterTableSearch() {
+            const q = document.getElementById('tableSearch').value.toLowerCase();
+            const searchFiltered = filteredReportData.filter(i => 
+                (i.musteri_adi && i.musteri_adi.toLowerCase().includes(q)) ||
+                (i.ulke && i.ulke.toLowerCase().includes(q)) ||
+                (i.bolge_adi && i.bolge_adi.toLowerCase().includes(q)) ||
+                (i.marka && i.marka.toLowerCase().includes(q))
+            );
+            renderTable(searchFiltered);
+        }
+
         function updateCharts(data) {
             const monthlyActual = new Array(12).fill(0);
             const monthlyBudget = new Array(12).fill(0);
 
             data.forEach(i => {
-                if (i.ay >= 1 && i.ay <= 12) {
-                    monthlyActual[i.ay - 1] += (i.ciro_usd_gerceklesen || 0) / 1000;
-                    monthlyBudget[i.ay - 1] += (i.ciro_usd_butce || 0) / 1000;
+                const ayIdx = (Number(i.ay) || 1) - 1;
+                if (ayIdx >= 0 && ayIdx < 12) {
+                    monthlyActual[ayIdx] += (Number(i.ciro_usd_gerceklesen) || 0) / 1000;
+                    monthlyBudget[ayIdx] += (Number(i.ciro_usd_butce) || 0) / 1000;
                 }
             });
 
@@ -378,7 +451,8 @@
 
             const brandTotals = {};
             data.forEach(i => {
-                brandTotals[i.marka] = (brandTotals[i.marka] || 0) + (i.ciro_usd_gerceklesen || 0);
+                const bName = i.marka || 'Diğer';
+                brandTotals[bName] = (brandTotals[bName] || 0) + (Number(i.ciro_usd_gerceklesen) || 0);
             });
 
             if (chartMarkaInstance) chartMarkaInstance.destroy();
@@ -389,7 +463,7 @@
                     labels: Object.keys(brandTotals),
                     datasets: [{
                         data: Object.values(brandTotals),
-                        backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981', '#6f42c1']
+                        backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981', '#6f42c1', '#f59e0b']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
