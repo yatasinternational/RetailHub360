@@ -234,7 +234,7 @@
             position: relative;
         }
 
-        /* TOP RIGHT CONTROLS (LANGUAGE SELECTOR) */
+        /* TOP RIGHT CONTROLS */
         .top-right-bar {
             position: absolute;
             top: 30px;
@@ -376,17 +376,10 @@
             transform: translateX(6px);
         }
 
-        /* Responsive Breakpoints */
         @media (max-width: 1100px) {
-            .tiles-grid {
-                grid-template-columns: repeat(1, 1fr);
-            }
-            .sidebar {
-                width: 220px;
-            }
-            .main-content {
-                margin-left: 220px;
-            }
+            .tiles-grid { grid-template-columns: repeat(1, 1fr); }
+            .sidebar { width: 220px; }
+            .main-content { margin-left: 220px; }
         }
     </style>
 </head>
@@ -400,11 +393,11 @@
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="input-group">
                     <label for="username" data-i18n="lbl_username">Username / Dealer Code</label>
-                    <input type="text" id="username" placeholder="e.g. 4000001368 or admin" required>
+                    <input type="text" id="username" placeholder="e.g. 4000001368 or BY-0601" required>
                 </div>
                 <div class="input-group">
                     <label for="password" data-i18n="lbl_password">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
+                    <input type="password" id="password" value="123456" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn-login" data-i18n="btn_login">Sign In</button>
             </form>
@@ -462,8 +455,6 @@
 
         <!-- CONTENT AREA -->
         <main class="main-content">
-            
-            <!-- TOP RIGHT LANGUAGE SELECTOR -->
             <div class="top-right-bar">
                 <select class="lang-selector" id="langSelect" onchange="changeLanguage(this.value)">
                     <option value="EN" selected>EN</option>
@@ -478,15 +469,10 @@
                 <p data-i18n="header_sub">Yataş Group International Sales, Order & Master Data Portal</p>
             </div>
 
-            <!-- TILES GRID -->
             <div class="tiles-grid">
-                
-                <!-- Tile 1: SellTrackIQ -->
                 <a href="SellTrackIQ.html" class="tile-card tile-1">
                     <div>
-                        <div class="tile-icon">
-                            <i class="fa-solid fa-chart-pie"></i>
-                        </div>
+                        <div class="tile-icon"><i class="fa-solid fa-chart-pie"></i></div>
                         <div class="tile-info">
                             <h3 data-i18n="tile1_title">SellTrackIQ Portal</h3>
                             <p data-i18n="tile1_desc">Real-time sell-out analytics, regional stock deduction, and live KPI tracking.</p>
@@ -498,12 +484,9 @@
                     </div>
                 </a>
 
-                <!-- Tile 2: B2B Order Portal -->
                 <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" class="tile-card tile-2">
                     <div>
-                        <div class="tile-icon">
-                            <i class="fa-solid fa-cart-flatbed"></i>
-                        </div>
+                        <div class="tile-icon"><i class="fa-solid fa-cart-flatbed"></i></div>
                         <div class="tile-info">
                             <h3 data-i18n="tile2_title">B2B Order Portal</h3>
                             <p data-i18n="tile2_desc">Interactive B2B order building, Excel exports with photos, and container volume calculations.</p>
@@ -515,12 +498,9 @@
                     </div>
                 </a>
 
-                <!-- Tile 3: Brands' Catalogues -->
                 <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" class="tile-card tile-3">
                     <div>
-                        <div class="tile-icon">
-                            <i class="fa-solid fa-book-open"></i>
-                        </div>
+                        <div class="tile-icon"><i class="fa-solid fa-book-open"></i></div>
                         <div class="tile-info">
                             <h3 data-i18n="tile3_title">Brands' Catalogues & Decks</h3>
                             <p data-i18n="tile3_desc">Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.</p>
@@ -531,12 +511,11 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </a>
-
             </div>
         </main>
     </div>
 
-    <!-- TRANSLATION DICTIONARY & AUTH SCRIPT -->
+    <!-- SCRIPT & SINGLE SIGN-ON LOGIC -->
     <script>
         const i18n = {
             EN: {
@@ -617,7 +596,6 @@
             }
         };
 
-        // Automatic Language Switcher
         function changeLanguage(lang) {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -628,7 +606,6 @@
             localStorage.setItem('retailhub_lang', lang);
         }
 
-        // Session check on load
         window.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('retailhub_lang') || 'EN';
             document.getElementById('langSelect').value = savedLang;
@@ -643,10 +620,16 @@
             }
         });
 
-        // Login Handler
+        // SINGLE SIGN-ON (SSO) ENTENTIONS
         function handleLogin(e) {
             e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
             localStorage.setItem('retailhub_session', 'active');
+            localStorage.setItem('retailhub_dealer_code', username || '4000001368');
+            localStorage.setItem('retailhub_password', pass || '123456');
+
             const overlay = document.getElementById('loginOverlay');
             overlay.style.opacity = '0';
             setTimeout(() => {
@@ -654,9 +637,10 @@
             }, 400);
         }
 
-        // Logout Handler
         function handleLogout() {
             localStorage.removeItem('retailhub_session');
+            localStorage.removeItem('retailhub_dealer_code');
+            localStorage.removeItem('retailhub_password');
             location.reload();
         }
     </script>
