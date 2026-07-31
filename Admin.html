@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yataş Group - Executive Live Dashboard</title>
+    <title>Yataş Group - Admin Executive Live Dashboard</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,21 +11,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Tailwind CSS, Chart.js & Lucide Icons -->
+    <!-- Tailwind CSS, Chart.js & Supabase JS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #0f172a; }
         .bg-yatas-navy { background-color: #0f2744; }
         .text-yatas-navy { color: #0f2744; }
-        .border-yatas-navy { border-color: #0f2744; }
         .bg-yatas-gold { background-color: #c59b27; }
         .text-yatas-gold { color: #c59b27; }
 
@@ -36,9 +30,6 @@
             box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.05);
         }
 
-        .admin-tab-btn {
-            transition: all 0.2s ease;
-        }
         .admin-tab-btn.active {
             background-color: #0f2744;
             color: #ffffff;
@@ -48,59 +39,77 @@
 </head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
 
-    <!-- HEADER / NAVIGATION -->
-    <header class="bg-yatas-navy text-white sticky top-0 z-50 shadow-md border-b border-slate-700">
-        <div class="max-w-[1700px] mx-auto px-6 h-20 flex items-center justify-between">
-            
-            <div class="flex items-center gap-6">
-                <!-- Ana Sayfaya Dönüş Butonu -->
-                <a href="index.html" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-xl text-xs font-bold border border-white/20 transition">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Back to RetailHub360</span>
-                </a>
-
-                <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20 flex items-center gap-2">
-                    <span class="text-yatas-gold font-black text-xl tracking-wider">[yataş</span>
-                    <span class="text-white text-xs font-semibold uppercase tracking-widest">GRUP]</span>
-                </div>
-
-                <div>
-                    <h1 class="font-bold text-lg leading-snug tracking-wide">Master Data Management</h1>
-                    <p class="text-xs text-slate-300 font-medium">System Configuration & Executive Performance Cockpit</p>
-                </div>
+    <!-- ADMIN SECURE LOGIN GATE (VERİLERİ TAM KORUYAN SHIELD) -->
+    <div id="adminAuthGate" class="fixed inset-0 bg-slate-100/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-center space-y-6">
+            <div class="w-16 h-16 bg-[#0f2744] text-[#c59b27] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-lg">
+                <i class="fa-solid fa-user-shield"></i>
             </div>
-
-            <!-- TABS SWITCHER -->
-            <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
-                <button onclick="switchAdminTab('live-dashboard')" id="btn-tab-live" class="admin-tab-btn active px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
-                    <i class="fa-solid fa-chart-line text-yatas-gold"></i>
-                    <span>Executive Live Dashboard</span>
-                </button>
-
-                <button onclick="switchAdminTab('master-data')" id="btn-tab-master" class="admin-tab-btn text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
-                    <i class="fa-solid fa-database"></i>
-                    <span>Master Data & SKUs</span>
-                </button>
+            <div>
+                <h2 class="text-xl font-extrabold text-[#0f2744]">Admin Kaptan Köşkü</h2>
+                <p class="text-xs text-slate-500 font-semibold mt-1">Lütfen Master Şifrenizi giriniz.</p>
             </div>
-
+            <form onsubmit="verifyAdminAuth(event)" class="space-y-4">
+                <input type="password" id="adminGatePassword" required placeholder="Master Password" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0f2744]">
+                <button type="submit" class="w-full py-3.5 bg-[#0f2744] text-white font-extrabold rounded-xl text-sm shadow-md hover:bg-[#0a1b30] transition">
+                    Canlı Raporu Aç
+                </button>
+            </form>
+            <a href="index.html" class="block text-xs font-bold text-slate-400 hover:text-[#0f2744] pt-2">
+                <i class="fa-solid fa-arrow-left mr-1"></i> RetailHub360 Ana Sayfaya Dön
+            </a>
         </div>
-    </header>
+    </div>
 
-    <!-- SECTION 1: EXECUTIVE LIVE DASHBOARD TAB -->
-    <div id="tab-content-live" class="flex-1">
-        <main class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6 pb-12">
+    <!-- PROTECTED ADMIN CONTENT -->
+    <div id="adminProtectedContent" class="hidden min-h-screen flex flex-col">
+        <!-- HEADER / NAVIGATION -->
+        <header class="bg-yatas-navy text-white sticky top-0 z-50 shadow-md border-b border-slate-700">
+            <div class="max-w-[1700px] mx-auto px-6 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-6">
+                    <a href="index.html" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-xl text-xs font-bold border border-white/20 transition">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Hub Dashboard</span>
+                    </a>
 
+                    <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20 flex items-center gap-2">
+                        <span class="text-yatas-gold font-black text-xl tracking-wider">[yataş</span>
+                        <span class="text-white text-xs font-semibold uppercase tracking-widest">ADMIN]</span>
+                    </div>
+
+                    <div>
+                        <h1 class="font-bold text-lg leading-snug tracking-wide">Kaptan Köşkü & Master Data Yönetimi</h1>
+                        <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Canlı Veritabanı Senkronize</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
+                    <button onclick="switchAdminTab('live-dashboard')" id="btn-tab-live" class="admin-tab-btn active px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-yatas-gold"></i>
+                        <span>Executive Live Dashboard</span>
+                    </button>
+                    <button onclick="switchAdminTab('master-data')" id="btn-tab-master" class="admin-tab-btn text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Master Data & SKU Düzenle</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD TAB CONTENT -->
+        <main id="tab-content-live" class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6 pb-12 flex-1 w-full">
             <!-- DYNAMIC FILTER BAR -->
             <section class="glass-card rounded-2xl p-5 border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-4 flex-1">
-                        <div class="flex items-center gap-2 text-xs font-bold text-yatas-navy uppercase tracking-wider pr-2 border-r border-slate-200">
-                            <i data-lucide="filter" class="w-4 h-4 text-yatas-gold"></i> Canlı Filtreler:
-                        </div>
-
+                        <span class="text-xs font-bold text-yatas-navy uppercase tracking-wider pr-2 border-r border-slate-200">Canlı Filtreler:</span>
+                        
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Yıl Seçimi</label>
-                            <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none">
+                            <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
                                 <option value="ALL">Tüm Yıllar (2024-2026)</option>
                                 <option value="2026" selected>2026 (Konsolide)</option>
                                 <option value="2025">2025</option>
@@ -109,197 +118,283 @@
                         </div>
 
                         <div class="flex flex-col gap-1">
-                            <label class="text-[10px] uppercase font-bold text-slate-400">Bölge / Ülke</label>
-                            <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none">
-                                <option value="ALL">Tüm Bölgeler & Ülkeler</option>
-                                <option value="Batı Avrupa">Batı Avrupa (İngiltere/Almanya)</option>
-                                <option value="CEE">Doğu Avrupa / CEE (Romanya)</option>
-                                <option value="Balkanlar">Balkanlar (Sırbistan/Bosna)</option>
+                            <label class="text-[10px] uppercase font-bold text-slate-400">Bölge</label>
+                            <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                                <option value="ALL">Tüm Bölgeler</option>
                             </select>
                         </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Marka</label>
-                            <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none">
+                            <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
                                 <option value="ALL">Tüm Markalar</option>
-                                <option value="Enza Home">Enza Home</option>
-                                <option value="Yataş Bedding">Yataş Bedding</option>
-                                <option value="Divanev">Divanev</option>
-                                <option value="Puffy">Puffy</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-                        <button onclick="switchInnerTab('finans')" id="tab-finans" class="inner-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-yatas-navy text-white shadow">Finans & LFL Ciro</button>
-                        <button onclick="switchInnerTab('turquality')" id="tab-turquality" class="inner-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600">Turquality & Teşvik</button>
-                        <button onclick="switchInnerTab('aging')" id="tab-aging" class="inner-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600">Ticari Aging & Risk</button>
-                        <button onclick="switchInnerTab('operasyon')" id="tab-operasyon" class="inner-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600">Sipariş / Sevk & m³ Depo</button>
                     </div>
                 </div>
             </section>
 
-            <!-- KPI CARDS GRID -->
+            <!-- KPI BANDS -->
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="glass-card rounded-2xl p-5 border-l-4 border-yatas-navy">
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (USD)</span>
-                        <i data-lucide="dollar-sign" class="w-5 h-5 text-yatas-navy"></i>
-                    </div>
-                    <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy">$11.40M</div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-500">Bütçe Hedef: <b>$11.80M</b></span>
-                        <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">%96.6</span>
-                    </div>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Gerçekleşen Ciro (USD)</span>
+                    <div id="kpiCiroUSD" class="text-2xl font-black text-yatas-navy mt-1">$0.00M</div>
+                    <div class="mt-2 text-[11px] text-slate-500">Bütçe: <b id="kpiButceUSD">$0.00M</b> (<span id="kpiAchievementPct" class="font-bold text-emerald-600">%0</span>)</div>
                 </div>
-
                 <div class="glass-card rounded-2xl p-5 border-l-4 border-yatas-gold">
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider">Net Ciro (TL)</span>
-                        <i data-lucide="trending-up" class="w-5 h-5 text-yatas-gold"></i>
-                    </div>
-                    <div id="kpiCiroTL" class="text-2xl font-black text-slate-800">₺478.8M</div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-500">SMM (TL): <b>₺266.0M</b></span>
-                        <span class="font-bold text-yatas-navy bg-amber-50 px-2 py-0.5 rounded-md">TL Bazlı</span>
-                    </div>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Net Ciro (TL)</span>
+                    <div id="kpiCiroTL" class="text-2xl font-black text-slate-800 mt-1">₺0.00M</div>
+                    <div class="mt-2 text-[11px] text-slate-500">SMM (TL): <b id="kpiSmmTL">₺0.00M</b></div>
                 </div>
-
                 <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500">
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider">Çarpan & Marj</span>
-                        <i data-lucide="pie-chart" class="w-5 h-5 text-emerald-600"></i>
-                    </div>
-                    <div class="text-2xl font-black text-emerald-600">1.80 x</div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-500">Brüt Kâr Marjı:</span>
-                        <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">%44.4</span>
-                    </div>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">SMM Çarpanı (Markup)</span>
+                    <div id="kpiCarpan" class="text-2xl font-black text-emerald-600 mt-1">0.00 x</div>
+                    <div class="mt-2 text-[11px] text-slate-500">Brüt Marj: <b id="kpiBrutMarj" class="text-emerald-700">%0.0</b></div>
                 </div>
-
                 <div class="glass-card rounded-2xl p-5 border-l-4 border-sky-500">
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider">Turquality Tahsilat</span>
-                        <i data-lucide="shield-check" class="w-5 h-5 text-sky-600"></i>
-                    </div>
-                    <div class="text-2xl font-black text-sky-700">$540.0K</div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-500">Gelir Tahsilat Oranı:</span>
-                        <span class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">%91.2</span>
-                    </div>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Toplam Satış Adedi</span>
+                    <div id="kpiTotalUnits" class="text-2xl font-black text-sky-700 mt-1">0 Pcs</div>
                 </div>
-
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-rose-500">
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider">Risk / Vadesi Geçen</span>
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-500"></i>
-                    </div>
-                    <div class="text-2xl font-black text-rose-600">$97.5K</div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-500">Limit Üstü Tutar:</span>
-                        <span class="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">$45.0K</span>
-                    </div>
+                <div class="glass-card rounded-2xl p-5 border-l-4 border-purple-500">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase">Aktif Bayi Sayısı</span>
+                    <div id="kpiActiveDealers" class="text-2xl font-black text-purple-700 mt-1">0 Bayi</div>
                 </div>
             </section>
 
             <!-- CHARTS SECTION GRID -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="glass-card rounded-2xl p-6 lg:col-span-2 border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Aylık Ciro Performansı: Bütçe vs. Gerçekleşen (USD)</h3>
-                            <p class="text-xs text-slate-400">Canlı SAP sevk verisi ile bütçelenen hedeflerin karşılaştırması</p>
-                        </div>
-                    </div>
+                    <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider mb-4">Aylık Ciro Performansı: Bütçe vs. Gerçekleşen (USD)</h3>
                     <div class="h-72 w-full">
                         <canvas id="chartCiroTrend"></canvas>
                     </div>
                 </div>
 
                 <div class="glass-card rounded-2xl p-6 border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider">Marka Bazlı Ciro Dağılımı</h3>
-                            <p class="text-xs text-slate-400">Konsolide uluslararası ciro payı</p>
-                        </div>
-                    </div>
+                    <h3 class="font-bold text-sm text-yatas-navy uppercase tracking-wider mb-4">Marka Bazlı Ciro Dağılımı</h3>
                     <div class="h-72 w-full flex items-center justify-center">
                         <canvas id="chartMarkaDistribution"></canvas>
                     </div>
                 </div>
             </section>
 
-            <!-- DYNAMIC DATA TABLE -->
+            <!-- PERFORMANCE TABLE -->
             <section class="glass-card rounded-2xl p-6 border border-slate-200">
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi</h3>
-                        <p class="text-xs text-slate-400">Seçili filtrelere göre dinamik türetilen C-Level detay dökümü</p>
-                    </div>
-                </div>
-
+                <h3 class="font-bold text-base text-yatas-navy mb-4">Konsolide Ülke ve Bayi Performans Matrisi</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse" id="mainDataTable">
-                        <thead>
-                            <tr class="bg-slate-100 text-yatas-navy text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200">
-                                <th class="py-3.5 px-4 rounded-l-xl">Kanal / Bölge</th>
-                                <th class="py-3.5 px-4">Ülke & Bayi</th>
-                                <th class="py-3.5 px-4 text-right">2026 Ciro (USD)</th>
-                                <th class="py-3.5 px-4 text-right">Bütçe (USD)</th>
-                                <th class="py-3.5 px-4 text-right">Bütçe Başarı %</th>
-                                <th class="py-3.5 px-4 text-right">Ciro (TL)</th>
-                                <th class="py-3.5 px-4 text-right">SMM (TL)</th>
-                                <th class="py-3.5 px-4 text-center">SMM Çarpanı</th>
-                                <th class="py-3.5 px-4 text-right">Brüt Kâr Marjı</th>
-                                <th class="py-3.5 px-4 text-center rounded-r-xl">Risk / Durum</th>
+                    <table class="w-full text-left text-xs divide-y divide-slate-200">
+                        <thead class="bg-slate-100 text-yatas-navy font-bold uppercase">
+                            <tr>
+                                <th class="p-3">Bölge</th>
+                                <th class="p-3">Ülke & Bayi</th>
+                                <th class="p-3">Marka</th>
+                                <th class="p-3 text-right">Ciro (USD)</th>
+                                <th class="p-3 text-right">Bütçe (USD)</th>
+                                <th class="p-3 text-right">Başarı %</th>
+                                <th class="p-3 text-right">Ciro (TL)</th>
+                                <th class="p-3 text-right">SMM (TL)</th>
+                                <th class="p-3 text-center">Çarpan</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="text-xs font-semibold divide-y divide-slate-100 text-slate-700"></tbody>
+                        <tbody id="adminTableBody" class="divide-y divide-slate-100 font-semibold"></tbody>
                     </table>
                 </div>
             </section>
+        </main>
 
+        <!-- MASTER DATA MANAGEMENT TAB -->
+        <main id="tab-content-master" class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6 pb-12 flex-1 w-full hidden">
+            <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-extrabold text-yatas-navy">Master Data & SKU Yönetimi</h3>
+                </div>
+                <p class="text-xs text-slate-500">Ürün fiyatları, stok durumları ve bayi bazlı erişim yetkileri buradan yönetilir.</p>
+            </section>
         </main>
     </div>
 
-    <!-- SECTION 2: MASTER DATA TAB -->
-    <div id="tab-content-master" class="flex-1 hidden p-8 max-w-[1700px] mx-auto w-full">
-        <div class="glass-card p-8 rounded-2xl border border-slate-200 space-y-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-xl font-extrabold text-yatas-navy">Global Master Data & Product Catalog Management</h2>
-                    <p class="text-xs text-slate-500 mt-1">Manage SKUs, GTIP codes, pricing parameters, and dealer assignments.</p>
-                </div>
-                <button class="bg-yatas-navy text-white px-5 py-2.5 rounded-xl font-extrabold text-xs flex items-center gap-2 shadow">
-                    <i class="fa-solid fa-plus"></i> Add New Product SKU
-                </button>
-            </div>
-
-            <div class="bg-slate-100 p-6 rounded-xl border border-slate-200 text-center text-slate-500 font-bold text-sm">
-                Master Data Table & Supabase Sync Manager Ready
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT LOGIC -->
     <script>
-        lucide.createIcons();
+        const ADMIN_MASTER_PASS = "Yatas2026*";
+        const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const rawData = [
-            { region: 'Batı Avrupa', country: 'İngiltere', dealer: 'ATMACA GROUP', brand: 'Yataş Bedding', ciroUSD: 1450000, butceUSD: 1500000, ciroTL: 60900000, smmTL: 33833333, carpan: 1.80, karPct: 44.4, risk: 'Düşük Risk' },
-            { region: 'CEE', country: 'Romanya', dealer: 'ROMANIA RETAIL SRL', brand: 'Enza Home', ciroUSD: 3100000, butceUSD: 3200000, ciroTL: 130200000, smmTL: 72333333, carpan: 1.80, karPct: 44.4, risk: 'Limit Üstü' },
-            { region: 'Balkanlar', country: 'Sırbistan', dealer: 'BALKAN BEDDING DOO', brand: 'Yataş Bedding', ciroUSD: 1750000, butceUSD: 1800000, ciroTL: 73500000, smmTL: 40833333, carpan: 1.80, karPct: 44.4, risk: 'Güvenli' },
-            { region: 'Balkanlar', country: 'Bosna-Hersek', dealer: 'SARAJEVO HOME', brand: 'Divanev', ciroUSD: 920000, butceUSD: 950000, ciroTL: 38640000, smmTL: 21466666, carpan: 1.80, karPct: 44.4, risk: 'Güvenli' },
-            { region: 'Batı Avrupa', country: 'Almanya', dealer: 'ALMANYA FRANCHISE', brand: 'Puffy', ciroUSD: 2100000, butceUSD: 2200000, ciroTL: 88200000, smmTL: 49000000, carpan: 1.80, karPct: 44.4, risk: 'Güvenli' }
-        ];
-
+        let masterReportData = [];
         let chartTrendInstance = null;
         let chartMarkaInstance = null;
 
-        window.onload = function() {
-            renderTable(rawData);
-            initCharts();
-        };
+        function verifyAdminAuth(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('adminGatePassword').value;
+            if (inputPass === ADMIN_MASTER_PASS) {
+                document.getElementById('adminAuthGate').classList.add('hidden');
+                document.getElementById('adminProtectedContent').classList.remove('hidden');
+                loadLiveSupabaseData();
+            } else {
+                alert("Hatalı Master Şifre!");
+            }
+        }
+
+        async function loadLiveSupabaseData() {
+            let allData = [];
+            let from = 0;
+            const step = 1000;
+            let hasMore = true;
+
+            while (hasMore) {
+                const { data, error } = await supabaseClient
+                    .from('executive_master_report')
+                    .select('*')
+                    .range(from, from + step - 1);
+
+                if (error || !data || data.length === 0) break;
+                allData = allData.concat(data);
+                if (data.length < step) hasMore = false;
+                from += step;
+            }
+
+            masterReportData = allData;
+            populateFilterOptions();
+            applyFilters();
+        }
+
+        function populateFilterOptions() {
+            const regions = [...new Set(masterReportData.map(i => i.bolge_adi))].filter(Boolean);
+            const brands = [...new Set(masterReportData.map(i => i.marka))].filter(Boolean);
+
+            const regionSelect = document.getElementById('filterRegion');
+            regionSelect.innerHTML = '<option value="ALL">Tüm Bölgeler</option>' + regions.map(r => `<option value="${r}">${r}</option>`).join('');
+
+            const brandSelect = document.getElementById('filterBrand');
+            brandSelect.innerHTML = '<option value="ALL">Tüm Markalar</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+        }
+
+        function applyFilters() {
+            const selectedYear = document.getElementById('filterYear').value;
+            const selectedRegion = document.getElementById('filterRegion').value;
+            const selectedBrand = document.getElementById('filterBrand').value;
+
+            let filtered = masterReportData.filter(i => {
+                let matchYear = (selectedYear === 'ALL' || String(i.yil) === selectedYear);
+                let matchRegion = (selectedRegion === 'ALL' || i.bolge_adi === selectedRegion);
+                let matchBrand = (selectedBrand === 'ALL' || i.marka === selectedBrand);
+                return matchYear && matchRegion && matchBrand;
+            });
+
+            updateKPIs(filtered);
+            renderTable(filtered);
+            updateCharts(filtered);
+        }
+
+        function updateKPIs(data) {
+            const totCiroUSD = data.reduce((acc, i) => acc + (i.ciro_usd_gerceklesen || 0), 0);
+            const totButceUSD = data.reduce((acc, i) => acc + (i.ciro_usd_butce || 0), 0);
+            const totCiroTL = data.reduce((acc, i) => acc + (i.ciro_tl_gerceklesen || 0), 0);
+            const totSmmTL = data.reduce((acc, i) => acc + (i.smm_tl_gerceklesen || 0), 0);
+            const totUnits = data.reduce((acc, i) => acc + (i.satis_adet_gerceklesen || 0), 0);
+            const uniqueDealers = new Set(data.map(i => i.musteri_kodu)).size;
+
+            const carpan = totSmmTL > 0 ? (totCiroTL / totSmmTL) : 0;
+            const brutMarj = totCiroTL > 0 ? (((totCiroTL - totSmmTL) / totCiroTL) * 100) : 0;
+            const achievementPct = totButceUSD > 0 ? ((totCiroUSD / totButceUSD) * 100) : 0;
+
+            document.getElementById('kpiCiroUSD').innerText = `$${(totCiroUSD / 1000000).toFixed(2)}M`;
+            document.getElementById('kpiButceUSD').innerText = `$${(totButceUSD / 1000000).toFixed(2)}M`;
+            document.getElementById('kpiAchievementPct').innerText = `%${achievementPct.toFixed(1)}`;
+
+            document.getElementById('kpiCiroTL').innerText = `₺${(totCiroTL / 1000000).toFixed(1)}M`;
+            document.getElementById('kpiSmmTL').innerText = `₺${(totSmmTL / 1000000).toFixed(1)}M`;
+
+            document.getElementById('kpiCarpan').innerText = carpan > 0 ? `${carpan.toFixed(2)} x` : 'N/A';
+            document.getElementById('kpiBrutMarj').innerText = `%${brutMarj.toFixed(1)}`;
+            document.getElementById('kpiTotalUnits').innerText = `${totUnits.toLocaleString()} Pcs`;
+            document.getElementById('kpiActiveDealers').innerText = `${uniqueDealers} Bayi`;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+
+            const grouped = {};
+            data.forEach(i => {
+                const key = `${i.bolge_adi}_${i.ulke}_${i.musteri_kodu}_${i.marka}`;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        region: i.bolge_adi, ulke: i.ulke, dealer: i.musteri_adi, marka: i.marka,
+                        ciroUSD: 0, butceUSD: 0, ciroTL: 0, smmTL: 0
+                    };
+                }
+                grouped[key].ciroUSD += (i.ciro_usd_gerceklesen || 0);
+                grouped[key].butceUSD += (i.ciro_usd_butce || 0);
+                grouped[key].ciroTL += (i.ciro_tl_gerceklesen || 0);
+                grouped[key].smmTL += (i.smm_tl_gerceklesen || 0);
+            });
+
+            const rows = Object.values(grouped);
+            tbody.innerHTML = rows.slice(0, 100).map(i => {
+                const realizasyon = i.butceUSD > 0 ? ((i.ciroUSD / i.butceUSD) * 100).toFixed(1) : 0;
+                const carpan = i.smmTL > 0 ? (i.ciroTL / i.smmTL).toFixed(2) : '-';
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-yatas-navy">${i.region}</td>
+                        <td class="p-3"><b>${i.ulke}</b> - ${i.dealer}</td>
+                        <td class="p-3"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${i.marka}</span></td>
+                        <td class="p-3 text-right font-black">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                        <td class="p-3 text-right text-slate-500">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                        <td class="p-3 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
+                        <td class="p-3 text-right text-slate-700">₺${(i.ciroTL / 1000000).toFixed(2)}M</td>
+                        <td class="p-3 text-right text-slate-500">₺${(i.smmTL / 1000000).toFixed(2)}M</td>
+                        <td class="p-3 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${carpan} x</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateCharts(data) {
+            const monthlyActual = new Array(12).fill(0);
+            const monthlyBudget = new Array(12).fill(0);
+
+            data.forEach(i => {
+                if (i.ay >= 1 && i.ay <= 12) {
+                    monthlyActual[i.ay - 1] += (i.ciro_usd_gerceklesen || 0) / 1000;
+                    monthlyBudget[i.ay - 1] += (i.ciro_usd_butce || 0) / 1000;
+                }
+            });
+
+            if (chartTrendInstance) chartTrendInstance.destroy();
+            const ctxTrend = document.getElementById('chartCiroTrend').getContext('2d');
+            chartTrendInstance = new Chart(ctxTrend, {
+                type: 'bar',
+                data: {
+                    labels: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Ekim', 'Kas', 'Ara'],
+                    datasets: [
+                        { label: 'Gerçekleşen (K$)', data: monthlyActual, backgroundColor: '#0f2744', borderRadius: 6 },
+                        { label: 'Bütçe (K$)', data: monthlyBudget, backgroundColor: '#cbd5e1', borderRadius: 6 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const brandTotals = {};
+            data.forEach(i => {
+                brandTotals[i.marka] = (brandTotals[i.marka] || 0) + (i.ciro_usd_gerceklesen || 0);
+            });
+
+            if (chartMarkaInstance) chartMarkaInstance.destroy();
+            const ctxMarka = document.getElementById('chartMarkaDistribution').getContext('2d');
+            chartMarkaInstance = new Chart(ctxMarka, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(brandTotals),
+                    datasets: [{
+                        data: Object.values(brandTotals),
+                        backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981', '#6f42c1']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
 
         function switchAdminTab(tab) {
             const btnLive = document.getElementById('btn-tab-live');
@@ -319,92 +414,6 @@
                 btnLive.className = "admin-tab-btn text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2";
             }
         }
-
-        function switchInnerTab(tab) {
-            document.querySelectorAll('.inner-tab-btn').forEach(b => {
-                b.className = "inner-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-600";
-            });
-            document.getElementById(`tab-${tab}`).className = "inner-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-yatas-navy text-white shadow";
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            data.forEach(item => {
-                const realizasyon = ((item.ciroUSD / item.butceUSD) * 100).toFixed(1);
-                const badgeColor = item.risk === 'Limit Üstü' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800';
-
-                const row = `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="py-3.5 px-4 font-bold text-yatas-navy">${item.region}</td>
-                        <td class="py-3.5 px-4">
-                            <div class="font-bold text-slate-800">${item.country}</div>
-                            <div class="text-[10px] text-slate-400">${item.dealer} (${item.brand})</div>
-                        </td>
-                        <td class="py-3.5 px-4 text-right font-black text-slate-800">$${(item.ciroUSD / 1000).toLocaleString()}K</td>
-                        <td class="py-3.5 px-4 text-right text-slate-500">$${(item.butceUSD / 1000).toLocaleString()}K</td>
-                        <td class="py-3.5 px-4 text-right font-bold ${realizasyon >= 95 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
-                        <td class="py-3.5 px-4 text-right font-semibold text-slate-700">₺${(item.ciroTL / 1000000).toFixed(1)}M</td>
-                        <td class="py-3.5 px-4 text-right text-slate-500">₺${(item.smmTL / 1000000).toFixed(1)}M</td>
-                        <td class="py-3.5 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${item.carpan} x</span></td>
-                        <td class="py-3.5 px-4 text-right font-bold text-emerald-600">%${item.karPct}</td>
-                        <td class="py-3.5 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${badgeColor}">${item.risk}</span></td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-        }
-
-        function applyFilters() {
-            const region = document.getElementById('filterRegion').value;
-            const brand = document.getElementById('filterBrand').value;
-
-            let filtered = rawData.filter(item => {
-                let matchRegion = (region === 'ALL' || item.region === region);
-                let matchBrand = (brand === 'ALL' || item.brand === brand);
-                return matchRegion && matchBrand;
-            });
-
-            renderTable(filtered);
-        }
-
-        function initCharts() {
-            const ctxTrend = document.getElementById('chartCiroTrend').getContext('2d');
-            chartTrendInstance = new Chart(ctxTrend, {
-                type: 'bar',
-                data: {
-                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
-                    datasets: [
-                        { label: 'Gerçekleşen Ciro (USD)', data: [850, 920, 1100, 980, 1050, 1250, 1150, 0, 0, 0, 0, 0], backgroundColor: '#0f2744', borderRadius: 6 },
-                        { label: 'Bütçe Hedef (USD)', data: [900, 950, 1050, 1000, 1100, 1200, 1200, 1150, 1100, 1250, 1300, 1400], backgroundColor: '#cbd5e1', borderRadius: 6 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            const ctxMarka = document.getElementById('chartMarkaDistribution').getContext('2d');
-            chartMarkaInstance = new Chart(ctxMarka, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Enza Home', 'Yataş Bedding', 'Divanev', 'Puffy'],
-                    datasets: [{ data: [45, 35, 12, 8], backgroundColor: ['#0f2744', '#c59b27', '#0284c7', '#10b981'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-// Sayfa açıldığında Admin Şifre Doğrulaması
-window.addEventListener('DOMContentLoaded', () => {
-    const adminPass = prompt("Lütfen Yönetici (Admin) Şifresini Giriniz:");
-    
-    // BURADAKİ "yatas2026" DEĞERİNİ KENDİ İSTEDİĞİN ŞİFREYLE DEĞİŞTİREBİLİRSİN
-    const correctPassword = "Yatas2026*"; 
-
-    if (adminPass !== correctPassword) {
-        alert("Hatalı Şifre! Ana sayfaya yönlendiriliyorsunuz.");
-        window.location.href = "index.html";
-    }
-});
     </script>
 </body>
 </html>
