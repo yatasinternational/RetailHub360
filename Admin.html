@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yataş Group - Admin Executive Live Dashboard</title>
+    <title>Yataş Group - Executive Live Dashboard & Admin Portal</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,11 +33,11 @@
         .bg-yatas-gold { background-color: #c59b27; }
         .text-yatas-gold { color: #c59b27; }
 
-        /* Glassmorphism Ultra Executive Cards */
+        /* Power BI Style Glassmorphism Cards */
         .glass-card {
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.9);
             box-shadow: 0 10px 25px -5px rgba(15, 39, 68, 0.05), 0 8px 10px -6px rgba(15, 39, 68, 0.01);
         }
 
@@ -71,7 +71,7 @@
                 <i class="fa-solid fa-user-shield"></i>
             </div>
             <div>
-                <h2 class="text-xl font-extrabold text-[#0f2744]">Admin Kaptan Köşkü</h2>
+                <h2 class="text-xl font-extrabold text-[#0f2744]">Yataş Admin Kaptan Köşkü</h2>
                 <p class="text-xs text-slate-500 font-semibold mt-1">Lütfen Master Şifrenizi giriniz.</p>
             </div>
             <form onsubmit="verifyAdminAuth(event)" class="space-y-4">
@@ -97,13 +97,19 @@
                         <span>Hub Dashboard</span>
                     </a>
 
-                    <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20 flex items-center gap-2">
-                        <span class="text-yatas-gold font-black text-xl tracking-wider">[yataş</span>
-                        <span class="text-white text-xs font-semibold uppercase tracking-widest">ADMIN]</span>
+                    <!-- Kurumsal Yataş Logo Alanı -->
+                    <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
+                        <div class="w-8 h-8 rounded-lg bg-yatas-gold text-yatas-navy flex items-center justify-center font-black text-lg shadow">
+                            Y
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-yatas-gold font-black text-lg leading-none tracking-wider">yataş</span>
+                            <span class="text-white text-[9px] font-bold uppercase tracking-widest leading-none mt-1">GROUP ADMIN</span>
+                        </div>
                     </div>
 
                     <div>
-                        <h1 class="font-bold text-lg leading-snug tracking-wide">Kaptan Köşkü & Master Data Yönetimi</h1>
+                        <h1 class="font-bold text-lg leading-snug tracking-wide">Executive Live Performance Dashboard</h1>
                         <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span id="dataStatus">Supabase Canlı Veri Bekleniyor...</span>
@@ -137,20 +143,42 @@
             <section class="glass-card rounded-2xl p-5 border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-4 flex-1">
-                        <span class="text-xs font-bold text-yatas-navy uppercase tracking-wider pr-2 border-r border-slate-200">
-                            <i class="fa-solid fa-filter text-yatas-gold mr-1"></i> Canlı Filtreler:
+                        <span class="text-xs font-bold text-yatas-navy uppercase tracking-wider pr-3 border-r border-slate-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-filter text-yatas-gold"></i> CANLI FİLTRELER:
                         </span>
                         
+                        <!-- Yıl Filtresi (Sadeleşti) -->
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Yıl Seçimi</label>
                             <select id="filterYear" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
-                                <option value="ALL">Tüm Yıllar (2024-2026)</option>
-                                <option value="2026" selected>2026 (Konsolide)</option>
+                                <option value="ALL">Tüm Yıllar</option>
+                                <option value="2026" selected>2026</option>
                                 <option value="2025">2025</option>
                                 <option value="2024">2024</option>
                             </select>
                         </div>
 
+                        <!-- Ay Filtresi (LFL İnceleme İçin Eklendi) -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] uppercase font-bold text-slate-400">Ay Seçimi (LFL)</label>
+                            <select id="filterMonth" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
+                                <option value="ALL" selected>Tüm Aylar (Yıllık)</option>
+                                <option value="1">Ocak (Ay 1)</option>
+                                <option value="2">Şubat (Ay 2)</option>
+                                <option value="3">Mart (Ay 3)</option>
+                                <option value="4">Nisan (Ay 4)</option>
+                                <option value="5">Mayıs (Ay 5)</option>
+                                <option value="6">Haziran (Ay 6)</option>
+                                <option value="7">Temmuz (Ay 7)</option>
+                                <option value="8">Ağustos (Ay 8)</option>
+                                <option value="9">Eylül (Ay 9)</option>
+                                <option value="10">Ekim (Ay 10)</option>
+                                <option value="11">Kasım (Ay 11)</option>
+                                <option value="12">Aralık (Ay 12)</option>
+                            </select>
+                        </div>
+
+                        <!-- Bölge Filtresi -->
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Bölge</label>
                             <select id="filterRegion" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
@@ -158,22 +186,16 @@
                             </select>
                         </div>
 
+                        <!-- Marka Filtresi -->
                         <div class="flex flex-col gap-1">
                             <label class="text-[10px] uppercase font-bold text-slate-400">Marka</label>
                             <select id="filterBrand" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
                                 <option value="ALL">Tüm Markalar</option>
                             </select>
                         </div>
-
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[10px] uppercase font-bold text-slate-400">Kanal</label>
-                            <select id="filterKanal" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-yatas-navy">
-                                <option value="ALL">Tüm Kanallar</option>
-                            </select>
-                        </div>
                     </div>
 
-                    <!-- View Mode Tabs -->
+                    <!-- Modül Alt Sekmeleri -->
                     <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                         <button onclick="switchSubTab('finans')" id="tab-finans" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-yatas-navy text-white shadow">
                             Finans & LFL Ciro
@@ -292,11 +314,11 @@
                 </div>
             </section>
 
-            <!-- PERFORMANCE TABLE MATRIX -->
+            <!-- PERFORMANCE TABLE MATRIX (Marka Kolonu Kaldırıldı, Bölge - Ülke - Bayi Yan Yana) -->
             <section class="glass-card rounded-2xl p-6 border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>
-                        <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Ülke ve Bayi Performans Matrisi (Ciro & SMM)</h3>
+                        <h3 id="tableTitle" class="font-bold text-base text-yatas-navy">Konsolide Bölge, Ülke ve Bayi Performans Matrisi (Ciro & SMM)</h3>
                         <p class="text-xs text-slate-400">Seçili filtrelere göre dinamik türetilen C-Level detay dökümü</p>
                     </div>
                     
@@ -311,10 +333,10 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse" id="mainDataTable">
                         <thead>
-                            <tr class="bg-slate-100 text-yatas-navy text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200">
+                            <tr id="tableHeaderRow" class="bg-slate-100 text-yatas-navy text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200">
                                 <th class="py-3.5 px-4 rounded-l-xl">Bölge</th>
-                                <th class="py-3.5 px-4">Ülke & Bayi</th>
-                                <th class="py-3.5 px-4">Marka</th>
+                                <th class="py-3.5 px-4">Ülke</th>
+                                <th class="py-3.5 px-4">Bayi Adı</th>
                                 <th class="py-3.5 px-4 text-right">Ciro (USD)</th>
                                 <th class="py-3.5 px-4 text-right">Bütçe (USD)</th>
                                 <th class="py-3.5 px-4 text-right">Başarı %</th>
@@ -329,13 +351,41 @@
             </section>
         </main>
 
-        <!-- MASTER DATA MANAGEMENT TAB -->
+        <!-- MASTER DATA MANAGEMENT TAB (Geliştirilmiş SKU & Veri Yönetimi) -->
         <main id="tab-content-master" class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6 pb-12 flex-1 w-full hidden">
-            <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-base font-extrabold text-yatas-navy">Master Data & SKU Yönetimi</h3>
+            <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-yatas-navy flex items-center gap-2">
+                            <i class="fa-solid fa-database text-yatas-gold"></i> Master Data & SKU Yönetim Modülü
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">Ürün fiyat haritalamaları, SKU eşleştirmeleri ve bayi bazlı parametreler bu ekrandan yönetilir.</p>
+                    </div>
+                    <button onclick="alert('Yeni SKU Kayıt Penceresi Yakında Aktif Olacak.')" class="bg-yatas-navy text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition shadow">
+                        <i class="fa-solid fa-plus mr-1"></i> Yeni SKU / Parametre Ekle
+                    </button>
                 </div>
-                <p class="text-xs text-slate-500">Ürün fiyatları, stok durumları ve bayi bazlı erişim yetkileri buradan yönetilir.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-xs font-bold text-slate-400 uppercase">Aktif SKU Sayısı</div>
+                        <div class="text-xl font-extrabold text-yatas-navy mt-1">12,450 Ürün</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-xs font-bold text-slate-400 uppercase">Eşleşen Cari Kayıtlar</div>
+                        <div class="text-xl font-extrabold text-emerald-600 mt-1">%99.4 Tam Eşleşme</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-xs font-bold text-slate-400 uppercase">Son Parametre Güncellemesi</div>
+                        <div class="text-xl font-extrabold text-yatas-gold mt-1">Bugün (Canlı)</div>
+                    </div>
+                </div>
+
+                <div class="p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                    <i class="fa-solid fa-sliders text-3xl text-slate-300 mb-2"></i>
+                    <h4 class="font-bold text-sm text-slate-700">SKU & Fiyat Listesi Düzenleme Ekranı Hazırlanıyor</h4>
+                    <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">Parametre Mapping dosyalarını buradan canlı olarak güncelleyebilir veya yerel Excel şablonlarını içeri aktarabilirsiniz.</p>
+                </div>
             </section>
         </main>
     </div>
@@ -349,6 +399,7 @@
 
         let masterReportData = [];
         let filteredReportData = [];
+        let currentSubTab = 'finans';
         let chartTrendInstance = null;
         let chartMarkaInstance = null;
 
@@ -406,43 +457,31 @@
         function populateFilterOptions() {
             const regions = [...new Set(masterReportData.map(i => i.bolge_adi))].filter(Boolean).sort();
             const brands = [...new Set(masterReportData.map(i => i.marka))].filter(Boolean).sort();
-            const kanals = [...new Set(masterReportData.map(i => i.kanal))].filter(Boolean).sort();
 
             const regionSelect = document.getElementById('filterRegion');
             regionSelect.innerHTML = '<option value="ALL">Tüm Bölgeler</option>' + regions.map(r => `<option value="${r}">${r}</option>`).join('');
 
             const brandSelect = document.getElementById('filterBrand');
             brandSelect.innerHTML = '<option value="ALL">Tüm Markalar</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
-
-            const kanalSelect = document.getElementById('filterKanal');
-            kanalSelect.innerHTML = '<option value="ALL">Tüm Kanallar</option>' + kanals.map(k => `<option value="${k}">${k}</option>`).join('');
         }
 
         function applyFilters() {
             const selectedYear = document.getElementById('filterYear').value;
+            const selectedMonth = document.getElementById('filterMonth').value;
             const selectedRegion = document.getElementById('filterRegion').value;
             const selectedBrand = document.getElementById('filterBrand').value;
-            const selectedKanal = document.getElementById('filterKanal').value;
 
             filteredReportData = masterReportData.filter(i => {
                 let matchYear = (selectedYear === 'ALL' || String(i.yil) === selectedYear);
+                let matchMonth = (selectedMonth === 'ALL' || String(i.ay) === selectedMonth);
                 let matchRegion = (selectedRegion === 'ALL' || i.bolge_adi === selectedRegion);
                 let matchBrand = (selectedBrand === 'ALL' || i.marka === selectedBrand);
-                let matchKanal = (selectedKanal === 'ALL' || i.kanal === selectedKanal);
-                return matchYear && matchRegion && matchBrand && matchKanal;
+                return matchYear && matchMonth && matchRegion && matchBrand;
             });
 
             updateKPIs(filteredReportData);
             renderTable(filteredReportData);
             updateCharts(filteredReportData);
-        }
-
-        function resetFilters() {
-            document.getElementById('filterYear').value = '2026';
-            document.getElementById('filterRegion').value = 'ALL';
-            document.getElementById('filterBrand').value = 'ALL';
-            document.getElementById('filterKanal').value = 'ALL';
-            applyFilters();
         }
 
         function updateKPIs(data) {
@@ -476,43 +515,59 @@
             const tbody = document.getElementById('adminTableBody');
             tbody.innerHTML = '';
 
+            // Marka Sütunu Kaldırıldı, Bölge - Ülke - Bayi Yan Yana Gruplanıyor
             const grouped = {};
             data.forEach(i => {
-                const key = `${i.bolge_adi}_${i.ulke}_${i.musteri_kodu}_${i.marka}`;
+                const key = `${i.bolge_adi}_${i.ulke}_${i.musteri_kodu}`;
                 if (!grouped[key]) {
                     grouped[key] = {
-                        region: i.bolge_adi, ulke: i.ulke, dealer: i.musteri_adi, marka: i.marka,
-                        ciroUSD: 0, butceUSD: 0, ciroTL: 0, smmTL: 0
+                        region: i.bolge_adi, 
+                        ulke: i.ulke, 
+                        dealer: i.musteri_adi,
+                        ciroUSD: 0, butceUSD: 0, ciroTL: 0, smmTL: 0, units: 0
                     };
                 }
                 grouped[key].ciroUSD += (Number(i.ciro_usd_gerceklesen) || 0);
                 grouped[key].butceUSD += (Number(i.ciro_usd_butce) || 0);
                 grouped[key].ciroTL += (Number(i.ciro_tl_gerceklesen) || 0);
                 grouped[key].smmTL += (Number(i.smm_tl_gerceklesen) || 0);
+                grouped[key].units += (Number(i.satis_adet_gerceklesen) || 0);
             });
 
             const rows = Object.values(grouped);
-            tbody.innerHTML = rows.slice(0, 150).map(i => {
-                const realizasyon = i.butceUSD > 0 ? ((i.ciroUSD / i.butceUSD) * 100).toFixed(1) : '0.0';
-                const carpan = i.smmTL > 0 ? (i.ciroTL / i.smmTL).toFixed(2) : '0.00';
 
-                return `
+            if (currentSubTab === 'finans') {
+                tbody.innerHTML = rows.slice(0, 150).map(i => {
+                    const realizasyon = i.butceUSD > 0 ? ((i.ciroUSD / i.butceUSD) * 100).toFixed(1) : '0.0';
+                    const carpan = i.smmTL > 0 ? (i.ciroTL / i.smmTL).toFixed(2) : '0.00';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-4 font-bold text-yatas-navy">${i.region || '-'}</td>
+                            <td class="py-3 px-4 font-bold text-slate-800">${i.ulke || '-'}</td>
+                            <td class="py-3 px-4 font-bold text-slate-600">${i.dealer || '-'}</td>
+                            <td class="py-3 px-4 text-right font-black text-yatas-navy">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                            <td class="py-3 px-4 text-right text-slate-400">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
+                            <td class="py-3 px-4 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
+                            <td class="py-3 px-4 text-right font-semibold text-slate-700">₺${(i.ciroTL / 1000000).toFixed(2)}M</td>
+                            <td class="py-3 px-4 text-right text-slate-500">₺${(i.smmTL / 1000000).toFixed(2)}M</td>
+                            <td class="py-3 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${carpan} x</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                // Diğer Sekmeler İçin Modüler Görünüm Taslağı
+                tbody.innerHTML = rows.slice(0, 150).map(i => `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="py-3 px-4 font-bold text-yatas-navy">${i.region || '-'}</td>
-                        <td class="py-3 px-4">
-                            <div class="font-bold text-slate-800">${i.ulke || '-'}</div>
-                            <div class="text-[10px] text-slate-400">${i.dealer || '-'}</div>
-                        </td>
-                        <td class="py-3 px-4"><span class="bg-slate-100 px-2 py-0.5 rounded font-bold">${i.marka || '-'}</span></td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${i.ulke || '-'}</td>
+                        <td class="py-3 px-4 font-bold text-slate-600">${i.dealer || '-'}</td>
                         <td class="py-3 px-4 text-right font-black text-yatas-navy">$${(i.ciroUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
-                        <td class="py-3 px-4 text-right text-slate-400">$${(i.butceUSD / 1000).toLocaleString('en-US', {maximumFractionDigits:1})}K</td>
-                        <td class="py-3 px-4 text-right font-bold ${realizasyon >= 90 ? 'text-emerald-600' : 'text-amber-600'}">%${realizasyon}</td>
-                        <td class="py-3 px-4 text-right font-semibold text-slate-700">₺${(i.ciroTL / 1000000).toFixed(2)}M</td>
-                        <td class="py-3 px-4 text-right text-slate-500">₺${(i.smmTL / 1000000).toFixed(2)}M</td>
-                        <td class="py-3 px-4 text-center"><span class="bg-amber-50 text-yatas-navy px-2 py-0.5 rounded font-bold">${carpan} x</span></td>
+                        <td class="py-3 px-4 text-right text-slate-500">${i.units.toLocaleString()} Pcs</td>
+                        <td class="py-3 px-4 text-center" colspan="4"><span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-bold">Modül Verisi Aktif</span></td>
                     </tr>
-                `;
-            }).join('');
+                `).join('');
+            }
         }
 
         function filterTableSearch() {
@@ -520,8 +575,7 @@
             const searchFiltered = filteredReportData.filter(i => 
                 (i.musteri_adi && i.musteri_adi.toLowerCase().includes(q)) ||
                 (i.ulke && i.ulke.toLowerCase().includes(q)) ||
-                (i.bolge_adi && i.bolge_adi.toLowerCase().includes(q)) ||
-                (i.marka && i.marka.toLowerCase().includes(q))
+                (i.bolge_adi && i.bolge_adi.toLowerCase().includes(q))
             );
             renderTable(searchFiltered);
         }
@@ -593,6 +647,7 @@
         }
 
         function switchSubTab(tab) {
+            currentSubTab = tab;
             document.querySelectorAll('.sub-tab-btn').forEach(btn => {
                 btn.classList.remove('bg-yatas-navy', 'text-white', 'shadow');
                 btn.classList.add('text-slate-600');
@@ -604,12 +659,13 @@
             }
 
             const titleMap = {
-                'finans': 'Konsolide Ülke ve Bayi Performans Matrisi (Ciro & SMM)',
+                'finans': 'Konsolide Bölge, Ülke ve Bayi Performans Matrisi (Ciro & SMM)',
                 'turquality': 'Turquality Teşvik, Tahsilat & Bütçe Simülasyon Matrisi',
                 'aging': 'Ticari Şartlar, Vade & Borç Yaşlandırma (Aging) Risk Tablosu',
                 'operasyon': 'Sipariş, Sevk Karşılama & Depo m³ Doluluk Analizi'
             };
             document.getElementById('tableTitle').innerText = titleMap[tab];
+            renderTable(filteredReportData);
         }
     </script>
 </body>
