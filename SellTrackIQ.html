@@ -2,8 +2,8 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yataş Group - SellTrackIQ POS & Inventory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Yataş Group - SellTrackIQ POS & Inventory Hub</title>
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,14 +16,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a; }
+        body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; color: #0f172a; }
         .bg-yatas-navy { background-color: #00205b; }
         .bg-yatas-dark-navy { background-color: #00153e; }
         .text-yatas-navy { color: #00205b; }
-        
-        .ui-card { background-color: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05); }
-        .btn-navy { background-color: #00205b; color: #ffffff; transition: all 0.2s ease; }
-        .btn-navy:hover { background-color: #00143d; }
+        .border-yatas-navy { border-color: #00205b; }
+
+        .ui-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05);
+        }
+
+        .btn-navy {
+            background-color: #00205b;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .btn-navy:hover {
+            background-color: #00143d;
+            box-shadow: 0 4px 12px rgba(0, 32, 91, 0.25);
+        }
 
         /* 3D FLIP CARD EFEKTİ (JET KASA) */
         .flip-card { perspective: 1000px; }
@@ -41,7 +54,7 @@
             transform: rotateY(180deg); background: white; z-index: 2;
         }
 
-        /* DİNAMİK PREVIEW HOVER BOX */
+        /* DİNAMİK TEKİL FLOATING PREVIEW */
         #globalHoverPreview {
             display: none; position: fixed; z-index: 999999; width: 260px;
             background: white; border: 2px solid #00205b; border-radius: 16px;
@@ -53,6 +66,9 @@
             transition: margin-top 0.35s ease, opacity 0.35s ease;
             max-height: 50px; opacity: 1; overflow: hidden;
         }
+        .announcement-bar.banner-hidden { margin-top: -36px; max-height: 0; opacity: 0; pointer-events: none; }
+        footer { transition: transform 0.35s ease, opacity 0.35s ease; }
+        footer.footer-hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-slate-50 text-slate-900">
@@ -70,7 +86,15 @@
     <div id="proformaModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 hidden">
         <div class="bg-white border border-slate-200 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                <h3 class="text-base font-extrabold text-[#00205b]">Yataş B2B Proforma Sipariş Taslağı</h3>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#00205b] text-white flex items-center justify-center font-black">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-[#00205b]">Yataş B2B Proforma Order Draft</h3>
+                        <p class="text-xs text-slate-500 font-semibold" id="proformaInvoiceNo">Doc: PRF-2026-0001</p>
+                    </div>
+                </div>
                 <button onclick="closeProformaModal()" class="text-slate-400 font-bold px-2 py-1 bg-slate-100 rounded-lg">✕</button>
             </div>
             <div class="space-y-3 text-xs font-semibold">
@@ -90,16 +114,16 @@
     <!-- TOP ANNOUNCEMENT BAR -->
     <div id="announcementBar" class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
         <span class="bg-[#d71921] text-white px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider">POS JET KASA</span>
-        <span class="truncate">Real-time B2B Sales, Margin & Inventory Management Portal</span>
+        <span class="truncate">Real-time B2B Inventory & Cashier Terminal</span>
     </div>
 
     <!-- SIGN IN MODAL -->
     <div id="loginModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-slate-900">
+        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl relative text-slate-900">
             <div class="text-center mb-6">
-                <div class="w-12 h-12 bg-[#00205b] text-white rounded-xl mx-auto flex items-center justify-center font-black text-xl mb-3">Y</div>
-                <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">SellTrackIQ Enterprise</h2>
-                <p class="text-xs text-slate-500 font-semibold mt-1">POS & Inventory Cashier Terminal</p>
+                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="h-12 mx-auto mb-4 object-contain rounded-lg" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
+                <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">SellTrackIQ POS</h2>
+                <p class="text-xs text-slate-500 font-semibold mt-1">Executive Sales & Cashier Terminal</p>
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-5">
@@ -130,16 +154,13 @@
                     <span>Hub Dashboard</span>
                 </a>
                 
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-[#00205b] text-white flex items-center justify-center font-black text-sm">Y</div>
-                    <span class="font-extrabold text-[#00205b] tracking-wider text-sm">SellTrackIQ</span>
-                </div>
+                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-8 w-auto object-contain rounded-md" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
 
                 <div class="hidden md:flex items-center gap-2">
                     <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm">
                         <i class="fa-solid fa-cash-register mr-1.5"></i> <span>Sales POS</span>
                     </button>
-                    <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+                    <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-2">
                         <i class="fa-solid fa-truck-ramp-box"></i> <span>Goods Receipt</span>
                         <span id="pendingBadge" class="bg-[#d71921] text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">0</span>
                     </button>
@@ -153,7 +174,7 @@
                 </div>
 
                 <span id="connectionBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> POS Active
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> POS Ready
                 </span>
             </div>
         </header>
@@ -179,7 +200,7 @@
                             <i class="fa-solid fa-cash-register text-sky-400"></i> Sales POS
                         </button>
                         <button onclick="switchTab('receipt')" id="sideNavReceipt" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy transition">
-                            <i class="fa-solid fa-truck-ramp-box text-slate-400"></i> Goods Receipt
+                            <i class="fa-solid fa-truck-ramp-box text-slate-400"></i> Goods Receipt (SAP)
                         </button>
                     </nav>
                 </div>
@@ -195,7 +216,7 @@
                 <!-- 1. ÜST BAR KPI STRIP -->
                 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="ui-card p-4 rounded-2xl border-l-4 border-[#00205b]">
-                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Top. Sipariş Tutarı</span>
+                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Top. Sipariş / Sevk Tutarı</span>
                         <div class="text-xl font-black text-[#00205b] mt-0.5" id="hdrOrderAmount">$0.00</div>
                     </div>
                     <div class="ui-card p-4 rounded-2xl border-l-4 border-emerald-500">
@@ -215,7 +236,7 @@
                 <!-- TAB 1: SALES POS TERMINAL -->
                 <div id="tab-sales-content" class="space-y-6">
                     <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
-                        <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">Product Catalog & POS Terminal</h3>
+                        <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">Product Catalog & Live POS Terminal</h3>
 
                         <!-- 3-Way View Switcher -->
                         <div class="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl border border-slate-300">
@@ -247,7 +268,7 @@
 
                             <div class="flex items-center gap-3">
                                 <label class="text-xs font-extrabold text-[#00205b] uppercase tracking-wider">Select Invoice:</label>
-                                <select id="invoiceFilter" onchange="onInvoiceFilterChange()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs font-bold text-slate-800 focus:outline-none">
+                                <select id="invoiceFilter" onchange="onInvoiceFilterChange()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
                                     <option value="ALL">All Pending Invoices</option>
                                 </select>
                             </div>
@@ -305,7 +326,7 @@
         </footer>
     </div>
 
-    <!-- JAVASCRIPT ENGINE -->
+    <!-- JAVASCRIPT REAL-TIME ENGINE -->
     <script>
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
@@ -317,13 +338,6 @@
         let todaySalesCount = 0;
         let todayTotalRevenue = 0;
         let currentViewMode = 'medium';
-
-        // SAMPLE DEMO PRODUCTS IF SUPABASE UNREACHABLE
-        const DEMO_PRODUCTS = [
-            { id: '1', code: '50503000008202', name: 'QUEEN SIZE VALERI PRINTED DUVET COVER SET', category: 'EV TEKSTİLİ', image: 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500', stock: 12, price: 250 },
-            { id: '2', code: '50503000008194', name: 'QUEEN SIZE MELONI INFINITY SET - BLUE', category: 'EV TEKSTİLİ', image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=500', stock: 2, price: 180 },
-            { id: '3', code: '50502000003062', name: 'VISCO THERMO COOL ERGONOMIC MATTRESS', category: 'YATAK', image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500', stock: 1, price: 650 }
-        ];
 
         window.addEventListener('DOMContentLoaded', async () => {
             const savedDealerCode = localStorage.getItem('retailhub_dealer_code') || '4000001368';
@@ -338,17 +352,27 @@
         }
 
         async function performLogin(code, pass) {
-            currentDealer = { id: 'temp-id-1', code: code, name: 'Enza Home Dealer (' + code + ')' };
-            
+            let { data, error } = await supabaseClient
+                .from('dealers')
+                .select('*')
+                .eq('code', code)
+                .maybeSingle();
+
+            if (!data) {
+                data = { id: 'temp-id-1', code: code, name: 'Enza Home Dealer (' + code + ')' };
+            }
+
+            currentDealer = data;
             document.getElementById('loginModal').classList.add('hidden');
             document.getElementById('portalContainer').classList.remove('hidden');
 
-            document.getElementById('dealerName').innerText = currentDealer.name;
-            document.getElementById('dealerCode').innerText = 'Code: ' + currentDealer.code;
-            document.getElementById('dealerAvatar').innerText = String(currentDealer.code).substring(0, 2).toUpperCase();
+            document.getElementById('dealerName').innerText = data.name;
+            document.getElementById('dealerCode').innerText = 'Code: ' + data.code;
+            document.getElementById('dealerAvatar').innerText = String(data.code).substring(0, 2).toUpperCase();
 
             fetchLiveProducts();
             fetchPendingShipments();
+            initBannerScrollEffect();
         }
 
         function logout() {
@@ -364,6 +388,27 @@
             const activeEl = document.getElementById({ 'list': 'viewBtnList', 'medium': 'viewBtnMedium', 'large': 'viewBtnLarge' }[mode]);
             if (activeEl) activeEl.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-[#00205b] text-white shadow";
             renderProducts(globalProducts);
+        }
+
+        function initBannerScrollEffect() {
+            const mainScroll = document.getElementById('mainScrollArea');
+            const announcementBar = document.getElementById('announcementBar');
+            const footer = document.getElementById('appFooter');
+            let isScrolling = null;
+
+            function handleScroll() {
+                if (announcementBar) announcementBar.classList.add('banner-hidden');
+                if (footer) footer.classList.add('footer-hidden');
+
+                clearTimeout(isScrolling);
+
+                isScrolling = setTimeout(() => {
+                    if (announcementBar) announcementBar.classList.remove('banner-hidden');
+                    if (footer) footer.classList.remove('footer-hidden');
+                }, 200);
+            }
+
+            if (mainScroll) mainScroll.addEventListener('scroll', handleScroll);
         }
 
         function switchTab(tab) {
@@ -384,20 +429,43 @@
         function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
         async function fetchLiveProducts() {
-            try {
-                let { data, error } = await supabaseClient.from('products').select('*').limit(20);
-                if (error || !data || data.length === 0) {
-                    globalProducts = DEMO_PRODUCTS;
-                } else {
-                    globalProducts = data.map(i => ({
-                        id: i.id, code: i.code, name: i.name, category: i.category || 'Koleksiyon',
-                        image: i.image_url || 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500',
-                        stock: Math.floor(Math.random() * 10), price: 250
-                    }));
-                }
-            } catch {
-                globalProducts = DEMO_PRODUCTS;
+            let allProductsData = [];
+            let from = 0;
+            const step = 1000;
+            let hasMore = true;
+
+            while (hasMore) {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select(`
+                        id, code, name, category, image_url,
+                        stocks ( quantity, dealer_id )
+                    `)
+                    .range(from, from + step - 1);
+
+                if (error || !data || data.length === 0) break;
+                allProductsData = allProductsData.concat(data);
+                if (data.length < step) hasMore = false;
+                from += step;
             }
+
+            if (allProductsData.length === 0) {
+                globalProducts = [
+                    { id: '1', code: '50503000008202', name: 'QUEEN SIZE VALERI PRINTED DUVET COVER SET', category: 'EV TEKSTİLİ', image: 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500', stock: 12, price: 250 },
+                    { id: '2', code: '50503000008194', name: 'QUEEN SIZE MELONI INFINITY SET - BLUE', category: 'EV TEKSTİLİ', image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=500', stock: 2, price: 180 },
+                    { id: '3', code: '50502000003062', name: 'VISCO THERMO COOL ERGONOMIC MATTRESS', category: 'YATAK', image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500', stock: 1, price: 650 }
+                ];
+            } else {
+                globalProducts = allProductsData.map(item => {
+                    const dealerStock = item.stocks ? item.stocks.find(s => s.dealer_id === currentDealer.id) : null;
+                    return {
+                        id: item.id, code: item.code, name: item.name, category: item.category || 'Collection',
+                        image: item.image_url || 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500',
+                        stock: dealerStock ? dealerStock.quantity : 0, price: 250
+                    };
+                });
+            }
+
             renderProducts(globalProducts);
             updateKPIs();
         }
@@ -405,6 +473,11 @@
         function renderProducts(items) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400 font-semibold">No products found in catalog.</div>`;
+                return;
+            }
 
             if (currentViewMode === 'list') {
                 grid.className = "space-y-3";
@@ -533,7 +606,7 @@
 
         function closeProformaModal() { document.getElementById('proformaModal').classList.add('hidden'); }
 
-        function confirmProformaOrder() {
+        async function confirmProformaOrder() {
             alert('B2B Proforma Siparişiniz Oluşturuldu ve SAP Sistemine İletildi!');
             closeProformaModal();
         }
@@ -542,9 +615,17 @@
             const p = globalProducts.find(item => item.id === id);
             const qty = Number(document.getElementById(`pos-qty-${id}`).value) || 1;
             if (p && p.stock >= qty) {
-                p.stock -= qty;
+                const newStock = p.stock - qty;
+
+                try {
+                    await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: p.id, quantity: newStock }, { onConflict: 'dealer_id,product_id' });
+                    await supabaseClient.from('stock_movements').insert([{ dealer_id: currentDealer.id, product_id: p.id, movement_type: 'SALE', quantity: qty }]);
+                } catch (err) { console.error(err); }
+
+                p.stock = newStock;
                 todaySalesCount += qty;
                 todayTotalRevenue += (qty * p.price);
+
                 alert('POS Satışı Başarıyla Kaydedildi!');
                 toggleFlipCard(id);
                 renderProducts(globalProducts);
@@ -564,13 +645,166 @@
             previewBox.style.display = 'block';
         }
 
-        function hideGlobalPreview() {
-            document.getElementById('globalHoverPreview').style.display = 'none';
-        }
+        function hideGlobalPreview() { document.getElementById('globalHoverPreview').style.display = 'none'; }
 
         async function fetchPendingShipments() {
+            if (!currentDealer || !currentDealer.code) return;
+            const searchCode = String(currentDealer.code).trim();
+
+            let { data } = await supabaseClient.from('shipments').select('*').eq('dealer_code', searchCode);
+            pendingShipmentsList = (data || []).filter(s => String(s.status).toUpperCase() === 'PENDING');
+
             const badgeEl = document.getElementById('pendingBadge');
-            if (badgeEl) badgeEl.innerText = '12';
+            if (badgeEl) badgeEl.innerText = pendingShipmentsList.length >= 1000 ? '1000+' : (pendingShipmentsList.length > 999 ? '999+' : pendingShipmentsList.length);
+
+            populateInvoiceFilterOptions();
+            renderShipmentsTable();
+        }
+
+        function populateInvoiceFilterOptions() {
+            const selectEl = document.getElementById('invoiceFilter');
+            if (!selectEl) return;
+            const uniqueInvoices = [...new Set(pendingShipmentsList.map(s => s.invoice_no))].filter(Boolean);
+            selectEl.innerHTML = '<option value="ALL">All Pending Invoices (' + uniqueInvoices.length + ' Invoices)</option>';
+            uniqueInvoices.forEach(inv => selectEl.innerHTML += `<option value="${inv}">Invoice: ${inv}</option>`);
+        }
+
+        function onInvoiceFilterChange() { renderShipmentsTable(); }
+
+        function renderShipmentsTable() {
+            const selectedInv = document.getElementById('invoiceFilter').value;
+            const tbody = document.getElementById('shipmentTableBody');
+            if (!tbody) return;
+
+            let filtered = pendingShipmentsList;
+            if (selectedInv !== 'ALL') filtered = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">No pending shipments found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            let totalInvoiceQty = 0, totalCountedQty = 0;
+
+            filtered.forEach(s => {
+                const matchedProduct = globalProducts.find(p => p.code === s.product_code);
+                const imgUrl = matchedProduct && matchedProduct.image ? matchedProduct.image : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
+                const invoiceQty = Number(s.quantity) || 0;
+                const defaultCountedQty = s.counted_qty !== undefined ? Number(s.counted_qty) : invoiceQty;
+                
+                totalInvoiceQty += invoiceQty;
+                totalCountedQty += defaultCountedQty;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100 font-semibold";
+                tr.innerHTML = `
+                    <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${imgUrl}" alt="${s.product_name}" 
+                                 onmouseenter="showGlobalPreview(event, '${imgUrl}', '${s.product_code}', '${(s.product_name || '').replace(/'/g, "\\'")}')" 
+                                 onmouseleave="hideGlobalPreview()"
+                                 class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm cursor-zoom-in">
+                            <div class="min-w-0">
+                                <span class="text-[10px] font-extrabold text-[#00205b] font-mono block">${s.product_code}</span>
+                                <span class="font-bold text-slate-900 text-xs block truncate max-w-md">${s.product_name || ''}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center font-extrabold text-slate-700">${invoiceQty} Pcs</td>
+                    <td class="p-4 text-center">
+                        <input type="number" min="0" id="counted-input-${s.id}" value="${defaultCountedQty}" onchange="onItemCountedChange('${s.id}', ${invoiceQty})" class="w-20 text-center py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-black text-[#00205b]">
+                    </td>
+                    <td class="p-4 text-center font-extrabold" id="diff-cell-${s.id}">${getDifferenceBadge(defaultCountedQty - invoiceQty)}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="approveSingleShipment('${s.id}', '${s.product_code}', ${invoiceQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow">
+                            Confirm & Add to Stock
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateHeaderSummary(totalInvoiceQty, totalCountedQty, totalCountedQty - totalInvoiceQty);
+        }
+
+        function onItemCountedChange(shipmentId, invoiceQty) {
+            const inputEl = document.getElementById(`counted-input-${shipmentId}`);
+            const diffCell = document.getElementById(`diff-cell-${shipmentId}`);
+            const countedVal = Number(inputEl.value) || 0;
+            const diff = countedVal - invoiceQty;
+            if (diffCell) diffCell.innerHTML = getDifferenceBadge(diff);
+            recalculateTableTotals();
+        }
+
+        function getDifferenceBadge(diff) {
+            if (diff === 0) return `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[10px]">0 Pcs</span>`;
+            if (diff > 0) return `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md text-[10px]">+${diff} Pcs</span>`;
+            return `<span class="bg-rose-100 text-[#d71921] px-2 py-0.5 rounded-md text-[10px]">${diff} Pcs</span>`;
+        }
+
+        function recalculateTableTotals() {
+            const selectedInv = document.getElementById('invoiceFilter').value;
+            let filtered = pendingShipmentsList;
+            if (selectedInv !== 'ALL') filtered = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
+
+            let totInv = 0, totCounted = 0;
+            filtered.forEach(s => {
+                const invQty = Number(s.quantity) || 0;
+                const inputEl = document.getElementById(`counted-input-${s.id}`);
+                const countedQty = inputEl ? (Number(inputEl.value) || 0) : invQty;
+                totInv += invQty; totCounted += countedQty;
+            });
+
+            updateHeaderSummary(totInv, totCounted, totCounted - totInv);
+        }
+
+        function updateHeaderSummary(totInv, totCounted, diff) {
+            document.getElementById('summaryInvoiceQty').innerText = totInv + ' Pcs';
+            document.getElementById('summaryCountedQty').innerText = totCounted + ' Pcs';
+            const diffEl = document.getElementById('summaryDifferenceQty');
+            if (diff === 0) { diffEl.className = "font-black text-slate-700 text-sm"; diffEl.innerText = "0 Pcs (Matched)"; }
+            else if (diff > 0) { diffEl.className = "font-black text-emerald-600 text-sm"; diffEl.innerText = "+" + diff + " Pcs (Excess)"; }
+            else { diffEl.className = "font-black text-[#d71921] text-sm"; diffEl.innerText = diff + " Pcs (Missing)"; }
+        }
+
+        async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
+            const product = globalProducts.find(p => p.code === productCode);
+            const inputEl = document.getElementById(`counted-input-${shipmentId}`);
+            const finalCountedQty = inputEl ? (Number(inputEl.value) || 0) : origInvoiceQty;
+
+            try {
+                if (product) {
+                    await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + finalCountedQty });
+                }
+                await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: finalCountedQty, counted_qty: finalCountedQty }).eq('id', shipmentId);
+                alert('Sevkiyat onaylandı ve stoğa eklendi!');
+                fetchPendingShipments();
+                fetchLiveProducts();
+            } catch (err) { console.error(err); }
+        }
+
+        async function approveSelectedInvoiceAll() {
+            const selectedInv = document.getElementById('invoiceFilter').value;
+            let targetShipments = pendingShipmentsList;
+            if (selectedInv !== 'ALL') targetShipments = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
+
+            try {
+                for (let s of targetShipments) {
+                    const product = globalProducts.find(p => p.code === s.product_code);
+                    const inputEl = document.getElementById(`counted-input-${s.id}`);
+                    const finalCountedQty = inputEl ? (Number(inputEl.value) || 0) : Number(s.quantity);
+
+                    if (product) {
+                        await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + finalCountedQty });
+                    }
+                    await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: finalCountedQty, counted_qty: finalCountedQty }).eq('id', s.id);
+                }
+                alert('Tüm faturalar onaylandı!');
+                fetchPendingShipments();
+                fetchLiveProducts();
+            } catch (err) { console.error(err); }
         }
 
         function updateKPIs() {
