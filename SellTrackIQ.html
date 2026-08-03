@@ -52,6 +52,35 @@
             box-shadow: 0 4px 12px rgba(0, 32, 91, 0.25);
         }
 
+        /* Image Hover Preview Pop-up Styling */
+        .img-preview-container {
+            position: relative;
+        }
+        .img-preview-popup {
+            display: none;
+            position: absolute;
+            left: 110%;
+            top: -20px;
+            z-index: 99;
+            width: 240px;
+            height: 240px;
+            background: white;
+            border: 2px solid #00205b;
+            border-radius: 16px;
+            box-shadow: 0 20px 35px -5px rgba(0, 32, 91, 0.25);
+            overflow: hidden;
+            pointer-events: none;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .img-preview-container:hover .img-preview-popup {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .announcement-bar {
             background: linear-gradient(90deg, #00153e, #00205b);
             transition: margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, max-height 0.35s ease;
@@ -228,15 +257,14 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: GOODS RECEIPT (İyileştirilmiş Filtreli & Fark Hesaplamalı Mal Kabul) -->
+                <!-- TAB 2: GOODS RECEIPT -->
                 <div id="tab-receipt-content" class="space-y-6 hidden">
                     
-                    <!-- Fatura Filtreleme Barı & Alt Toplam Özet Kartı -->
                     <div class="ui-card p-5 rounded-2xl border border-slate-200 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-4">
                             <div>
                                 <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">SAP Shipments & Goods Confirmation</h3>
-                                <p class="text-xs text-slate-500 font-semibold mt-0.5">Filter by Invoice Number to verify and accept delivery</p>
+                                <p class="text-xs text-slate-500 font-semibold mt-0.5">Hover over image for large HD preview or filter by Invoice</p>
                             </div>
 
                             <!-- Fatura Seçim Filtresi -->
@@ -248,7 +276,7 @@
                             </div>
                         </div>
 
-                        <!-- Seçili Fatura Alt Toplam Başlık Bilgisi (Header Totals & Toplu Onay) -->
+                        <!-- Header Alt Toplamlar & Toplu Onay -->
                         <div id="invoiceHeaderSummary" class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-4">
                             <div class="flex flex-wrap items-center gap-6 text-xs">
                                 <div>
@@ -265,21 +293,20 @@
                                 </div>
                             </div>
 
-                            <!-- Accept All (Toplu Onayla) Butonu -->
                             <button onclick="approveSelectedInvoiceAll()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-sm flex items-center gap-2">
-                                <i class="fa-solid fa-[#00205b] fa-check-double"></i>
+                                <i class="fa-solid fa-check-double"></i>
                                 <span>Accept All (Approve Invoice)</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Fatura Detay Satırlar Tablosu -->
-                    <div class="ui-card rounded-2xl overflow-hidden shadow-sm">
+                    <!-- Fatura Tablosu -->
+                    <div class="ui-card rounded-2xl overflow-visible shadow-sm">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-100 text-slate-600 uppercase font-extrabold border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">Invoice / Doc No</th>
-                                    <th class="p-4">Product Code & Detail</th>
+                                    <th class="p-4">Product Code & Detail (Hover Preview)</th>
                                     <th class="p-4 text-center">Invoice Qty</th>
                                     <th class="p-4 text-center">Counted Qty (Editable)</th>
                                     <th class="p-4 text-center">Difference</th>
@@ -292,7 +319,7 @@
                         </table>
                     </div>
 
-                    <!-- TABLO ALTI / STOK DETAY ÖZET SEKME ALANI (HISTORY) -->
+                    <!-- STOK DETAY ÖZET SEKME ALANI -->
                     <div class="ui-card rounded-2xl p-6 border border-slate-200 space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-200 pb-3">
                             <h4 class="text-sm font-extrabold text-[#00205b] flex items-center gap-2">
@@ -602,7 +629,6 @@
             }
         }
 
-        // GOODS RECEIPT (ESNEK SEVKİYAT SORGUSU & FİLTRELİ MAL KABUL)
         async function fetchPendingShipments() {
             if (!currentDealer || !currentDealer.code) return;
 
@@ -618,7 +644,6 @@
                 return;
             }
 
-            // PENDING VE APPROVED AYRIŞTIRMA
             pendingShipmentsList = (data || []).filter(s => 
                 String(s.status).toUpperCase() === 'PENDING'
             );
@@ -627,7 +652,6 @@
                 String(s.status).toUpperCase() === 'APPROVED'
             );
 
-            // Bekleyen Badge Güncelleme (999+ Yapısı)
             const badgeEl = document.getElementById('pendingBadge');
             if (badgeEl) {
                 if (pendingShipmentsList.length >= 1000) {
@@ -687,36 +711,43 @@
                     : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
 
                 const invoiceQty = Number(s.quantity) || 0;
-                // Counted Qty varsayılan olarak Invoice Qty gelir
                 const defaultCountedQty = s.counted_qty !== undefined ? Number(s.counted_qty) : invoiceQty;
                 
                 totalInvoiceQty += invoiceQty;
                 totalCountedQty += defaultCountedQty;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100 font-semibold";
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100 font-semibold relative";
+                
                 tr.innerHTML = `
                     <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
                     <td class="p-4">
                         <div class="flex items-center gap-3">
-                            <img src="${imgUrl}" alt="${s.product_name}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100 shadow-sm" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=100';">
+                            <div class="img-preview-container cursor-pointer shrink-0">
+                                <img src="${imgUrl}" alt="${s.product_name}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm hover:ring-2 hover:ring-[#00205b] transition" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=100';">
+                                
+                                <div class="img-preview-popup p-2 bg-white flex flex-col justify-between">
+                                    <img src="${imgUrl}" alt="${s.product_name}" class="w-full h-44 object-cover rounded-lg bg-slate-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=500';">
+                                    <div class="mt-1.5 px-1">
+                                        <span class="text-[10px] font-black text-[#00205b] font-mono block">${s.product_code}</span>
+                                        <span class="text-[11px] font-bold text-slate-800 line-clamp-1">${s.product_name || ''}</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="min-w-0">
                                 <span class="text-[10px] font-extrabold text-[#00205b] font-mono block tracking-wider">${s.product_code}</span>
                                 <span class="font-bold text-slate-900 text-xs block truncate max-w-md" title="${s.product_name || ''}">${s.product_name || ''}</span>
                             </div>
                         </div>
                     </td>
-                    <!-- Invoice Qty -->
                     <td class="p-4 text-center font-extrabold text-slate-700 whitespace-nowrap">${invoiceQty} Pcs</td>
-                    <!-- Counted Qty (Değiştirilebilir Input) -->
                     <td class="p-4 text-center whitespace-nowrap">
                         <input type="number" min="0" id="counted-input-${s.id}" value="${defaultCountedQty}" onchange="onItemCountedChange('${s.id}', ${invoiceQty})" class="w-20 text-center py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-black text-[#00205b] focus:outline-none focus:ring-2 focus:ring-[#00205b]">
                     </td>
-                    <!-- Difference -->
                     <td class="p-4 text-center whitespace-nowrap font-extrabold" id="diff-cell-${s.id}">
                         ${getDifferenceBadge(defaultCountedQty - invoiceQty)}
                     </td>
-                    <!-- Action (Tekil Onay) -->
                     <td class="p-4 text-right whitespace-nowrap">
                         <button onclick="approveSingleShipment('${s.id}', '${s.product_code}', ${invoiceQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm active:scale-95">
                             Confirm & Add to Stock
@@ -792,7 +823,6 @@
             }
         }
 
-        // TEKİL SEVKİYAT ONAYLAMA
         async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
             const product = globalProducts.find(p => p.code === productCode);
             if (!product) {
@@ -803,7 +833,6 @@
             const inputEl = document.getElementById(`counted-input-${shipmentId}`);
             const finalCountedQty = inputEl ? (Number(inputEl.value) || 0) : origInvoiceQty;
 
-            // Stok Counted Qty kadar artırılır
             const newStock = product.stock + finalCountedQty;
 
             try {
@@ -830,7 +859,6 @@
             }
         }
 
-        // TOPLU FATURA ONAYLAMA (ACCEPT ALL)
         async function approveSelectedInvoiceAll() {
             const selectedInv = document.getElementById('invoiceFilter').value;
             let targetShipments = pendingShipmentsList;
@@ -881,7 +909,6 @@
             }
         }
 
-        // ONAYLANAN FATURA HİSTORİ ÖZETİ (STOCK DETAIL SUMMARY)
         function renderApprovedSummaryHistory() {
             const tbody = document.getElementById('approvedSummaryBody');
             if (!tbody) return;
@@ -891,7 +918,6 @@
                 return;
             }
 
-            // Invoice No bazında gruplama
             const groupedApproved = {};
             approvedShipmentsHistory.forEach(s => {
                 const inv = s.invoice_no || 'N/A';
