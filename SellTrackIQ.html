@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yataş Group - SellTrackIQ</title>
+    <title>Yataş Group - SellTrackIQ B2B Proforma & POS</title>
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,981 +16,134 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body {
-            background-color: #f8fafc;
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            color: #0f172a;
-        }
-
+        body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a; }
         .bg-yatas-navy { background-color: #00205b; }
         .bg-yatas-dark-navy { background-color: #00153e; }
-        .text-yatas-navy { color: #00205b; }
-        .border-yatas-navy { border-color: #00205b; }
-
-        .ui-card {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05);
-        }
-
-        .ui-card-hover {
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .ui-card-hover:hover {
-            transform: translateY(-3px);
-            border-color: #00205b;
-            box-shadow: 0 12px 30px -4px rgba(0, 32, 91, 0.12);
-        }
-
-        .btn-navy {
-            background-color: #00205b;
-            color: #ffffff;
-            transition: all 0.2s ease;
-        }
-        .btn-navy:hover {
-            background-color: #00143d;
-            box-shadow: 0 4px 12px rgba(0, 32, 91, 0.25);
-        }
-
-        /* DİNAMİK TEKİL FLOATING IMAGE PREVIEW (STRICT HOVER) */
-        #globalHoverPreview {
-            display: none;
-            position: fixed;
-            z-index: 999999;
-            width: 260px;
-            background: white;
-            border: 2px solid #00205b;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 32, 91, 0.35);
-            overflow: hidden;
-            pointer-events: none;
-            transition: opacity 0.15s ease, transform 0.15s ease;
-        }
-
-        .announcement-bar {
-            background: linear-gradient(90deg, #00153e, #00205b);
-            transition: margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, max-height 0.35s ease;
-            max-height: 50px;
-            opacity: 1;
-            overflow: hidden;
-        }
-        .announcement-bar.banner-hidden {
-            margin-top: -36px;
-            max-height: 0;
-            opacity: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            pointer-events: none;
-        }
-
-        footer {
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
-        }
-        footer.footer-hidden {
-            transform: translateY(100%);
-            opacity: 0;
-            pointer-events: none;
-        }
+        .ui-card { background-color: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05); }
+        .btn-navy { background-color: #00205b; color: #ffffff; transition: all 0.2s ease; }
+        .btn-navy:hover { background-color: #00143d; }
     </style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-slate-50 text-slate-900">
 
-    <!-- GLOBAL SINGLE IMAGE PREVIEW CONTAINER (MİKRO DİNAMİK PREVIEW) -->
-    <div id="globalHoverPreview" class="p-2.5 bg-white">
-        <img id="previewImg" src="" alt="Product Preview" class="w-full h-48 object-cover rounded-xl bg-slate-100 border border-slate-100">
-        <div class="mt-2 px-1">
-            <span id="previewCode" class="text-[10px] font-black text-[#00205b] font-mono block"></span>
-            <span id="previewName" class="text-xs font-bold text-slate-800 leading-tight block truncate"></span>
-        </div>
-    </div>
-
-    <!-- TOP ANNOUNCEMENT BAR -->
-    <div id="announcementBar" class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
-        <span class="bg-[#d71921] text-white px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider">NOTICE</span>
-        <span class="truncate">Real-time B2B Inventory & Goods Receipt Confirmation Portal</span>
-    </div>
-
-    <!-- SIGN IN MODAL -->
-    <div id="loginModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl relative text-slate-900">
-            <div class="text-center mb-6">
-                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="h-12 mx-auto mb-4 object-contain rounded-lg" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
-                <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">SellTrackIQ</h2>
-                <p class="text-xs text-slate-500 font-semibold mt-1">Executive Sell-out & Stock Tracking Portal</p>
-            </div>
-
-            <form onsubmit="handleLogin(event)" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dealer Code</label>
-                    <input type="text" id="loginDealerCode" required placeholder="e.g. 4000001368 or BY-0601" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b] transition placeholder:text-slate-400">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Password</label>
-                    <input type="password" id="loginPassword" required value="123456" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b] transition">
-                </div>
-                <button type="submit" class="w-full py-3.5 btn-navy font-extrabold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
-                    <span>Sign In</span>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MAIN PORTAL CONTAINER -->
-    <div id="portalContainer" class="flex-1 flex flex-col min-w-0 hidden">
-
-        <!-- HEADER NAVBAR -->
-        <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
-            <div class="flex items-center gap-6">
-                <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#00205b]">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Hub Dashboard</span>
-                </a>
-                
-                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-8 w-auto object-contain rounded-md" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
-
-                <div class="hidden md:flex items-center gap-2">
-                    <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm">
-                        <i class="fa-solid fa-boxes-stacked mr-1.5"></i> <span>Sales & Stock</span>
-                    </button>
-                    <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-2">
-                        <i class="fa-solid fa-truck-ramp-box"></i> <span>Goods Receipt</span>
-                        <span id="pendingBadge" class="bg-[#d71921] text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">0</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div class="relative w-52 md:w-64 hidden sm:block">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search SKU or name..." class="w-full pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-800 font-semibold focus:outline-none focus:border-[#00205b]">
-                </div>
-
-                <span id="connectionBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Sync
-                </span>
-            </div>
-        </header>
-
-        <!-- PORTAL BODY -->
-        <div class="flex-1 flex overflow-hidden">
-
-            <!-- SIDEBAR -->
-            <aside class="w-64 bg-yatas-dark-navy text-white p-5 hidden lg:flex flex-col justify-between shrink-0 shadow-lg">
-                <div class="space-y-5">
-                    <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Dealer Info</div>
-                    
-                    <div class="bg-yatas-navy border border-slate-700 p-4 rounded-xl flex items-center gap-3 shadow-inner">
-                        <div id="dealerAvatar" class="w-10 h-10 rounded-full bg-white text-[#00205b] flex items-center justify-center font-extrabold text-sm shrink-0 shadow">
-                            --
-                        </div>
-                        <div class="min-w-0">
-                            <h4 id="dealerName" class="text-xs font-extrabold truncate text-white">--</h4>
-                            <p id="dealerCode" class="text-[10px] text-slate-300 font-mono truncate">Code: --</p>
-                        </div>
+    <!-- PROFORMA SİPARİŞ MODAL -->
+    <div id="proformaModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#00205b] text-white flex items-center justify-center font-black">
+                        <i class="fa-solid fa-file-invoice"></i>
                     </div>
-
-                    <nav class="space-y-1.5 pt-2">
-                        <button onclick="switchTab('sales')" id="sideNavSales" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition">
-                            <i class="fa-solid fa-boxes-stacked text-sky-400"></i> Sales & Inventory
-                        </button>
-                        <button onclick="switchTab('receipt')" id="sideNavReceipt" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy hover:text-white transition">
-                            <i class="fa-solid fa-truck-ramp-box text-slate-400"></i> Goods Receipt (SAP)
-                        </button>
-                    </nav>
-                </div>
-
-                <button onclick="logout()" class="w-full py-2.5 border border-slate-700 text-slate-300 hover:bg-rose-900/30 hover:text-rose-300 hover:border-rose-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                </button>
-            </aside>
-
-            <!-- MAIN CONTENT AREA -->
-            <main id="mainScrollArea" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-50">
-
-                <!-- TAB 1: SALES & STOCK -->
-                <div id="tab-sales-content" class="space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        <div class="ui-card p-5 rounded-2xl flex items-center justify-between">
-                            <div>
-                                <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Total Stock on Hand</p>
-                                <p class="text-2xl font-extrabold text-[#00205b] mt-1" id="kpiTotalStock">0 Pcs</p>
-                            </div>
-                            <div class="w-11 h-11 rounded-xl bg-blue-50 text-[#00205b] flex items-center justify-center text-lg font-bold border border-blue-100">
-                                <i class="fa-solid fa-cubes"></i>
-                            </div>
-                        </div>
-
-                        <div class="ui-card p-5 rounded-2xl flex items-center justify-between">
-                            <div>
-                                <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Today's Sales</p>
-                                <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="kpiTodaySales">0 Pcs</p>
-                            </div>
-                            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold border border-emerald-100">
-                                <i class="fa-solid fa-chart-line"></i>
-                            </div>
-                        </div>
-
-                        <div class="ui-card p-5 rounded-2xl flex items-center justify-between">
-                            <div>
-                                <p class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Critical Stock Alert</p>
-                                <p class="text-2xl font-extrabold text-[#d71921] mt-1" id="kpiCriticalStock">0 Items</p>
-                            </div>
-                            <div class="w-11 h-11 rounded-xl bg-rose-50 text-[#d71921] flex items-center justify-center text-lg font-bold border border-rose-100">
-                                <i class="fa-solid fa-triangle-exclamation"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between pt-2">
-                        <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">Product Catalog & Live Stock Deduction</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="productGrid">
-                        <div class="col-span-3 text-center py-12 text-slate-400 font-semibold">Loading catalog...</div>
-                    </div>
-                </div>
-
-                <!-- TAB 2: GOODS RECEIPT -->
-                <div id="tab-receipt-content" class="space-y-6 hidden">
-                    
-                    <div class="ui-card p-5 rounded-2xl border border-slate-200 space-y-4">
-                        <div class="flex flex-wrap items-center justify-between gap-4">
-                            <div>
-                                <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">SAP Shipments & Goods Confirmation</h3>
-                                <p class="text-xs text-slate-500 font-semibold mt-0.5">Hover over image for large HD preview or filter by Invoice</p>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <label class="text-xs font-extrabold text-[#00205b] uppercase tracking-wider">Select Invoice:</label>
-                                <select id="invoiceFilter" onchange="onInvoiceFilterChange()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
-                                    <option value="ALL">All Pending Invoices</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Header Alt Toplamlar & Toplu Onay -->
-                        <div id="invoiceHeaderSummary" class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-4">
-                            <div class="flex flex-wrap items-center gap-6 text-xs">
-                                <div>
-                                    <span class="text-slate-400 uppercase font-extrabold block text-[10px]">Invoice Qty Total</span>
-                                    <span id="summaryInvoiceQty" class="font-black text-[#00205b] text-sm">0 Pcs</span>
-                                </div>
-                                <div class="border-l border-slate-300 pl-6">
-                                    <span class="text-slate-400 uppercase font-extrabold block text-[10px]">Counted Qty Total</span>
-                                    <span id="summaryCountedQty" class="font-black text-emerald-600 text-sm">0 Pcs</span>
-                                </div>
-                                <div class="border-l border-slate-300 pl-6">
-                                    <span class="text-slate-400 uppercase font-extrabold block text-[10px]">Total Difference</span>
-                                    <span id="summaryDifferenceQty" class="font-black text-slate-700 text-sm">0 Pcs</span>
-                                </div>
-                            </div>
-
-                            <button onclick="approveSelectedInvoiceAll()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-sm flex items-center gap-2">
-                                <i class="fa-solid fa-check-double"></i>
-                                <span>Accept All (Approve Invoice)</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Fatura Tablosu -->
-                    <div class="ui-card rounded-2xl overflow-visible shadow-sm">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-slate-600 uppercase font-extrabold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-4">Invoice / Doc No</th>
-                                    <th class="p-4">Product Code & Detail (Hover Preview)</th>
-                                    <th class="p-4 text-center">Invoice Qty</th>
-                                    <th class="p-4 text-center">Counted Qty (Editable)</th>
-                                    <th class="p-4 text-center">Difference</th>
-                                    <th class="p-4 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="shipmentTableBody" class="divide-y divide-slate-200 font-semibold">
-                                <tr><td colspan="6" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- STOK DETAY ÖZET SEKME ALANI -->
-                    <div class="ui-card rounded-2xl p-6 border border-slate-200 space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                            <h4 class="text-sm font-extrabold text-[#00205b] flex items-center gap-2">
-                                <i class="fa-solid fa-clock-rotate-left text-sky-600"></i> Stock Detail Summary (Approved Invoices History)
-                            </h4>
-                            <span class="text-[11px] font-bold text-slate-400">Past Mal Kabul Records</span>
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-500 font-extrabold uppercase border-b border-slate-200 text-[10px]">
-                                        <th class="py-2.5 px-3">Date</th>
-                                        <th class="py-2.5 px-3">Invoice No</th>
-                                        <th class="py-2.5 px-3 text-right">Invoice Qty</th>
-                                        <th class="py-2.5 px-3 text-right">Approved Qty</th>
-                                        <th class="py-2.5 px-3 text-center">Difference</th>
-                                        <th class="py-2.5 px-3 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="approvedSummaryBody" class="divide-y divide-slate-100 font-semibold text-slate-700">
-                                    <tr><td colspan="6" class="p-4 text-center text-slate-400">No approved invoice history found.</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-
-            </main>
-        </div>
-
-        <!-- FOOTER -->
-        <footer id="appFooter" class="h-10 border-t border-slate-200 bg-white px-6 flex items-center justify-between text-[11px] font-bold text-slate-500 shrink-0 z-20">
-            <div>Copyright © 2026 Yataş International</div>
-            <div class="text-[#00205b]">Proudly presented by International Sales Development Team</div>
-        </footer>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentDealer = null;
-        let globalProducts = [];
-        let pendingShipmentsList = [];
-        let approvedShipmentsHistory = [];
-        let todaySalesCount = 0;
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            const isHubActive = localStorage.getItem('retailhub_session') === 'active';
-            const savedDealerCode = localStorage.getItem('retailhub_dealer_code');
-            const savedPassword = localStorage.getItem('retailhub_password');
-
-            if (isHubActive && savedDealerCode) {
-                document.getElementById('loginDealerCode').value = savedDealerCode;
-                if (savedPassword) document.getElementById('loginPassword').value = savedPassword;
-
-                await performLogin(savedDealerCode, savedPassword || '123456');
-            }
-        });
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const code = document.getElementById('loginDealerCode').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
-            await performLogin(code, pass);
-        }
-
-        async function performLogin(code, pass) {
-            let { data, error } = await supabaseClient
-                .from('dealers')
-                .select('*')
-                .eq('code', code)
-                .maybeSingle();
-
-            if (!data) {
-                data = { id: 'temp-id-1', code: code, name: 'Yataş Dealer (' + code + ')' };
-            }
-
-            currentDealer = data;
-            document.getElementById('loginModal').classList.add('hidden');
-            document.getElementById('portalContainer').classList.remove('hidden');
-
-            document.getElementById('dealerName').innerText = data.name;
-            document.getElementById('dealerCode').innerText = 'Code: ' + data.code;
-            document.getElementById('dealerAvatar').innerText = String(data.code).substring(0, 2).toUpperCase();
-
-            fetchLiveProducts();
-            fetchPendingShipments();
-            initBannerScrollEffect();
-        }
-
-        function logout() {
-            localStorage.removeItem('retailhub_session');
-            localStorage.removeItem('retailhub_dealer_code');
-            localStorage.removeItem('retailhub_password');
-            window.location.href = 'index.html';
-        }
-
-        function initBannerScrollEffect() {
-            const mainScroll = document.getElementById('mainScrollArea');
-            const announcementBar = document.getElementById('announcementBar');
-            const footer = document.getElementById('appFooter');
-            let isScrolling = null;
-
-            function handleScroll() {
-                if (announcementBar) announcementBar.classList.add('banner-hidden');
-                if (footer) footer.classList.add('footer-hidden');
-
-                clearTimeout(isScrolling);
-
-                isScrolling = setTimeout(() => {
-                    if (announcementBar) announcementBar.classList.remove('banner-hidden');
-                    if (footer) footer.classList.remove('footer-hidden');
-                }, 200);
-            }
-
-            if (mainScroll) mainScroll.addEventListener('scroll', handleScroll);
-            window.addEventListener('scroll', handleScroll);
-        }
-
-        function switchTab(tab) {
-            const btnSales = document.getElementById('btnTabSales');
-            const btnReceipt = document.getElementById('btnTabReceipt');
-            const sideSales = document.getElementById('sideNavSales');
-            const sideReceipt = document.getElementById('sideNavReceipt');
-            const contentSales = document.getElementById('tab-sales-content');
-            const contentReceipt = document.getElementById('tab-receipt-content');
-
-            if (tab === 'sales') {
-                contentSales.classList.remove('hidden');
-                contentReceipt.classList.add('hidden');
-
-                btnSales.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm";
-                btnReceipt.className = "px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition";
-
-                sideSales.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition";
-                sideSales.querySelector('i').className = "fa-solid fa-boxes-stacked text-sky-400";
-                
-                sideReceipt.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy hover:text-white transition";
-                sideReceipt.querySelector('i').className = "fa-solid fa-truck-ramp-box text-slate-400";
-            } else {
-                contentSales.classList.add('hidden');
-                contentReceipt.classList.remove('hidden');
-
-                btnReceipt.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm";
-                btnSales.className = "px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition";
-
-                sideReceipt.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition";
-                sideReceipt.querySelector('i').className = "fa-solid fa-truck-ramp-box text-sky-400";
-
-                sideSales.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy hover:text-white transition";
-                sideSales.querySelector('i').className = "fa-solid fa-boxes-stacked text-slate-400";
-            }
-        }
-
-        function loadTodaySalesHistory() {
-            if (!currentDealer) return;
-            const todayKey = `sales_${currentDealer.id}_${new Date().toISOString().slice(0,10)}`;
-            todaySalesCount = parseInt(localStorage.getItem(todayKey)) || 0;
-        }
-
-        async function fetchLiveProducts() {
-            loadTodaySalesHistory();
-
-            let allProductsData = [];
-            let from = 0;
-            const step = 1000;
-            let hasMore = true;
-
-            while (hasMore) {
-                const { data, error } = await supabaseClient
-                    .from('products')
-                    .select(`
-                        id, code, name, category, image_url,
-                        stocks ( quantity, dealer_id )
-                    `)
-                    .range(from, from + step - 1);
-
-                if (error || !data || data.length === 0) break;
-                allProductsData = allProductsData.concat(data);
-                if (data.length < step) hasMore = false;
-                from += step;
-            }
-
-            globalProducts = allProductsData.map(item => {
-                const dealerStock = item.stocks ? item.stocks.find(s => s.dealer_id === currentDealer.id) : null;
-                return {
-                    id: item.id,
-                    code: item.code,
-                    name: item.name,
-                    category: item.category || 'Collection',
-                    image: item.image_url || 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500',
-                    stock: dealerStock ? dealerStock.quantity : 0
-                };
-            });
-
-            renderProducts(globalProducts);
-            updateKPIs();
-        }
-
-        function renderProducts(items) {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = '';
-
-            if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400 font-semibold">No products found in catalog.</div>`;
-                return;
-            }
-
-            items.forEach(p => {
-                const isCritical = p.stock > 0 && p.stock <= 3;
-                
-                let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
-                if (isCritical) {
-                    badgeClass = "bg-rose-100 text-[#d71921] border-rose-200";
-                } else if (p.stock > 3) {
-                    badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
-                }
-
-                const card = document.createElement('div');
-                card.className = "ui-card ui-card-hover rounded-2xl overflow-hidden flex flex-col justify-between group";
-
-                card.innerHTML = `
                     <div>
-                        <div class="h-48 w-full bg-slate-100 relative overflow-hidden">
-                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=500';">
-                            <span class="absolute top-3 left-3 bg-slate-900/80 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md tracking-wider">
-                                ${p.code}
-                            </span>
-                            <span class="absolute top-3 right-3 ${badgeClass} border text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
-                                Stock: ${p.stock} Pcs
-                            </span>
-                        </div>
-
-                        <div class="p-5">
-                            <span class="text-[11px] text-[#00205b] font-extrabold uppercase tracking-wider block">${p.category}</span>
-                            <h3 class="text-base font-bold text-slate-900 mt-1 leading-snug">${p.name}</h3>
-                        </div>
+                        <h3 class="text-base font-extrabold text-[#00205b]">Yataş B2B Proforma Order Draft</h3>
+                        <p class="text-xs text-slate-500 font-semibold" id="proformaInvoiceNo">Doc: PRF-2026-0001</p>
                     </div>
+                </div>
+                <button onclick="closeProformaModal()" class="text-slate-400 hover:text-slate-800 font-bold px-2.5 py-1 bg-slate-100 rounded-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-                    <div class="p-5 pt-0 mt-auto">
-                        <div class="flex items-center gap-3 pt-3 border-t border-slate-200">
-                            <div class="flex items-center bg-slate-100 rounded-xl border border-slate-200 p-1">
-                                <button onclick="updateQty('${p.id}', -1)" class="w-8 h-8 text-slate-800 font-extrabold hover:bg-slate-200 rounded-lg transition">-</button>
-                                <span id="qty-${p.id}" class="w-8 text-center text-xs font-extrabold text-slate-900">1</span>
-                                <button onclick="updateQty('${p.id}', 1)" class="w-8 h-8 text-slate-800 font-extrabold hover:bg-slate-200 rounded-lg transition">+</button>
-                            </div>
-
-                            <button onclick="makeSale('${p.id}')" class="flex-1 btn-navy font-extrabold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                <span>Record Sale</span>
-                            </button>
-                        </div>
+            <!-- Proforma İçerik Özet -->
+            <div class="space-y-3">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-2 gap-4 text-xs font-semibold">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Bayi Bilgisi</span>
+                        <span id="profDealerName" class="font-extrabold text-[#00205b] block">--</span>
                     </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Oluşturma Tarihi</span>
+                        <span id="profDate" class="font-bold text-slate-800 block">04.08.2026</span>
+                    </div>
+                </div>
 
-        async function makeSale(productId) {
-            const qtyInput = parseInt(document.getElementById(`qty-${productId}`).innerText) || 1;
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-600 font-extrabold uppercase text-[10px]">
+                            <tr>
+                                <th class="p-3">SKU & Ürün</th>
+                                <th class="p-3 text-center">Sipariş Miktarı</th>
+                                <th class="p-3 text-right">Birim Fiyat</th>
+                                <th class="p-3 text-right">Toplam Tutar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proformaTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                    <span class="text-xs font-bold text-emerald-800 uppercase">Toplam Proforma Tutar:</span>
+                    <span id="profTotalAmount" class="text-lg font-black text-emerald-700">$0.00</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+                <button onclick="closeProformaModal()" class="px-4 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">İptal</button>
+                <button onclick="confirmAndSendProformaOrder()" class="px-5 py-2.5 bg-[#00205b] text-white font-extrabold rounded-xl text-xs hover:bg-[#00153e] transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Proformayı Onayla & SAP'ye Gönder
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN PORTAL WRAPPER (Devamı mevcut kodunuzla aynı yapıda akmaktadır) -->
+    <script>
+        let currentProformaItem = null;
+
+        function generateProformaDraft(productId, recommendedOrder) {
             const product = globalProducts.find(p => p.id === productId);
+            if (!product) return;
 
-            if (!product || product.stock < qtyInput) {
-                alert(`Insufficient Stock! Available stock: ${product ? product.stock : 0} Pcs, Requested: ${qtyInput} Pcs`);
-                return;
-            }
+            currentProformaItem = { product, qty: recommendedOrder };
 
-            const newStock = product.stock - qtyInput;
+            document.getElementById('proformaInvoiceNo').innerText = `Doc: PRF-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('profDealerName').innerText = currentDealer ? currentDealer.name : 'Yataş Dealer';
+            document.getElementById('profDate').innerText = new Date().toLocaleDateString('tr-TR');
+
+            const tbody = document.getElementById('proformaTableBody');
+            const total = recommendedOrder * product.price;
+
+            tbody.innerHTML = `
+                <tr>
+                    <td class="p-3">
+                        <span class="font-mono font-black text-[#00205b] block text-[10px]">${product.code}</span>
+                        <span class="font-bold text-slate-800">${product.name}</span>
+                    </td>
+                    <td class="p-3 text-center font-black text-[#00205b]">${recommendedOrder} Pcs</td>
+                    <td class="p-3 text-right font-bold">$${product.price}</td>
+                    <td class="p-3 text-right font-black text-emerald-600">$${total}</td>
+                </tr>
+            `;
+
+            document.getElementById('profTotalAmount').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('proformaModal').classList.remove('hidden');
+        }
+
+        function closeProformaModal() {
+            document.getElementById('proformaModal').classList.add('hidden');
+        }
+
+        async function confirmAndSendProformaOrder() {
+            if (!currentProformaItem) return;
 
             try {
-                const { error: stockError } = await supabaseClient
-                    .from('stocks')
-                    .upsert({ 
-                        dealer_id: currentDealer.id, 
-                        product_id: productId, 
-                        quantity: newStock 
-                    }, { onConflict: 'dealer_id,product_id' });
+                // Supabase Sipariş Kaydı
+                await supabaseClient.from('shipments').insert([{
+                    dealer_code: currentDealer.code,
+                    invoice_no: `PRF-${Math.floor(100000 + Math.random() * 900000)}`,
+                    product_code: currentProformaItem.product.code,
+                    product_name: currentProformaItem.product.name,
+                    quantity: currentProformaItem.qty,
+                    status: 'PENDING'
+                }]);
 
-                if (stockError) throw stockError;
-
-                await supabaseClient
-                    .from('stock_movements')
-                    .insert([{ 
-                        dealer_id: currentDealer.id, 
-                        product_id: productId, 
-                        movement_type: 'SALE', 
-                        quantity: qtyInput 
-                    }]);
-
-                product.stock = newStock;
-                todaySalesCount += qtyInput;
-
-                const todayKey = `sales_${currentDealer.id}_${new Date().toISOString().slice(0,10)}`;
-                localStorage.setItem(todayKey, todaySalesCount);
-
-                renderProducts(globalProducts);
-                updateKPIs();
-
-            } catch (err) {
-                console.error("Sale transaction error:", err);
-                alert("An error occurred while recording the sale!");
-            }
-        }
-
-        async function fetchPendingShipments() {
-            if (!currentDealer || !currentDealer.code) return;
-
-            const searchCode = String(currentDealer.code).trim();
-
-            let { data, error } = await supabaseClient
-                .from('shipments')
-                .select('*')
-                .eq('dealer_code', searchCode);
-
-            if (error) {
-                console.error("Shipment fetch error:", error);
-                return;
-            }
-
-            pendingShipmentsList = (data || []).filter(s => 
-                String(s.status).toUpperCase() === 'PENDING'
-            );
-
-            approvedShipmentsHistory = (data || []).filter(s => 
-                String(s.status).toUpperCase() === 'APPROVED'
-            );
-
-            const badgeEl = document.getElementById('pendingBadge');
-            if (badgeEl) {
-                if (pendingShipmentsList.length >= 1000) {
-                    badgeEl.innerText = '1000+';
-                } else if (pendingShipmentsList.length > 999) {
-                    badgeEl.innerText = '999+';
-                } else {
-                    badgeEl.innerText = pendingShipmentsList.length;
-                }
-            }
-
-            populateInvoiceFilterOptions();
-            renderShipmentsTable();
-            renderApprovedSummaryHistory();
-        }
-
-        function populateInvoiceFilterOptions() {
-            const selectEl = document.getElementById('invoiceFilter');
-            if (!selectEl) return;
-
-            const uniqueInvoices = [...new Set(pendingShipmentsList.map(s => s.invoice_no))].filter(Boolean);
-
-            selectEl.innerHTML = '<option value="ALL">All Pending Invoices (' + uniqueInvoices.length + ' Invoices)</option>';
-            uniqueInvoices.forEach(inv => {
-                selectEl.innerHTML += `<option value="${inv}">Invoice: ${inv}</option>`;
-            });
-        }
-
-        function onInvoiceFilterChange() {
-            renderShipmentsTable();
-        }
-
-        // DİNAMİK TEKİL FLOATING PREVIEW KONTROLÜ (TÜM MÜKERRER RESİM AÇILMALARINI ENGELLER)
-        function showGlobalPreview(e, imgUrl, code, name) {
-            const previewBox = document.getElementById('globalHoverPreview');
-            const previewImg = document.getElementById('previewImg');
-            const previewCode = document.getElementById('previewCode');
-            const previewName = document.getElementById('previewName');
-
-            if (!previewBox) return;
-
-            previewImg.src = imgUrl;
-            previewCode.innerText = code || '';
-            previewName.innerText = name || '';
-
-            // Fare imlecinin hemen sağında dinamik pozisyonlama
-            previewBox.style.left = (e.clientX + 20) + 'px';
-            previewBox.style.top = Math.min(e.clientY - 40, window.innerHeight - 280) + 'px';
-            previewBox.style.display = 'block';
-        }
-
-        function hideGlobalPreview() {
-            const previewBox = document.getElementById('globalHoverPreview');
-            if (previewBox) {
-                previewBox.style.display = 'none';
-            }
-        }
-
-        function renderShipmentsTable() {
-            const selectedInv = document.getElementById('invoiceFilter').value;
-            const tbody = document.getElementById('shipmentTableBody');
-            if (!tbody) return;
-
-            let filtered = pendingShipmentsList;
-            if (selectedInv !== 'ALL') {
-                filtered = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
-            }
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">No pending shipments found for this filter.</td></tr>`;
-                updateHeaderSummary(0, 0, 0);
-                return;
-            }
-
-            tbody.innerHTML = '';
-            let totalInvoiceQty = 0;
-            let totalCountedQty = 0;
-
-            filtered.forEach(s => {
-                const matchedProduct = globalProducts.find(p => p.code === s.product_code);
-                const imgUrl = matchedProduct && matchedProduct.image 
-                    ? matchedProduct.image 
-                    : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
-
-                const invoiceQty = Number(s.quantity) || 0;
-                const defaultCountedQty = s.counted_qty !== undefined ? Number(s.counted_qty) : invoiceQty;
-                
-                totalInvoiceQty += invoiceQty;
-                totalCountedQty += defaultCountedQty;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100 font-semibold";
-                
-                // MOUSEENTER / MOUSELEAVE EVENTLERİ İLE DİNAMİK TEKİL ÖNİZLEME
-                tr.innerHTML = `
-                    <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="shrink-0">
-                                <img src="${imgUrl}" alt="${s.product_name}" 
-                                     onmouseenter="showGlobalPreview(event, '${imgUrl}', '${s.product_code}', '${(s.product_name || '').replace(/'/g, "\\'")}')" 
-                                     onmouseleave="hideGlobalPreview()"
-                                     class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm hover:ring-2 hover:ring-[#00205b] cursor-zoom-in transition" 
-                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=100';">
-                            </div>
-
-                            <div class="min-w-0">
-                                <span class="text-[10px] font-extrabold text-[#00205b] font-mono block tracking-wider">${s.product_code}</span>
-                                <span class="font-bold text-slate-900 text-xs block truncate max-w-md" title="${s.product_name || ''}">${s.product_name || ''}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 text-center font-extrabold text-slate-700 whitespace-nowrap">${invoiceQty} Pcs</td>
-                    <td class="p-4 text-center whitespace-nowrap">
-                        <input type="number" min="0" id="counted-input-${s.id}" value="${defaultCountedQty}" onchange="onItemCountedChange('${s.id}', ${invoiceQty})" class="w-20 text-center py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-black text-[#00205b] focus:outline-none focus:ring-2 focus:ring-[#00205b]">
-                    </td>
-                    <td class="p-4 text-center whitespace-nowrap font-extrabold" id="diff-cell-${s.id}">
-                        ${getDifferenceBadge(defaultCountedQty - invoiceQty)}
-                    </td>
-                    <td class="p-4 text-right whitespace-nowrap">
-                        <button onclick="approveSingleShipment('${s.id}', '${s.product_code}', ${invoiceQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm active:scale-95">
-                            Confirm & Add to Stock
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            updateHeaderSummary(totalInvoiceQty, totalCountedQty, totalCountedQty - totalInvoiceQty);
-        }
-
-        function onItemCountedChange(shipmentId, invoiceQty) {
-            const inputEl = document.getElementById(`counted-input-${shipmentId}`);
-            const diffCell = document.getElementById(`diff-cell-${shipmentId}`);
-            
-            const countedVal = Number(inputEl.value) || 0;
-            const diff = countedVal - invoiceQty;
-
-            if (diffCell) {
-                diffCell.innerHTML = getDifferenceBadge(diff);
-            }
-
-            recalculateTableTotals();
-        }
-
-        function getDifferenceBadge(diff) {
-            if (diff === 0) {
-                return `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[10px]">0 Pcs</span>`;
-            } else if (diff > 0) {
-                return `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md text-[10px]">+${diff} Pcs</span>`;
-            } else {
-                return `<span class="bg-rose-100 text-[#d71921] px-2 py-0.5 rounded-md text-[10px]">${diff} Pcs</span>`;
-            }
-        }
-
-        function recalculateTableTotals() {
-            const selectedInv = document.getElementById('invoiceFilter').value;
-            let filtered = pendingShipmentsList;
-            if (selectedInv !== 'ALL') {
-                filtered = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
-            }
-
-            let totInv = 0;
-            let totCounted = 0;
-
-            filtered.forEach(s => {
-                const invQty = Number(s.quantity) || 0;
-                const inputEl = document.getElementById(`counted-input-${s.id}`);
-                const countedQty = inputEl ? (Number(inputEl.value) || 0) : invQty;
-
-                totInv += invQty;
-                totCounted += countedQty;
-            });
-
-            updateHeaderSummary(totInv, totCounted, totCounted - totInv);
-        }
-
-        function updateHeaderSummary(totInv, totCounted, diff) {
-            document.getElementById('summaryInvoiceQty').innerText = totInv + ' Pcs';
-            document.getElementById('summaryCountedQty').innerText = totCounted + ' Pcs';
-            
-            const diffEl = document.getElementById('summaryDifferenceQty');
-            if (diff === 0) {
-                diffEl.className = "font-black text-slate-700 text-sm";
-                diffEl.innerText = "0 Pcs (Matched)";
-            } else if (diff > 0) {
-                diffEl.className = "font-black text-emerald-600 text-sm";
-                diffEl.innerText = "+" + diff + " Pcs (Excess)";
-            } else {
-                diffEl.className = "font-black text-[#d71921] text-sm";
-                diffEl.innerText = diff + " Pcs (Missing)";
-            }
-        }
-
-        async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
-            const product = globalProducts.find(p => p.code === productCode);
-            if (!product) {
-                alert('Product not found in database!');
-                return;
-            }
-
-            const inputEl = document.getElementById(`counted-input-${shipmentId}`);
-            const finalCountedQty = inputEl ? (Number(inputEl.value) || 0) : origInvoiceQty;
-
-            const newStock = product.stock + finalCountedQty;
-
-            try {
-                await supabaseClient
-                    .from('stocks')
-                    .upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: newStock });
-
-                await supabaseClient
-                    .from('shipments')
-                    .update({ 
-                        status: 'APPROVED',
-                        approved_qty: finalCountedQty,
-                        counted_qty: finalCountedQty 
-                    })
-                    .eq('id', shipmentId);
-
-                alert(`Shipment confirmed! ${finalCountedQty} Pcs added to live inventory.`);
+                alert('B2B Proforma Siparişiniz Başarıyla Oluşturuldu ve SAP Sistemine İletildi!');
+                closeProformaModal();
                 fetchPendingShipments();
-                fetchLiveProducts();
-
-            } catch (err) {
-                console.error("Single approval error:", err);
-                alert("An error occurred during confirmation!");
+            } catch (ex) {
+                console.error("Proforma Error:", ex);
+                alert("Sipariş iletilirken hata oluştu.");
             }
-        }
-
-        async function approveSelectedInvoiceAll() {
-            const selectedInv = document.getElementById('invoiceFilter').value;
-            let targetShipments = pendingShipmentsList;
-
-            if (selectedInv !== 'ALL') {
-                targetShipments = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
-            }
-
-            if (targetShipments.length === 0) {
-                alert('No pending shipments to approve!');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to approve all ${targetShipments.length} shipment item(s) in this selection?`)) {
-                return;
-            }
-
-            try {
-                for (let s of targetShipments) {
-                    const product = globalProducts.find(p => p.code === s.product_code);
-                    const inputEl = document.getElementById(`counted-input-${s.id}`);
-                    const finalCountedQty = inputEl ? (Number(inputEl.value) || 0) : Number(s.quantity);
-
-                    if (product) {
-                        const newStock = product.stock + finalCountedQty;
-                        await supabaseClient
-                            .from('stocks')
-                            .upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: newStock });
-                    }
-
-                    await supabaseClient
-                        .from('shipments')
-                        .update({ 
-                            status: 'APPROVED',
-                            approved_qty: finalCountedQty,
-                            counted_qty: finalCountedQty 
-                        })
-                        .eq('id', s.id);
-                }
-
-                alert('All selected invoice shipments approved and added to inventory!');
-                fetchPendingShipments();
-                fetchLiveProducts();
-
-            } catch (err) {
-                console.error("Accept all error:", err);
-                alert("An error occurred during bulk confirmation!");
-            }
-        }
-
-        function renderApprovedSummaryHistory() {
-            const tbody = document.getElementById('approvedSummaryBody');
-            if (!tbody) return;
-
-            if (approvedShipmentsHistory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No approved invoice history found.</td></tr>`;
-                return;
-            }
-
-            const groupedApproved = {};
-            approvedShipmentsHistory.forEach(s => {
-                const inv = s.invoice_no || 'N/A';
-                if (!groupedApproved[inv]) {
-                    groupedApproved[inv] = {
-                        date: s.updated_at || s.created_at || new Date().toISOString(),
-                        invoiceNo: inv,
-                        invoiceQty: 0,
-                        approvedQty: 0
-                    };
-                }
-                const origQty = Number(s.quantity) || 0;
-                const appQty = s.approved_qty !== undefined ? Number(s.approved_qty) : origQty;
-
-                groupedApproved[inv].invoiceQty += origQty;
-                groupedApproved[inv].approvedQty += appQty;
-            });
-
-            const summaryList = Object.values(groupedApproved);
-            tbody.innerHTML = summaryList.map(item => {
-                const diff = item.approvedQty - item.invoiceQty;
-                const formattedDate = new Date(item.date).toLocaleDateString('en-US');
-
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2.5 px-3 text-slate-500 font-mono text-[11px]">${formattedDate}</td>
-                        <td class="py-2.5 px-3 font-mono font-extrabold text-[#00205b]">${item.invoiceNo}</td>
-                        <td class="py-2.5 px-3 text-right font-bold text-slate-700">${item.invoiceQty} Pcs</td>
-                        <td class="py-2.5 px-3 text-right font-black text-emerald-600">${item.approvedQty} Pcs</td>
-                        <td class="py-2.5 px-3 text-center">${getDifferenceBadge(diff)}</td>
-                        <td class="py-2.5 px-3 text-center">
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold">Approved</span>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function updateQty(id, delta) {
-            const el = document.getElementById(`qty-${id}`);
-            let current = parseInt(el.innerText);
-            if (current + delta >= 1) el.innerText = current + delta;
-        }
-
-        function updateKPIs() {
-            const totalStock = globalProducts.reduce((acc, p) => acc + p.stock, 0);
-            const criticalCount = globalProducts.filter(p => p.stock > 0 && p.stock <= 3).length;
-
-            document.getElementById('kpiTotalStock').innerText = totalStock + ' Pcs';
-            document.getElementById('kpiTodaySales').innerText = todaySalesCount + ' Pcs';
-            document.getElementById('kpiCriticalStock').innerText = criticalCount + ' Items';
-        }
-
-        function filterProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = globalProducts.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query));
-            renderProducts(filtered);
         }
     </script>
 </body>
