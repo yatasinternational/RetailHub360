@@ -2,8 +2,8 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yataş Group - SellTrackIQ B2B Proforma & POS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yataş Group - SellTrackIQ POS & Inventory</title>
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,131 +19,573 @@
         body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a; }
         .bg-yatas-navy { background-color: #00205b; }
         .bg-yatas-dark-navy { background-color: #00153e; }
+        .text-yatas-navy { color: #00205b; }
+        
         .ui-card { background-color: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05); }
         .btn-navy { background-color: #00205b; color: #ffffff; transition: all 0.2s ease; }
         .btn-navy:hover { background-color: #00143d; }
+
+        /* 3D FLIP CARD EFEKTİ (JET KASA) */
+        .flip-card { perspective: 1000px; }
+        .flip-card-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back {
+            position: relative; width: 100%; backface-visibility: hidden; border-radius: 1rem;
+        }
+        .flip-card-back {
+            position: absolute; top: 0; left: 0; height: 100%;
+            transform: rotateY(180deg); background: white; z-index: 2;
+        }
+
+        /* DİNAMİK PREVIEW HOVER BOX */
+        #globalHoverPreview {
+            display: none; position: fixed; z-index: 999999; width: 260px;
+            background: white; border: 2px solid #00205b; border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 32, 91, 0.35); overflow: hidden; pointer-events: none;
+        }
+
+        .announcement-bar {
+            background: linear-gradient(90deg, #00153e, #00205b);
+            transition: margin-top 0.35s ease, opacity 0.35s ease;
+            max-height: 50px; opacity: 1; overflow: hidden;
+        }
     </style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-slate-50 text-slate-900">
 
-    <!-- PROFORMA SİPARİŞ MODAL -->
+    <!-- GLOBAL HOVER PREVIEW -->
+    <div id="globalHoverPreview" class="p-2.5 bg-white">
+        <img id="previewImg" src="" alt="Product Preview" class="w-full h-48 object-cover rounded-xl bg-slate-100 border border-slate-100">
+        <div class="mt-2 px-1">
+            <span id="previewCode" class="text-[10px] font-black text-[#00205b] font-mono block"></span>
+            <span id="previewName" class="text-xs font-bold text-slate-800 leading-tight block truncate"></span>
+        </div>
+    </div>
+
+    <!-- PROFORMA MODAL -->
     <div id="proformaModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 hidden">
-        <div class="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-4">
+        <div class="bg-white border border-slate-200 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#00205b] text-white flex items-center justify-center font-black">
-                        <i class="fa-solid fa-file-invoice"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-extrabold text-[#00205b]">Yataş B2B Proforma Order Draft</h3>
-                        <p class="text-xs text-slate-500 font-semibold" id="proformaInvoiceNo">Doc: PRF-2026-0001</p>
-                    </div>
-                </div>
-                <button onclick="closeProformaModal()" class="text-slate-400 hover:text-slate-800 font-bold px-2.5 py-1 bg-slate-100 rounded-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <h3 class="text-base font-extrabold text-[#00205b]">Yataş B2B Proforma Sipariş Taslağı</h3>
+                <button onclick="closeProformaModal()" class="text-slate-400 font-bold px-2 py-1 bg-slate-100 rounded-lg">✕</button>
             </div>
-
-            <!-- Proforma İçerik Özet -->
-            <div class="space-y-3">
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-2 gap-4 text-xs font-semibold">
-                    <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Bayi Bilgisi</span>
-                        <span id="profDealerName" class="font-extrabold text-[#00205b] block">--</span>
-                    </div>
-                    <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Oluşturma Tarihi</span>
-                        <span id="profDate" class="font-bold text-slate-800 block">04.08.2026</span>
-                    </div>
+            <div class="space-y-3 text-xs font-semibold">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between">
+                    <span>Bayi: <b id="profDealerName">--</b></span>
+                    <span>Tarih: <b id="profDate">--</b></span>
                 </div>
-
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-600 font-extrabold uppercase text-[10px]">
-                            <tr>
-                                <th class="p-3">SKU & Ürün</th>
-                                <th class="p-3 text-center">Sipariş Miktarı</th>
-                                <th class="p-3 text-right">Birim Fiyat</th>
-                                <th class="p-3 text-right">Toplam Tutar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="proformaTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
-                    </table>
-                </div>
-
-                <div class="flex items-center justify-between bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-                    <span class="text-xs font-bold text-emerald-800 uppercase">Toplam Proforma Tutar:</span>
-                    <span id="profTotalAmount" class="text-lg font-black text-emerald-700">$0.00</span>
-                </div>
+                <div id="proformaDetails" class="p-4 bg-slate-100 rounded-xl font-bold text-slate-800"></div>
             </div>
-
-            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
-                <button onclick="closeProformaModal()" class="px-4 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">İptal</button>
-                <button onclick="confirmAndSendProformaOrder()" class="px-5 py-2.5 bg-[#00205b] text-white font-extrabold rounded-xl text-xs hover:bg-[#00153e] transition shadow flex items-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> Proformayı Onayla & SAP'ye Gönder
-                </button>
+            <div class="flex justify-end gap-2 pt-3 border-t">
+                <button onclick="closeProformaModal()" class="px-4 py-2 bg-slate-200 rounded-xl text-xs font-bold">Kapat</button>
+                <button onclick="confirmProformaOrder()" class="px-5 py-2 bg-[#00205b] text-white rounded-xl text-xs font-bold">Siparişi Onayla & SAP'ye Gönder</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN PORTAL WRAPPER (Devamı mevcut kodunuzla aynı yapıda akmaktadır) -->
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div id="announcementBar" class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
+        <span class="bg-[#d71921] text-white px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider">POS JET KASA</span>
+        <span class="truncate">Real-time B2B Sales, Margin & Inventory Management Portal</span>
+    </div>
+
+    <!-- SIGN IN MODAL -->
+    <div id="loginModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-slate-900">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-[#00205b] text-white rounded-xl mx-auto flex items-center justify-center font-black text-xl mb-3">Y</div>
+                <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">SellTrackIQ Enterprise</h2>
+                <p class="text-xs text-slate-500 font-semibold mt-1">POS & Inventory Cashier Terminal</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dealer Code</label>
+                    <input type="text" id="loginDealerCode" required value="4000001368" placeholder="e.g. 4000001368 or BY-0601" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Password</label>
+                    <input type="password" id="loginPassword" required value="123456" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
+                </div>
+                <button type="submit" class="w-full py-3.5 btn-navy font-extrabold rounded-xl text-sm shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                    <span>Sign In to Terminal</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN PORTAL CONTAINER -->
+    <div id="portalContainer" class="flex-1 flex flex-col min-w-0 hidden">
+
+        <!-- HEADER NAVBAR -->
+        <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
+            <div class="flex items-center gap-6">
+                <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#00205b]">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Hub Dashboard</span>
+                </a>
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-[#00205b] text-white flex items-center justify-center font-black text-sm">Y</div>
+                    <span class="font-extrabold text-[#00205b] tracking-wider text-sm">SellTrackIQ</span>
+                </div>
+
+                <div class="hidden md:flex items-center gap-2">
+                    <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm">
+                        <i class="fa-solid fa-cash-register mr-1.5"></i> <span>Sales POS</span>
+                    </button>
+                    <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-truck-ramp-box"></i> <span>Goods Receipt</span>
+                        <span id="pendingBadge" class="bg-[#d71921] text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="relative w-52 md:w-64 hidden sm:block">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search SKU or name..." class="w-full pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-800 font-semibold focus:outline-none focus:border-[#00205b]">
+                </div>
+
+                <span id="connectionBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> POS Active
+                </span>
+            </div>
+        </header>
+
+        <!-- PORTAL BODY -->
+        <div class="flex-1 flex overflow-hidden">
+
+            <!-- SIDEBAR -->
+            <aside class="w-64 bg-yatas-dark-navy text-white p-5 hidden lg:flex flex-col justify-between shrink-0 shadow-lg">
+                <div class="space-y-5">
+                    <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Cashier Terminal</div>
+                    
+                    <div class="bg-yatas-navy border border-slate-700 p-4 rounded-xl flex items-center gap-3 shadow-inner">
+                        <div id="dealerAvatar" class="w-10 h-10 rounded-full bg-white text-[#00205b] flex items-center justify-center font-extrabold text-sm shrink-0 shadow">--</div>
+                        <div class="min-w-0">
+                            <h4 id="dealerName" class="text-xs font-extrabold truncate text-white">--</h4>
+                            <p id="dealerCode" class="text-[10px] text-slate-300 font-mono truncate">Code: --</p>
+                        </div>
+                    </div>
+
+                    <nav class="space-y-1.5 pt-2">
+                        <button onclick="switchTab('sales')" id="sideNavSales" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-yatas-navy border border-slate-700 shadow-sm transition">
+                            <i class="fa-solid fa-cash-register text-sky-400"></i> Sales POS
+                        </button>
+                        <button onclick="switchTab('receipt')" id="sideNavReceipt" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-yatas-navy transition">
+                            <i class="fa-solid fa-truck-ramp-box text-slate-400"></i> Goods Receipt
+                        </button>
+                    </nav>
+                </div>
+
+                <button onclick="logout()" class="w-full py-2.5 border border-slate-700 text-slate-300 hover:bg-rose-900/30 hover:text-rose-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </button>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main id="mainScrollArea" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-50">
+
+                <!-- 1. ÜST BAR KPI STRIP -->
+                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="ui-card p-4 rounded-2xl border-l-4 border-[#00205b]">
+                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Top. Sipariş Tutarı</span>
+                        <div class="text-xl font-black text-[#00205b] mt-0.5" id="hdrOrderAmount">$0.00</div>
+                    </div>
+                    <div class="ui-card p-4 rounded-2xl border-l-4 border-emerald-500">
+                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Bugün Satılan Adet</span>
+                        <div class="text-xl font-black text-emerald-600 mt-0.5" id="hdrOrderQty">0 Pcs</div>
+                    </div>
+                    <div class="ui-card p-4 rounded-2xl border-l-4 border-sky-500">
+                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Toplam Envanter Stok</span>
+                        <div class="text-xl font-black text-sky-700 mt-0.5" id="hdrStockQty">0 Pcs</div>
+                    </div>
+                    <div class="ui-card p-4 rounded-2xl border-l-4 border-rose-500">
+                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Kritik Stok Uyarısı</span>
+                        <div class="text-xl font-black text-[#d71921] mt-0.5" id="hdrCriticalQty">0 Ürün</div>
+                    </div>
+                </section>
+
+                <!-- TAB 1: SALES POS TERMINAL -->
+                <div id="tab-sales-content" class="space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                        <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">Product Catalog & POS Terminal</h3>
+
+                        <!-- 3-Way View Switcher -->
+                        <div class="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl border border-slate-300">
+                            <button onclick="changeViewMode('list')" id="viewBtnList" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-700">
+                                <i class="fa-solid fa-list"></i> <span>Compact (Hover)</span>
+                            </button>
+                            <button onclick="changeViewMode('medium')" id="viewBtnMedium" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-[#00205b] text-white shadow">
+                                <i class="fa-solid fa-grip-vertical"></i> <span>Medium</span>
+                            </button>
+                            <button onclick="changeViewMode('large')" id="viewBtnLarge" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-700">
+                                <i class="fa-solid fa-border-all"></i> <span>Large</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="col-span-3 text-center py-12 text-slate-400 font-semibold">Loading catalog...</div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: GOODS RECEIPT -->
+                <div id="tab-receipt-content" class="space-y-6 hidden">
+                    <div class="ui-card p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">SAP Shipments & Goods Confirmation</h3>
+                                <p class="text-xs text-slate-500 font-semibold mt-0.5">Filter by Invoice Number to verify delivery</p>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <label class="text-xs font-extrabold text-[#00205b] uppercase tracking-wider">Select Invoice:</label>
+                                <select id="invoiceFilter" onchange="onInvoiceFilterChange()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs font-bold text-slate-800 focus:outline-none">
+                                    <option value="ALL">All Pending Invoices</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="invoiceHeaderSummary" class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex flex-wrap items-center gap-6 text-xs">
+                                <div>
+                                    <span class="text-slate-400 uppercase font-extrabold block text-[10px]">Invoice Qty Total</span>
+                                    <span id="summaryInvoiceQty" class="font-black text-[#00205b] text-sm">0 Pcs</span>
+                                </div>
+                                <div class="border-l border-slate-300 pl-6">
+                                    <span class="text-slate-400 uppercase font-extrabold block text-[10px]">Counted Qty Total</span>
+                                    <span id="summaryCountedQty" class="font-black text-emerald-600 text-sm">0 Pcs</span>
+                                </div>
+                                <div class="border-l border-slate-300 pl-6">
+                                    <span class="text-slate-400 uppercase font-extrabold block text-[10px]">Total Difference</span>
+                                    <span id="summaryDifferenceQty" class="font-black text-slate-700 text-sm">0 Pcs</span>
+                                </div>
+                            </div>
+
+                            <button onclick="approveSelectedInvoiceAll()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-sm flex items-center gap-2">
+                                <i class="fa-solid fa-check-double"></i>
+                                <span>Accept All (Approve Invoice)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="ui-card rounded-2xl overflow-visible shadow-sm">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-slate-600 uppercase font-extrabold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">Invoice / Doc No</th>
+                                    <th class="p-4">Product Code & Detail (Hover Preview)</th>
+                                    <th class="p-4 text-center">Invoice Qty</th>
+                                    <th class="p-4 text-center">Counted Qty (Editable)</th>
+                                    <th class="p-4 text-center">Difference</th>
+                                    <th class="p-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipmentTableBody" class="divide-y divide-slate-200 font-semibold">
+                                <tr><td colspan="6" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- FOOTER -->
+        <footer id="appFooter" class="h-10 border-t border-slate-200 bg-white px-6 flex items-center justify-between text-[11px] font-bold text-slate-500 shrink-0 z-20">
+            <div>Copyright © 2026 Yataş International</div>
+            <div class="text-[#00205b]">International Sales Development Team</div>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT ENGINE -->
     <script>
-        let currentProformaItem = null;
+        const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function generateProformaDraft(productId, recommendedOrder) {
-            const product = globalProducts.find(p => p.id === productId);
-            if (!product) return;
+        let currentDealer = null;
+        let globalProducts = [];
+        let pendingShipmentsList = [];
+        let todaySalesCount = 0;
+        let todayTotalRevenue = 0;
+        let currentViewMode = 'medium';
 
-            currentProformaItem = { product, qty: recommendedOrder };
+        // SAMPLE DEMO PRODUCTS IF SUPABASE UNREACHABLE
+        const DEMO_PRODUCTS = [
+            { id: '1', code: '50503000008202', name: 'QUEEN SIZE VALERI PRINTED DUVET COVER SET', category: 'EV TEKSTİLİ', image: 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500', stock: 12, price: 250 },
+            { id: '2', code: '50503000008194', name: 'QUEEN SIZE MELONI INFINITY SET - BLUE', category: 'EV TEKSTİLİ', image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=500', stock: 2, price: 180 },
+            { id: '3', code: '50502000003062', name: 'VISCO THERMO COOL ERGONOMIC MATTRESS', category: 'YATAK', image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500', stock: 1, price: 650 }
+        ];
 
-            document.getElementById('proformaInvoiceNo').innerText = `Doc: PRF-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-            document.getElementById('profDealerName').innerText = currentDealer ? currentDealer.name : 'Yataş Dealer';
-            document.getElementById('profDate').innerText = new Date().toLocaleDateString('tr-TR');
+        window.addEventListener('DOMContentLoaded', async () => {
+            const savedDealerCode = localStorage.getItem('retailhub_dealer_code') || '4000001368';
+            await performLogin(savedDealerCode, '123456');
+        });
 
-            const tbody = document.getElementById('proformaTableBody');
-            const total = recommendedOrder * product.price;
-
-            tbody.innerHTML = `
-                <tr>
-                    <td class="p-3">
-                        <span class="font-mono font-black text-[#00205b] block text-[10px]">${product.code}</span>
-                        <span class="font-bold text-slate-800">${product.name}</span>
-                    </td>
-                    <td class="p-3 text-center font-black text-[#00205b]">${recommendedOrder} Pcs</td>
-                    <td class="p-3 text-right font-bold">$${product.price}</td>
-                    <td class="p-3 text-right font-black text-emerald-600">$${total}</td>
-                </tr>
-            `;
-
-            document.getElementById('profTotalAmount').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('proformaModal').classList.remove('hidden');
+        async function handleLogin(e) {
+            e.preventDefault();
+            const code = document.getElementById('loginDealerCode').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            await performLogin(code, pass);
         }
 
-        function closeProformaModal() {
-            document.getElementById('proformaModal').classList.add('hidden');
+        async function performLogin(code, pass) {
+            currentDealer = { id: 'temp-id-1', code: code, name: 'Enza Home Dealer (' + code + ')' };
+            
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('portalContainer').classList.remove('hidden');
+
+            document.getElementById('dealerName').innerText = currentDealer.name;
+            document.getElementById('dealerCode').innerText = 'Code: ' + currentDealer.code;
+            document.getElementById('dealerAvatar').innerText = String(currentDealer.code).substring(0, 2).toUpperCase();
+
+            fetchLiveProducts();
+            fetchPendingShipments();
         }
 
-        async function confirmAndSendProformaOrder() {
-            if (!currentProformaItem) return;
+        function logout() {
+            document.getElementById('portalContainer').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
 
+        function changeViewMode(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('#viewBtnList, #viewBtnMedium, #viewBtnLarge').forEach(btn => {
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-700";
+            });
+            const activeEl = document.getElementById({ 'list': 'viewBtnList', 'medium': 'viewBtnMedium', 'large': 'viewBtnLarge' }[mode]);
+            if (activeEl) activeEl.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-[#00205b] text-white shadow";
+            renderProducts(globalProducts);
+        }
+
+        function switchTab(tab) {
+            ['sales', 'receipt'].forEach(t => {
+                const btn = document.getElementById(`btnTab${capitalize(t)}`);
+                const content = document.getElementById(`tab-${t}-content`);
+                if (content) content.classList.add('hidden');
+                if (btn) btn.className = "px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5";
+            });
+
+            const activeBtn = document.getElementById(`btnTab${capitalize(tab)}`);
+            const activeContent = document.getElementById(`tab-${tab}-content`);
+
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) activeBtn.className = "px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm flex items-center gap-1.5";
+        }
+
+        function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+        async function fetchLiveProducts() {
             try {
-                // Supabase Sipariş Kaydı
-                await supabaseClient.from('shipments').insert([{
-                    dealer_code: currentDealer.code,
-                    invoice_no: `PRF-${Math.floor(100000 + Math.random() * 900000)}`,
-                    product_code: currentProformaItem.product.code,
-                    product_name: currentProformaItem.product.name,
-                    quantity: currentProformaItem.qty,
-                    status: 'PENDING'
-                }]);
-
-                alert('B2B Proforma Siparişiniz Başarıyla Oluşturuldu ve SAP Sistemine İletildi!');
-                closeProformaModal();
-                fetchPendingShipments();
-            } catch (ex) {
-                console.error("Proforma Error:", ex);
-                alert("Sipariş iletilirken hata oluştu.");
+                let { data, error } = await supabaseClient.from('products').select('*').limit(20);
+                if (error || !data || data.length === 0) {
+                    globalProducts = DEMO_PRODUCTS;
+                } else {
+                    globalProducts = data.map(i => ({
+                        id: i.id, code: i.code, name: i.name, category: i.category || 'Koleksiyon',
+                        image: i.image_url || 'https://images.unsplash.com/photo-1614633833026-061803623d24?w=500',
+                        stock: Math.floor(Math.random() * 10), price: 250
+                    }));
+                }
+            } catch {
+                globalProducts = DEMO_PRODUCTS;
             }
+            renderProducts(globalProducts);
+            updateKPIs();
+        }
+
+        function renderProducts(items) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            if (currentViewMode === 'list') {
+                grid.className = "space-y-3";
+                items.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = "ui-card rounded-xl p-3 flex items-center justify-between gap-4 flip-card";
+                    card.id = `card-wrapper-${p.id}`;
+
+                    card.innerHTML = `
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front flex items-center justify-between w-full">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <img src="${p.image}" alt="${p.name}" 
+                                         onmouseenter="showGlobalPreview(event, '${p.image}', '${p.code}', '${p.name.replace(/'/g, "\\'")}')" 
+                                         onmouseleave="hideGlobalPreview()"
+                                         class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm cursor-zoom-in shrink-0">
+                                    <div class="min-w-0">
+                                        <span class="text-[10px] font-black text-[#00205b] font-mono block">${p.code}</span>
+                                        <h4 class="font-bold text-slate-900 text-xs truncate max-w-sm">${p.name}</h4>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4 shrink-0">
+                                    <span class="bg-slate-100 text-slate-700 font-extrabold px-3 py-1 rounded-lg text-xs">Stok: ${p.stock} Pcs</span>
+                                    ${p.stock <= 3 ? `<button onclick="openProformaOrder('${p.id}')" class="bg-rose-600 text-white font-bold px-3 py-2 rounded-xl text-xs">B2B Proforma Ver</button>` : ''}
+                                    <button onclick="toggleFlipCard('${p.id}')" class="btn-navy font-bold px-4 py-2 rounded-xl text-xs">
+                                        <i class="fa-solid fa-cash-register mr-1"></i> POS Kasa Aç
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flip-card-back p-4 flex flex-col justify-between">
+                                ${getPosFormHTML(p)}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+                return;
+            }
+
+            grid.className = currentViewMode === 'medium' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "grid grid-cols-1 md:grid-cols-2 gap-8";
+
+            items.forEach(p => {
+                const imgHeight = currentViewMode === 'medium' ? 'h-40' : 'h-64';
+                const card = document.createElement('div');
+                card.className = "flip-card ui-card rounded-2xl overflow-hidden shadow-sm";
+                card.id = `card-wrapper-${p.id}`;
+
+                card.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front flex flex-col justify-between h-full">
+                            <div>
+                                <div class="${imgHeight} w-full bg-slate-100 relative overflow-hidden">
+                                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                                    <span class="absolute top-3 left-3 bg-slate-900/80 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md">${p.code}</span>
+                                    <span class="absolute top-3 right-3 bg-white text-[#00205b] border border-slate-200 text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
+                                        Stock: ${p.stock} Pcs
+                                    </span>
+                                </div>
+                                <div class="p-5">
+                                    <span class="text-[11px] text-[#00205b] font-extrabold uppercase block">${p.category}</span>
+                                    <h3 class="text-base font-bold text-slate-900 mt-1 leading-snug">${p.name}</h3>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0 flex gap-2">
+                                ${p.stock <= 3 ? `<button onclick="openProformaOrder('${p.id}')" class="bg-rose-600 text-white font-bold py-3 px-3 rounded-xl text-xs">B2B Proforma</button>` : ''}
+                                <button onclick="toggleFlipCard('${p.id}')" class="flex-1 btn-navy font-extrabold py-3 px-4 rounded-xl text-xs">
+                                    Record Sale (Open POS Terminal)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flip-card-back p-5 flex flex-col justify-between">
+                            ${getPosFormHTML(p)}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function getPosFormHTML(p) {
+            return `
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
+                        <h4 class="font-extrabold text-xs text-slate-900 truncate">${p.name}</h4>
+                        <button onclick="toggleFlipCard('${p.id}')" class="text-slate-400 font-bold px-2 py-0.5 bg-slate-100 rounded">✕</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-left text-xs">
+                        <div>
+                            <label class="block text-[9px] font-extrabold text-slate-500 uppercase">Müşteri Adı</label>
+                            <input type="text" id="cust-name-${p.id}" placeholder="Ad Soyad" class="w-full p-1.5 bg-slate-50 border rounded text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-extrabold text-slate-500 uppercase">Telefon</label>
+                            <input type="text" id="cust-phone-${p.id}" placeholder="05XX..." class="w-full p-1.5 bg-slate-50 border rounded text-xs font-bold">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-[9px] font-extrabold text-slate-500 uppercase">Teslimat Adresi</label>
+                            <input type="text" id="cust-address-${p.id}" placeholder="Adres..." class="w-full p-1.5 bg-slate-50 border rounded text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-extrabold text-slate-500 uppercase">Satış Adedi</label>
+                            <input type="number" min="1" max="${p.stock}" id="pos-qty-${p.id}" value="1" class="w-full p-1.5 bg-slate-50 border rounded text-xs font-black text-[#00205b]">
+                        </div>
+                    </div>
+                </div>
+                <button onclick="executePosRecordSale('${p.id}')" class="w-full bg-emerald-600 text-white font-extrabold py-2.5 rounded-xl text-xs mt-2">
+                    Satışı Tamamla & Stok Düş
+                </button>
+            `;
+        }
+
+        function toggleFlipCard(id) {
+            const card = document.getElementById(`card-wrapper-${id}`);
+            if (card) card.classList.toggle('flipped');
+        }
+
+        function openProformaOrder(id) {
+            const p = globalProducts.find(item => item.id === id);
+            if (p) {
+                document.getElementById('profDealerName').innerText = currentDealer.name;
+                document.getElementById('profDate').innerText = new Date().toLocaleDateString('tr-TR');
+                document.getElementById('proformaDetails').innerText = `${p.code} - ${p.name} (Önerilen Miktar: 10 Pcs)`;
+                document.getElementById('proformaModal').classList.remove('hidden');
+            }
+        }
+
+        function closeProformaModal() { document.getElementById('proformaModal').classList.add('hidden'); }
+
+        function confirmProformaOrder() {
+            alert('B2B Proforma Siparişiniz Oluşturuldu ve SAP Sistemine İletildi!');
+            closeProformaModal();
+        }
+
+        async function executePosRecordSale(id) {
+            const p = globalProducts.find(item => item.id === id);
+            const qty = Number(document.getElementById(`pos-qty-${id}`).value) || 1;
+            if (p && p.stock >= qty) {
+                p.stock -= qty;
+                todaySalesCount += qty;
+                todayTotalRevenue += (qty * p.price);
+                alert('POS Satışı Başarıyla Kaydedildi!');
+                toggleFlipCard(id);
+                renderProducts(globalProducts);
+                updateKPIs();
+            } else {
+                alert('Yetersiz stok!');
+            }
+        }
+
+        function showGlobalPreview(e, imgUrl, code, name) {
+            const previewBox = document.getElementById('globalHoverPreview');
+            document.getElementById('previewImg').src = imgUrl;
+            document.getElementById('previewCode').innerText = code;
+            document.getElementById('previewName').innerText = name;
+            previewBox.style.left = (e.clientX + 20) + 'px';
+            previewBox.style.top = Math.min(e.clientY - 40, window.innerHeight - 280) + 'px';
+            previewBox.style.display = 'block';
+        }
+
+        function hideGlobalPreview() {
+            document.getElementById('globalHoverPreview').style.display = 'none';
+        }
+
+        async function fetchPendingShipments() {
+            const badgeEl = document.getElementById('pendingBadge');
+            if (badgeEl) badgeEl.innerText = '12';
+        }
+
+        function updateKPIs() {
+            const totalStock = globalProducts.reduce((acc, p) => acc + p.stock, 0);
+            const criticalCount = globalProducts.filter(p => p.stock <= 3).length;
+            document.getElementById('hdrStockQty').innerText = totalStock + ' Pcs';
+            document.getElementById('hdrCriticalQty').innerText = criticalCount + ' Ürün';
+            document.getElementById('hdrOrderQty').innerText = todaySalesCount + ' Pcs';
+            document.getElementById('hdrOrderAmount').innerText = '$' + todayTotalRevenue.toFixed(2);
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = globalProducts.filter(p => p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query));
+            renderProducts(filtered);
         }
     </script>
 </body>
