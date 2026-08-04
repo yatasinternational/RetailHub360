@@ -751,26 +751,52 @@
             document.getElementById('summaryCountedQty').innerText = totalCountedQty + ' Pcs';
         }
 
-        async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
+async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
             const product = globalProducts.find(p => p.code === productCode);
             const inputCounted = document.getElementById(`counted-input-${shipmentId}`);
             const inputCogs = document.getElementById(`cogs-input-${shipmentId}`);
             const inputPrice = document.getElementById(`price-input-${shipmentId}`);
 
             const finalCountedQty = inputCounted ? (Number(inputCounted.value) || origInvoiceQty) : origInvoiceQty;
-            const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
-            const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
+            const finalCogs = inputCogs ? Number(inputCogs.value) : (product ? product.cogs : 130);
+            const finalPrice = inputPrice ? Number(inputPrice.value) : (product ? product.price : 250);
 
             try {
                 if (product) {
-                    await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + finalCountedQty });
+                    const newTotalStock = Number(product.stock) + Number(finalCountedQty);
+                    
+                    // 1. Supabase stocks tablosunu güncelle
+                    const { error: stockErr } = await supabaseClient
+                        .from('stocks')
+                        .upsert({ 
+                            dealer_id: currentDealer.id, 
+                            product_id: product.id, 
+                            quantity: newTotalStock 
+                        }, { onConflict: 'dealer_id,product_id' });
+
+                    if (stockErr) {
+                        console.error("Stock update error:", stockErr);
+                        alert("Stok güncellenirken hata oluştu: " + stockErr.message);
+                        return;
+                    }
+
+                    // 2. Ürün SMM ve Fiyatını güncelle
                     await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
                 }
-                await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: finalCountedQty, counted_qty: finalCountedQty }).eq('id', shipmentId);
-                alert('Shipment confirmed and imported to store stock with updated SMM and Price!');
-                fetchPendingShipments();
-                fetchLiveProducts();
-            } catch (err) { console.error(err); }
+
+                // 3. Sevkiyat durumunu APPROVED yap
+                await supabaseClient.from('shipments').update({ 
+                    status: 'APPROVED', 
+                    approved_qty: finalCountedQty, 
+                    counted_qty: finalCountedQty 
+                }).eq('id', shipmentId);
+
+                alert('Shipment confirmed and imported to store stock successfully!');
+                await fetchPendingShipments();
+                await fetchLiveProducts();
+            } catch (err) { 
+                console.error("Approval Exception:", err); 
+            }
         }
 
         async function approveSelectedInvoiceAll() {
@@ -786,19 +812,34 @@
                     const inputPrice = document.getElementById(`price-input-${s.id}`);
 
                     const finalCountedQty = inputCounted ? (Number(inputCounted.value) || Number(s.quantity)) : Number(s.quantity);
-                    const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
-                    const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
+                    const finalCogs = inputCogs ? Number(inputCogs.value) : (product ? product.cogs : 130);
+                    const finalPrice = inputPrice ? Number(inputPrice.value) : (product ? product.price : 250);
 
                     if (product) {
-                        await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + finalCountedQty });
+                        const newTotalStock = Number(product.stock) + Number(finalCountedQty);
+                        
+                        await supabaseClient
+                            .from('stocks')
+                            .upsert({ 
+                                dealer_id: currentDealer.id, 
+                                product_id: product.id, 
+                                quantity: newTotalStock 
+                            }, { onConflict: 'dealer_id,product_id' });
+
                         await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
                     }
-                    await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: finalCountedQty, counted_qty: finalCountedQty }).eq('id', s.id);
+                    await supabaseClient.from('shipments').update({ 
+                        status: 'APPROVED', 
+                        approved_qty: finalCountedQty, 
+                        counted_qty: finalCountedQty 
+                    }).eq('id', s.id);
                 }
                 alert('All selected invoice items confirmed and imported to store stock!');
-                fetchPendingShipments();
-                fetchLiveProducts();
-            } catch (err) { console.error(err); }
+                await fetchPendingShipments();
+                await fetchLiveProducts();
+            } catch (err) { 
+                console.error("Bulk Approval Exception:", err); 
+            }
         }
 
         /* 7'Lİ KPI HESAPLAMASI & CANLI MARK-UP (SATIŞ FİYATI / SMM) */
