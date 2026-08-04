@@ -514,6 +514,47 @@
             });
         }
 
+	const i18nGlobal = {
+    	EN: {
+        	today_rev: "Today's Sales Revenue",
+        	delivered_rev: "Delivered Revenue",
+        	stock_val: "Inventory Stock Valuation ($)",
+        	stock_count: "Current Inventory On Hand",
+        	sign_out: "Sign Out"
+    	},
+    	TR: {
+        	today_rev: "Bugünün Kasa Cirosu",
+        	delivered_rev: "Teslim Edilen Ciro",
+        	stock_val: "Envanter Stok Maliyeti ($)",
+        	stock_count: "Mevcut Stok Adedi",
+        	sign_out: "Çıkış Yap"
+    	},
+    	DE: {
+        	today_rev: "Tagesumsatz",
+        	delivered_rev: "Gelieferter Umsatz",
+        	stock_val: "Lagerbewertung ($)",
+        	stock_count: "Aktueller Lagerbestand",
+        	sign_out: "Abmelden"
+    	},
+    	RU: {
+        	today_rev: "Выручка за сегодня",
+        	delivered_rev: "Доставленная выручка",
+        	stock_val: "Оценка запасов ($)",
+        	stock_count: "Текущий запас",
+        	sign_out: "Выйти"
+    	}
+};
+
+function changeLanguage(lang) {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18nGlobal[lang] && i18nGlobal[lang][key]) {
+            el.innerText = i18nGlobal[lang][key];
+        }
+    });
+}
+
+
         async function switchPresentation(index) {
             currentActivePresentationIndex = index;
             globalLoading.style.display = 'flex'; globalLoading.style.opacity = '1';

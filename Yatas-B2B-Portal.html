@@ -38,6 +38,29 @@
             --radius-lg: 20px;
             --brand-ambient: radial-gradient(circle at 10% 20%, rgba(0, 40, 112, 0.06) 0%, transparent 50%);
         }
+	/* LOGO TİTREŞİMİ (FLICKER) KESİN ÇÖZÜMÜ & DARK MODE FIX */
+	     .brand-logo-btn {
+              height: 38px !important;
+              min-width: 120px !important;
+              flex-shrink: 0 !important;
+              overflow: hidden !important;
+	}
+             .brand-logo-btn img {
+              height: 32px !important;
+              width: auto !important;
+              max-width: 140px !important;
+              object-fit: contain !important;
+              display: block !important;
+	}
+              [data-theme="dark"] .brand-logo-btn img,
+              [data-theme="dark"] .filter-chip-logo {
+              filter: brightness(0) invert(1) !important;
+              opacity: 0.95;
+	}
+
+	/* CHATBOT & SEPET Z-INDEX HİYERARŞİSİ */
+              .chat-widget-btn, .chat-window { z-index: 4000 !important; }
+	      .cart-drawer, .cart-overlay { z-index: 99999 !important; }
 
         [data-theme="dark"] {
             --yatas-navy: #38bdf8;
@@ -721,8 +744,8 @@
             </a>
 
             <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars" id="hamburgerIcon"></i></button>
-            <button class="brand-logo-btn" onclick="resetToHome()">
-                <img src="../yatas_grup_logo.jpg" alt="Yataş Group" onerror="this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png'">
+            <button class="brand-logo-btn" onclick="resetToHome()" title="Yataş Group Home">
+                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
             </button>
             
             <div class="nav-view-tabs">
