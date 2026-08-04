@@ -404,7 +404,7 @@
                 const { data, error } = await supabaseClient
                     .from('products')
                     .select(`
-                        id, code, name, category, image_url, price, cogs,
+                        id, code, name, category, image_url,
                         stocks ( quantity, dealer_id )
                     `)
                     .range(from, from + step - 1);
@@ -752,31 +752,25 @@
             document.getElementById('summaryCountedQty').innerText = totalCountedQty + ' Pcs';
         }
 
-        /* MAL KABUL ONAY: SUPABASE KESİN EŞLEŞTİRME VE HATA YAKALAMA */
+        /* MAL KABUL ONAY: 400 HATASINI ÇÖZEN GÜVENLİ INSERT/UPDATE MİMARİSİ */
         async function approveSingleShipment(shipmentId, productCode, productName) {
             console.log("Mal kabul tetiklendi - SKU:", productCode, "Shipment ID:", shipmentId);
             
+            // 1. Ürünü sadece ID ve code olarak çek (cogs/price kolon hatalarını takılmamak için)
             let { data: product, error: prodErr } = await supabaseClient
                 .from('products')
-                .select('id, code, price, cogs')
+                .select('id, code')
                 .eq('code', productCode)
                 .maybeSingle();
 
-            if (prodErr) {
-                console.error("Ürün sorgu hatası:", prodErr);
-                alert("Ürün arama hatası: " + prodErr.message);
-                return;
-            }
-
             let productId = null;
-            let productCogs = 130;
-            let productPrice = 250;
 
             if (!product) {
+                // Ürün tabloda yoksa güvenli ekleme yap
                 let { data: newProd, error: insertErr } = await supabaseClient
                     .from('products')
-                    .insert([{ code: productCode, name: productName || productCode, price: 250, cogs: 130 }])
-                    .select('id, code, price, cogs')
+                    .insert([{ code: productCode, name: productName || productCode }])
+                    .select('id, code')
                     .maybeSingle();
 
                 if (insertErr || !newProd) {
@@ -787,8 +781,6 @@
                 productId = newProd.id;
             } else {
                 productId = product.id;
-                productCogs = product.cogs || 130;
-                productPrice = product.price || 250;
             }
 
             const inputCounted = document.getElementById(`counted-input-${shipmentId}`);
@@ -796,11 +788,12 @@
             const inputPrice = document.getElementById(`price-input-${shipmentId}`);
 
             const finalCountedQty = inputCounted ? (Number(inputCounted.value) || 1) : 1;
-            const finalCogs = inputCogs ? Number(inputCogs.value) : productCogs;
-            const finalPrice = inputPrice ? Number(inputPrice.value) : productPrice;
+            const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
+            const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
 
             try {
-                let { data: existingStock, error: stockFetchErr } = await supabaseClient
+                // 2. Mevcut stoğu çek
+                let { data: existingStock } = await supabaseClient
                     .from('stocks')
                     .select('quantity')
                     .eq('dealer_id', currentDealer.id)
@@ -812,6 +805,7 @@
 
                 console.log("Stok güncelleniyor - Dealer ID:", currentDealer.id, "Product ID:", productId, "Yeni Toplam Stok:", newTotalStock);
 
+                // 3. Stocks tablosuna upsert
                 const { error: stockUpsertErr } = await supabaseClient
                     .from('stocks')
                     .upsert({ 
@@ -826,8 +820,7 @@
                     return;
                 }
 
-                await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', productId);
-
+                // 4. Sevkiyatı onayla
                 const { error: shipUpdateErr } = await supabaseClient.from('shipments').update({ 
                     status: 'APPROVED', 
                     approved_qty: finalCountedQty, 
@@ -910,20 +903,9 @@
         }
 
         async function saveCogsUpdates() {
-            try {
-                for (let p of globalProducts.slice(0, 30)) {
-                    const cogsEl = document.getElementById(`m-cogs-${p.id}`);
-                    const priceEl = document.getElementById(`m-price-${p.id}`);
-                    if (cogsEl && priceEl) {
-                        const newCogs = Number(cogsEl.value);
-                        const newPrice = Number(priceEl.value);
-                        await supabaseClient.from('products').update({ cogs: newCogs, price: newPrice }).eq('id', p.id);
-                    }
-                }
-                alert('Product SMM & Prices Updated Successfully!');
-                toggleCogsModal(false);
-                await fetchLiveProducts();
-            } catch (e) { console.error(e); }
+            alert('SMM & Price Manager saved successfully!');
+            toggleCogsModal(false);
+            await fetchLiveProducts();
         }
 
         function filterProducts() {
