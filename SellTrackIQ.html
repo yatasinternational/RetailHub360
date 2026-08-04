@@ -355,7 +355,6 @@
                 .maybeSingle();
 
             if (!data) {
-                // Eğer bayi veritabanında yoksa otomatik oluştur veya geçici ID ata
                 let { data: newDealer } = await supabaseClient
                     .from('dealers')
                     .insert([{ code: code, name: 'Enza Home Dealer (' + code + ')' }])
@@ -753,20 +752,43 @@
             document.getElementById('summaryCountedQty').innerText = totalCountedQty + ' Pcs';
         }
 
-        /* MAL KABUL ONAY: PRODUCT ID VEYA CODE İLE KESİN EŞLEŞTİRME VE STOĞA EKLEME */
+        /* MAL KABUL ONAY: SUPABASE KESİN EŞLEŞTİRME VE HATA YAKALAMA */
         async function approveSingleShipment(shipmentId, productCode, productName) {
-            let product = globalProducts.find(p => p.code === productCode);
+            console.log("Mal kabul tetiklendi - SKU:", productCode, "Shipment ID:", shipmentId);
             
-            // Eğer globalProducts içinde ürün anında bulunamadıysa Supabase'den ID'sini çek
+            let { data: product, error: prodErr } = await supabaseClient
+                .from('products')
+                .select('id, code, price, cogs')
+                .eq('code', productCode)
+                .maybeSingle();
+
+            if (prodErr) {
+                console.error("Ürün sorgu hatası:", prodErr);
+                alert("Ürün arama hatası: " + prodErr.message);
+                return;
+            }
+
+            let productId = null;
+            let productCogs = 130;
+            let productPrice = 250;
+
             if (!product) {
-                let { data: fetchedProd } = await supabaseClient.from('products').select('*').eq('code', productCode).maybeSingle();
-                if (fetchedProd) {
-                    product = { id: fetchedProd.id, code: fetchedProd.code, stock: 0, cogs: fetchedProd.cogs || 130, price: fetchedProd.price || 250 };
-                } else {
-                    // Ürün veritabanında yoksa otomatik oluştur
-                    let { data: newProd } = await supabaseClient.from('products').insert([{ code: productCode, name: productName || productCode, price: 250, cogs: 130 }]).select().maybeSingle();
-                    if (newProd) product = { id: newProd.id, code: newProd.code, stock: 0, cogs: 130, price: 250 };
+                let { data: newProd, error: insertErr } = await supabaseClient
+                    .from('products')
+                    .insert([{ code: productCode, name: productName || productCode, price: 250, cogs: 130 }])
+                    .select('id, code, price, cogs')
+                    .maybeSingle();
+
+                if (insertErr || !newProd) {
+                    console.error("Yeni ürün kayıt hatası:", insertErr);
+                    alert("Yeni ürün veritabanına eklenemedi: " + (insertErr ? insertErr.message : "Bilinmeyen hata"));
+                    return;
                 }
+                productId = newProd.id;
+            } else {
+                productId = product.id;
+                productCogs = product.cogs || 130;
+                productPrice = product.price || 250;
             }
 
             const inputCounted = document.getElementById(`counted-input-${shipmentId}`);
@@ -774,59 +796,60 @@
             const inputPrice = document.getElementById(`price-input-${shipmentId}`);
 
             const finalCountedQty = inputCounted ? (Number(inputCounted.value) || 1) : 1;
-            const finalCogs = inputCogs ? Number(inputCogs.value) : (product ? product.cogs : 130);
-            const finalPrice = inputPrice ? Number(inputPrice.value) : (product ? product.price : 250);
+            const finalCogs = inputCogs ? Number(inputCogs.value) : productCogs;
+            const finalPrice = inputPrice ? Number(inputPrice.value) : productPrice;
 
             try {
-                if (product && product.id) {
-                    // Mevcut stoğu çek veya 0 al
-                    let { data: existingStock } = await supabaseClient
-                        .from('stocks')
-                        .select('quantity')
-                        .eq('dealer_id', currentDealer.id)
-                        .eq('product_id', product.id)
-                        .maybeSingle();
+                let { data: existingStock, error: stockFetchErr } = await supabaseClient
+                    .from('stocks')
+                    .select('quantity')
+                    .eq('dealer_id', currentDealer.id)
+                    .eq('product_id', productId)
+                    .maybeSingle();
 
-                    const currentQty = existingStock ? Number(existingStock.quantity) : 0;
-                    const newTotalStock = currentQty + Number(finalCountedQty);
+                const currentQty = existingStock ? Number(existingStock.quantity) : 0;
+                const newTotalStock = currentQty + Number(finalCountedQty);
 
-                    // Stocks tablosuna kaydet
-                    const { error: stockErr } = await supabaseClient
-                        .from('stocks')
-                        .upsert({ 
-                            dealer_id: currentDealer.id, 
-                            product_id: product.id, 
-                            quantity: newTotalStock 
-                        }, { onConflict: 'dealer_id,product_id' });
+                console.log("Stok güncelleniyor - Dealer ID:", currentDealer.id, "Product ID:", productId, "Yeni Toplam Stok:", newTotalStock);
 
-                    if (stockErr) {
-                        alert("Stock DB Error: " + stockErr.message);
-                        return;
-                    }
+                const { error: stockUpsertErr } = await supabaseClient
+                    .from('stocks')
+                    .upsert({ 
+                        dealer_id: currentDealer.id, 
+                        product_id: productId, 
+                        quantity: newTotalStock 
+                    }, { onConflict: 'dealer_id,product_id' });
 
-                    // Ürün SMM ve Fiyatını güncelle
-                    await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
+                if (stockUpsertErr) {
+                    console.error("Stocks Upsert Hatası:", stockUpsertErr);
+                    alert("Stok tablosuna yazılamadı! Hata: " + stockUpsertErr.message);
+                    return;
                 }
 
-                // Sevkiyatı onayla
-                await supabaseClient.from('shipments').update({ 
+                await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', productId);
+
+                const { error: shipUpdateErr } = await supabaseClient.from('shipments').update({ 
                     status: 'APPROVED', 
                     approved_qty: finalCountedQty, 
                     counted_qty: finalCountedQty 
                 }).eq('id', shipmentId);
 
+                if (shipUpdateErr) {
+                    console.error("Sevkiyat güncelleme hatası:", shipUpdateErr);
+                }
+
                 alert('Goods successfully received and added to store stock!');
                 await fetchPendingShipments();
                 await fetchLiveProducts();
             } catch (err) { 
-                console.error("Approval Exception:", err); 
-                alert("Mal kabul onay hatası: " + err.message);
+                console.error("Kritik Mal Kabul İstisnası:", err); 
+                alert("İşlem sırasında hata: " + err.message);
             }
         }
 
         async function approveSelectedInvoiceAll() {
-            const selectedInv = document.getElementById('invoiceFilter').value;
             let targetShipments = pendingShipmentsList;
+            const selectedInv = document.getElementById('invoiceFilter').value;
             if (selectedInv !== 'ALL') targetShipments = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
 
             try {
@@ -835,7 +858,7 @@
                 }
                 alert('All selected invoice items confirmed and imported to store stock!');
             } catch (err) { 
-                console.error("Bulk Approval Exception:", err); 
+                console.error("Toplu onay hatası:", err); 
             }
         }
 
