@@ -717,6 +717,7 @@
                 totalCountedQty += defaultCountedQty;
 
                 const tr = document.createElement('tr');
+                tr.id = `shipment-row-${s.id}`;
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100 font-semibold";
                 tr.innerHTML = `
                     <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
@@ -752,11 +753,10 @@
             document.getElementById('summaryCountedQty').innerText = totalCountedQty + ' Pcs';
         }
 
-        /* MAL KABUL ONAY: 400 HATASINI ÇÖZEN GÜVENLİ INSERT/UPDATE MİMARİSİ */
+        /* MAL KABUL ONAY: HIZLI UI DOM KALDIRMA VE VERİTABANI SENKRONİZASYONU */
         async function approveSingleShipment(shipmentId, productCode, productName) {
             console.log("Mal kabul tetiklendi - SKU:", productCode, "Shipment ID:", shipmentId);
             
-            // 1. Ürünü sadece ID ve code olarak çek (cogs/price kolon hatalarını takılmamak için)
             let { data: product, error: prodErr } = await supabaseClient
                 .from('products')
                 .select('id, code')
@@ -766,7 +766,6 @@
             let productId = null;
 
             if (!product) {
-                // Ürün tabloda yoksa güvenli ekleme yap
                 let { data: newProd, error: insertErr } = await supabaseClient
                     .from('products')
                     .insert([{ code: productCode, name: productName || productCode }])
@@ -774,7 +773,6 @@
                     .maybeSingle();
 
                 if (insertErr || !newProd) {
-                    console.error("Yeni ürün kayıt hatası:", insertErr);
                     alert("Yeni ürün veritabanına eklenemedi: " + (insertErr ? insertErr.message : "Bilinmeyen hata"));
                     return;
                 }
@@ -784,15 +782,9 @@
             }
 
             const inputCounted = document.getElementById(`counted-input-${shipmentId}`);
-            const inputCogs = document.getElementById(`cogs-input-${shipmentId}`);
-            const inputPrice = document.getElementById(`price-input-${shipmentId}`);
-
             const finalCountedQty = inputCounted ? (Number(inputCounted.value) || 1) : 1;
-            const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
-            const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
 
             try {
-                // 2. Mevcut stoğu çek
                 let { data: existingStock } = await supabaseClient
                     .from('stocks')
                     .select('quantity')
@@ -803,9 +795,6 @@
                 const currentQty = existingStock ? Number(existingStock.quantity) : 0;
                 const newTotalStock = currentQty + Number(finalCountedQty);
 
-                console.log("Stok güncelleniyor - Dealer ID:", currentDealer.id, "Product ID:", productId, "Yeni Toplam Stok:", newTotalStock);
-
-                // 3. Stocks tablosuna upsert
                 const { error: stockUpsertErr } = await supabaseClient
                     .from('stocks')
                     .upsert({ 
@@ -815,24 +804,27 @@
                     }, { onConflict: 'dealer_id,product_id' });
 
                 if (stockUpsertErr) {
-                    console.error("Stocks Upsert Hatası:", stockUpsertErr);
                     alert("Stok tablosuna yazılamadı! Hata: " + stockUpsertErr.message);
                     return;
                 }
 
-                // 4. Sevkiyatı onayla
-                const { error: shipUpdateErr } = await supabaseClient.from('shipments').update({ 
+                // Sevkiyatı APPROVED yap
+                await supabaseClient.from('shipments').update({ 
                     status: 'APPROVED', 
                     approved_qty: finalCountedQty, 
                     counted_qty: finalCountedQty 
                 }).eq('id', shipmentId);
 
-                if (shipUpdateErr) {
-                    console.error("Sevkiyat güncelleme hatası:", shipUpdateErr);
-                }
+                // Mükerrer gitmemesi için diziden anında çıkar ve DOM satırını yok et
+                pendingShipmentsList = pendingShipmentsList.filter(s => s.id !== shipmentId);
+                const rowEl = document.getElementById(`shipment-row-${shipmentId}`);
+                if (rowEl) rowEl.remove();
 
-                alert('Goods successfully received and added to store stock!');
-                await fetchPendingShipments();
+                // Bekleyen badge sayısını güncelle
+                const badgeEl = document.getElementById('pendingBadge');
+                if (badgeEl) badgeEl.innerText = pendingShipmentsList.length > 999 ? '999+' : pendingShipmentsList.length;
+
+                renderShipmentsTable();
                 await fetchLiveProducts();
             } catch (err) { 
                 console.error("Kritik Mal Kabul İstisnası:", err); 
@@ -841,7 +833,7 @@
         }
 
         async function approveSelectedInvoiceAll() {
-            let targetShipments = pendingShipmentsList;
+            let targetShipments = [...pendingShipmentsList];
             const selectedInv = document.getElementById('invoiceFilter').value;
             if (selectedInv !== 'ALL') targetShipments = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
 
