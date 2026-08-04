@@ -13,7 +13,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Supabase JS -->
+    <!-- Supabase JS Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -29,11 +29,12 @@
             <a href="index.html" target="_self" class="flex items-center gap-2 bg-slate-100 text-[#00205b] px-3.5 py-2 rounded-xl text-xs font-extrabold border border-slate-300 hover:bg-slate-200 transition">
                 <i class="fa-solid fa-arrow-left"></i> Back to Hub
             </a>
-	<div class="flex items-center gap-3">
-    	    <a href="index.html" target="_self" class="flex items-center justify-center h-9 min-w-[110px] shrink-0 overflow-hidden">
-                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-8 w-auto max-w-[130px] object-contain block" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
-            </a>
-            <span class="font-extrabold text-[#00205b] text-sm border-l border-slate-200 pl-3">Dealer Master Data & Analytics</span>
+            <div class="flex items-center gap-3">
+                <a href="index.html" target="_self" class="flex items-center justify-center h-9 min-w-[110px] shrink-0 overflow-hidden">
+                    <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="h-8 w-auto max-w-[130px] object-contain block" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
+                </a>
+                <span class="font-extrabold text-[#00205b] text-sm border-l border-slate-200 pl-3">Dealer Master Data & Analytics</span>
+            </div>
         </div>
 
         <!-- BAYİ BİLGİSİ VE CANLI BAĞLANTI DURUMU -->
@@ -45,34 +46,39 @@
                 <option value="2026" selected>Year: 2026</option>
                 <option value="2025">Year: 2025</option>
             </select>
+            <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-100 border border-slate-200 text-xs font-bold px-3 py-1.5 rounded-xl text-slate-700 outline-none cursor-pointer">
+                <option value="EN" selected>EN</option>
+                <option value="TR">TR</option>
+                <option value="DE">DE</option>
+                <option value="RU">RU</option>
+            </select>
         </div>
     </header>
 
-    <!-- CONTENT BODY -->
+    <!-- CONTENT BODY (SELLTRACKIQ AKIŞI) -->
     <main class="max-w-7xl mx-auto px-6 py-8 space-y-6 flex-1 w-full">
-        <!-- KPI STRIP (CANLI SUPABASE VERİLERİ İLE DOLAR) -->
+        <!-- KPI STRIP -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div class="ui-card p-5 rounded-2xl border-l-4 border-[#00205b]">
-                <span class="text-[10px] font-extrabold text-slate-400 uppercase">Today's Sales Revenue (Sell-Out)</span>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="today_rev">Today's Sales Revenue (Sell-Out)</span>
                 <div class="text-2xl font-black text-[#00205b] mt-1" id="kpiTodayRev">$0.00</div>
             </div>
             <div class="ui-card p-5 rounded-2xl border-l-4 border-emerald-500">
-                <span class="text-[10px] font-extrabold text-slate-400 uppercase">Total Units Sold (YTD)</span>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="delivered_rev">Total Units Sold (YTD)</span>
                 <div class="text-2xl font-black text-emerald-600 mt-1" id="kpiTotalSoldUnits">0 Pcs</div>
             </div>
             <div class="ui-card p-5 rounded-2xl border-l-4 border-sky-500">
-                <span class="text-[10px] font-extrabold text-slate-400 uppercase">Inventory Stock Valuation ($)</span>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="stock_val">Inventory Stock Valuation ($)</span>
                 <div class="text-2xl font-black text-sky-600 mt-1" id="kpiStockVal">$0.00</div>
             </div>
             <div class="ui-card p-5 rounded-2xl border-l-4 border-amber-500">
-                <span class="text-[10px] font-extrabold text-slate-400 uppercase">Current Stock On Hand</span>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="stock_count">Current Stock On Hand</span>
                 <div class="text-2xl font-black text-amber-600 mt-1" id="kpiStockCount">0 Pcs</div>
             </div>
         </div>
 
-        <!-- GRAFİKLER (SUPABASE CANLI AKIŞI) -->
+        <!-- GRAFİKLER (CANLI SUPABASE VERİSİ) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Pie Chart: Category / Brand Distribution -->
             <div class="ui-card p-6 rounded-2xl border border-slate-200">
                 <h3 class="font-extrabold text-sm text-[#00205b] mb-4">Live Category Share (from SellTrackIQ)</h3>
                 <div class="h-64 flex items-center justify-center">
@@ -80,7 +86,6 @@
                 </div>
             </div>
 
-            <!-- Line Chart: Stock Movements Trend -->
             <div class="ui-card p-6 rounded-2xl border border-slate-200">
                 <h3 class="font-extrabold text-sm text-[#00205b] mb-4">Stock Movement & Sales Trend</h3>
                 <div class="h-64">
@@ -95,7 +100,7 @@
         <div>Proudly presented by International Sales Development Team</div>
     </footer>
 
-    <!-- SUPABASE CANLI VERİ ENTEGRASYON SCRIPTİ -->
+    <!-- SUPABASE CANLI AKIŞ ENGINE -->
     <script>
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
@@ -103,6 +108,21 @@
 
         let pieChart = null;
         let trendChart = null;
+
+        const i18nGlobal = {
+            EN: {
+                today_rev: "Today's Sales Revenue (Sell-Out)",
+                delivered_rev: "Total Units Sold (YTD)",
+                stock_val: "Inventory Stock Valuation ($)",
+                stock_count: "Current Stock On Hand"
+            },
+            TR: {
+                today_rev: "Bugünün Kasa Cirosu (Sell-Out)",
+                delivered_rev: "Toplam Satılan Adet (YTD)",
+                stock_val: "Envanter Stok Maliyeti ($)",
+                stock_count: "Mevcut Stok Adedi"
+            }
+        };
 
         window.addEventListener('DOMContentLoaded', async () => {
             initEmptyCharts();
@@ -120,7 +140,7 @@
             const ctxTrend = document.getElementById('chartSalesTrend').getContext('2d');
             trendChart = new Chart(ctxTrend, {
                 type: 'line',
-                data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'], datasets: [{ label: 'Units Sold', data: [0,0,0,0,0,0,0,0], borderColor: '#00205b', fill: true, backgroundColor: 'rgba(0,32,91,0.05)' }] },
+                data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'], datasets: [{ label: 'Units Sold', data: [12, 18, 25, 30, 42, 38, 45, 50], borderColor: '#00205b', fill: true, backgroundColor: 'rgba(0,32,91,0.05)' }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
@@ -128,7 +148,6 @@
         async function fetchDealerLiveAnalytics() {
             const savedDealerCode = localStorage.getItem('retailhub_dealer_code') || '4000001368';
 
-            // 1. Bayi Bilgisini Çek
             let { data: dealerData } = await supabaseClient
                 .from('dealers')
                 .select('*')
@@ -137,10 +156,9 @@
 
             const dealerId = dealerData ? dealerData.id : 'temp-id-1';
 
-            // 2. Bayinin Anlık Stoklarını Çek
             let { data: stockData } = await supabaseClient
                 .from('stocks')
-                .select('quantity, products ( name, category, price )')
+                .select('quantity, products ( name, category, price, cogs )')
                 .eq('dealer_id', dealerId);
 
             let totalPcs = 0;
@@ -151,55 +169,14 @@
                 stockData.forEach(s => {
                     const qty = Number(s.quantity) || 0;
                     totalPcs += qty;
-                    const price = (s.products && s.products.price) ? Number(s.products.price) : 250;
-                    totalVal += (qty * price);
+                    const cogsPrice = (s.products && s.products.cogs) ? Number(s.products.cogs) : 130;
+                    totalVal += (qty * cogsPrice);
 
                     const cat = (s.products && s.products.category) ? s.products.category : 'General';
                     categoryMap[cat] = (categoryMap[cat] || 0) + qty;
                 });
             }
-	const i18nGlobal = {
-    	EN: {
-        	today_rev: "Today's Sales Revenue",
-        	delivered_rev: "Delivered Revenue",
-        	stock_val: "Inventory Stock Valuation ($)",
-        	stock_count: "Current Inventory On Hand",
-        	sign_out: "Sign Out"
-    	},
-    	TR: {
-        	today_rev: "Bugünün Kasa Cirosu",
-        	delivered_rev: "Teslim Edilen Ciro",
-        	stock_val: "Envanter Stok Maliyeti ($)",
-        	stock_count: "Mevcut Stok Adedi",
-        	sign_out: "Çıkış Yap"
-    	},
-    	DE: {
-        	today_rev: "Tagesumsatz",
-        	delivered_rev: "Gelieferter Umsatz",
-        	stock_val: "Lagerbewertung ($)",
-        	stock_count: "Aktueller Lagerbestand",
-        	sign_out: "Abmelden"
-    	},
-    	RU: {
-        	today_rev: "Выручка за сегодня",
-        	delivered_rev: "Доставленная выручка",
-        	stock_val: "Оценка запасов ($)",
-        	stock_count: "Текущий запас",
-        	sign_out: "Выйти"
-    	}
-};
 
-function changeLanguage(lang) {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (i18nGlobal[lang] && i18nGlobal[lang][key]) {
-            el.innerText = i18nGlobal[lang][key];
-        }
-    });
-}
-
-
-            // 3. Bayinin Satış Hareketlerini (Stock Movements) Çek
             let { data: moveData } = await supabaseClient
                 .from('stock_movements')
                 .select('*')
@@ -213,23 +190,31 @@ function changeLanguage(lang) {
                 moveData.forEach(m => {
                     const mQty = Number(m.quantity) || 0;
                     todaySoldUnits += mQty;
-                    todayRevenue += (mQty * 250); // Ortalama birim fiyat
+                    todayRevenue += (mQty * 250);
                 });
             }
 
-            // UI Güncelleme
             document.getElementById('kpiTodayRev').innerText = `$${todayRevenue.toLocaleString('en-US', {minimumFractionDigits:2})}`;
             document.getElementById('kpiTotalSoldUnits').innerText = `${todaySoldUnits} Pcs`;
             document.getElementById('kpiStockVal').innerText = `$${totalVal.toLocaleString('en-US', {minimumFractionDigits:2})}`;
             document.getElementById('kpiStockCount').innerText = `${totalPcs} Pcs`;
 
-            // Pasta Grafiği Güncelle
             const catLabels = Object.keys(categoryMap).length > 0 ? Object.keys(categoryMap) : ['Enza Home', 'Yataş Bedding', 'Puffy'];
             const catValues = Object.keys(categoryMap).length > 0 ? Object.values(categoryMap) : [40, 40, 20];
 
             pieChart.data.labels = catLabels;
             pieChart.data.datasets[0].data = catValues;
+            pieChart.data.datasets[0].backgroundColor = ['#00205b', '#c59b27', '#0284c7', '#10b981', '#6f42c1'];
             pieChart.update();
+        }
+
+        function changeLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18nGlobal[lang] && i18nGlobal[lang][key]) {
+                    el.innerText = i18nGlobal[lang][key];
+                }
+            });
         }
     </script>
 </body>

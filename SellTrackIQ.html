@@ -93,10 +93,45 @@
         </div>
     </div>
 
+    <!-- PRODUCT COGS / SMM & PRICE MANAGEMENT MODAL -->
+    <div id="cogsManagerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-slate-200 w-full max-w-3xl rounded-2xl p-6 shadow-2xl text-slate-900 max-h-[85vh] flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-[#00205b]">Product SMM & Price Manager</h3>
+                        <p class="text-xs text-slate-500">View and update store cost (COGS) and retail sales prices</p>
+                    </div>
+                    <button onclick="toggleCogsModal(false)" class="text-slate-400 hover:text-rose-600 font-bold px-2 py-1 bg-slate-100 rounded-lg text-xs">✕</button>
+                </div>
+
+                <div class="overflow-y-auto max-h-[55vh] pr-1 space-y-2">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-[#00205b] font-extrabold uppercase border-b">
+                                <th class="p-2.5">SKU / Code</th>
+                                <th class="p-2.5">Product Name</th>
+                                <th class="p-2.5 text-center">Unit COGS ($)</th>
+                                <th class="p-2.5 text-center">Sales Price ($)</th>
+                                <th class="p-2.5 text-center">Mark-up</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cogsTableBody" class="divide-y divide-slate-100 font-semibold"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                <button onclick="toggleCogsModal(false)" class="px-5 py-2.5 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Close</button>
+                <button onclick="saveCogsUpdates()" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-black shadow hover:bg-emerald-700">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN PORTAL CONTAINER -->
     <div id="portalContainer" class="flex-1 flex flex-col min-w-0 hidden">
 
-        <!-- HEADER NAVBAR (TAM GENİŞLİK VE SAĞA YASLI BAYİ BİLGİSİ) -->
+        <!-- HEADER NAVBAR (SAĞ ÜST SİGN-OUT SİLİNDİ) -->
         <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10 w-full">
             <div class="flex items-center gap-5">
                 <a href="index.html" target="_self" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#00205b] transition">
@@ -116,14 +151,19 @@
                     <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm flex items-center gap-1.5 transition">
                         <i class="fa-solid fa-cash-register"></i> <span>Sales & Stock</span>
                     </button>
+                    <!-- GOODS RECEIPT (999+ LİMİT DÜZELTMESİ) -->
                     <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
                         <i class="fa-solid fa-truck-ramp-box"></i> <span>Goods Receipt</span>
                         <span id="pendingBadge" class="bg-[#d71921] text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">0</span>
                     </button>
+
+                    <button onclick="toggleCogsModal(true)" class="px-3.5 py-2 rounded-full text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 ml-2">
+                        <i class="fa-solid fa-calculator"></i> <span>SMM & Price Manager</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- SAĞ ÜST KONTROLLER VE BAYİ PROFİLİ -->
+            <!-- SAĞ ÜST KONTROLLER VE BAYİ PROFİLİ (ÇIKIŞ BUTONU SİLİNDİ) -->
             <div class="flex items-center gap-4">
                 <div class="relative w-48 hidden lg:block">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -143,7 +183,7 @@
                     <span id="b2bCartCountBadge" class="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
                 </a>
 
-                <!-- EN SAĞA YASLANAN BAYİ BİLGİSİ ROZETİ -->
+                <!-- BAYİ PROFİLİ -->
                 <div class="flex items-center gap-2.5 bg-slate-100 border border-slate-200/80 px-3 py-1.5 rounded-2xl">
                     <div id="dealerAvatar" class="w-7 h-7 rounded-xl bg-[#00205b] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-sm">40</div>
                     <div class="text-left leading-tight">
@@ -151,90 +191,79 @@
                         <span id="dealerCode" class="text-[10px] text-slate-500 font-mono font-semibold block">Code: 4000001368</span>
                     </div>
                 </div>
-
-                <button onclick="logout()" class="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition" title="Sign Out">
-                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
-                </button>
             </div>
         </header>
 
-        <!-- MAIN BODY AREA (SOL BANNERSIS FULL-WIDTH WORKSPACE) -->
+        <!-- MAIN BODY AREA -->
         <main id="mainScrollArea" class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 w-full max-w-[1800px] mx-auto">
 
-            <!-- 1. YENİ GENİŞLETİLMİŞ 7'Lİ KPI STRIP -->
+            <!-- 1. GENİŞLETİLMİŞ DİNAMİK 7'Lİ KPI STRIP (MARK-UP CANLI HESAPLANIR) -->
             <section class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3.5">
-                <!-- 1. Today's Sales -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-emerald-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Today's Sales</span>
                     <div class="text-lg font-black text-emerald-600 mt-0.5" id="kpiTodaySales">0 Pcs</div>
                     <span class="text-[10px] font-bold text-slate-400" id="kpiTodayRevenue">$0.00</span>
                 </div>
 
-                <!-- 2. Monthly Sales -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-blue-600">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Monthly Sales</span>
                     <div class="text-lg font-black text-blue-600 mt-0.5" id="kpiMonthlySales">0 Pcs</div>
                     <span class="text-[10px] font-bold text-slate-400" id="kpiMonthlyRevenue">$0.00</span>
                 </div>
 
-                <!-- 3. Cost of Goods Sold (COGS) -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-indigo-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">COGS (SMM)</span>
                     <div class="text-lg font-black text-indigo-600 mt-0.5" id="kpiCOGS">$0.00</div>
                     <span class="text-[10px] font-bold text-slate-400">Total Product Cost</span>
                 </div>
 
-                <!-- 4. Mark-up -->
+                <!-- CANLI HESAPLANAN MARK-UP -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-amber-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Mark-up</span>
                     <div class="text-lg font-black text-amber-600 mt-0.5" id="kpiMarkup">0.00 x</div>
-                    <span class="text-[10px] font-bold text-slate-400">Margin Multiplier</span>
+                    <span class="text-[10px] font-bold text-slate-400">Price / COGS Ratio</span>
                 </div>
 
-                <!-- 5. Total Stock -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-sky-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Total Stock</span>
                     <div class="text-lg font-black text-sky-600 mt-0.5" id="kpiTotalStock">0 Pcs</div>
                     <span class="text-[10px] font-bold text-slate-400">On Hand Inventory</span>
                 </div>
 
-                <!-- 6. Total Stock Cost -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-purple-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Total Stock Cost</span>
                     <div class="text-lg font-black text-purple-600 mt-0.5" id="kpiStockCost">$0.00</div>
                     <span class="text-[10px] font-bold text-slate-400">Inventory Valuation</span>
                 </div>
 
-                <!-- 7. Critical Stock Alert (Sadece Mağazasında Olanlar) -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-rose-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Critical Alert</span>
                     <div class="text-lg font-black text-rose-600 mt-0.5" id="kpiCriticalStock">0 Items</div>
-                    <span class="text-[10px] font-bold text-slate-400">Stock &lt;= 3 Pcs</span>
+                    <span class="text-[10px] font-bold text-slate-400">In-Stock &lt;= 3 Pcs</span>
                 </div>
             </section>
 
-            <!-- TAB 1: SALES POS TERMINAL (STOKTA OLAN ÜRÜNLERİN 5'Lİ GRID'İ) -->
+            <!-- TAB 1: SALES POS TERMINAL -->
             <div id="tab-sales-content" class="space-y-4">
                 <div class="flex items-center justify-between pt-1">
                     <div>
                         <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">Active In-Stock Catalog & Live Kasa Terminal</h3>
-                        <p class="text-xs text-slate-500 font-semibold">Showing only products with confirmed stock on hand (&gt;0 Pcs)</p>
+                        <p class="text-xs text-slate-500 font-semibold">Showing only confirmed products on hand (&gt;0 Pcs)</p>
                     </div>
                 </div>
 
-                <!-- HER SATIRDA 5 ÜRÜN DİZİLİMİ (grid-cols-5) -->
                 <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div class="col-span-5 text-center py-12 text-slate-400 font-semibold">Loading in-stock items...</div>
                 </div>
             </div>
 
-            <!-- TAB 2: GOODS RECEIPT (MAL KABUL) -->
+            <!-- TAB 2: GOODS RECEIPT (DİNAMİK FİYAT, SMM VE COUNTED QTY DOLU GELİR) -->
             <div id="tab-receipt-content" class="space-y-6 hidden">
                 <div class="ui-card p-5 rounded-2xl border border-slate-200 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <h3 class="text-base font-extrabold text-[#00205b] tracking-tight">SAP Shipments & Goods Confirmation</h3>
-                            <p class="text-xs text-slate-500 font-semibold mt-0.5">Accept pending invoices to update live store stock</p>
+                            <p class="text-xs text-slate-500 font-semibold mt-0.5">Edit Unit Cost (COGS) & Sales Price before importing goods to store stock</p>
                         </div>
 
                         <div class="flex items-center gap-3">
@@ -272,11 +301,13 @@
                                 <th class="p-4">Product Code & Detail</th>
                                 <th class="p-4 text-center">Invoice Qty</th>
                                 <th class="p-4 text-center">Counted Qty</th>
+                                <th class="p-4 text-center">Unit COGS ($ SMM)</th>
+                                <th class="p-4 text-center">Sales Price ($)</th>
                                 <th class="p-4 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody id="shipmentTableBody" class="divide-y divide-slate-200 font-semibold">
-                            <tr><td colspan="5" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>
+                            <tr><td colspan="7" class="p-6 text-center text-slate-400">No pending shipments found.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -291,7 +322,7 @@
         </footer>
     </div>
 
-    <!-- JAVASCRIPT CANLI SUPABASE VE POS SİSTEMİ -->
+    <!-- JAVASCRIPT REAL-TIME ENGINE -->
     <script>
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
@@ -340,11 +371,6 @@
             fetchLiveProducts();
             fetchPendingShipments();
             fetchSalesAnalytics();
-        }
-
-        function logout() {
-            document.getElementById('portalContainer').classList.add('hidden');
-            document.getElementById('loginModal').classList.remove('hidden');
         }
 
         function switchTab(tab) {
@@ -399,10 +425,10 @@
                 };
             });
 
-            // SADECE MAĞAZADA STOĞU VAR OLAN ÜRÜNLERİ EKRANA BAS (Mal Kabulü yapılmamış sıfır stoklular elenir)
             const inStockProducts = globalProducts.filter(p => p.stock > 0);
             renderProducts(inStockProducts);
             updateKPIs();
+            renderCogsTableBody();
         }
 
         async function fetchSalesAnalytics() {
@@ -457,7 +483,6 @@
 
                 card.innerHTML = `
                     <div class="flip-card-inner">
-                        <!-- FRONT SIDE -->
                         <div class="flip-card-front flex flex-col justify-between h-full">
                             <div>
                                 <div class="h-36 w-full bg-slate-100 relative overflow-hidden">
@@ -488,7 +513,6 @@
                             </div>
                         </div>
 
-                        <!-- BACK SIDE (3-TABBED POS FORM) -->
                         <div class="flip-card-back p-3.5 flex flex-col justify-between">
                             ${get3TabbedPosFormHTML(p)}
                         </div>
@@ -498,7 +522,6 @@
             });
         }
 
-        /* 3-SEKMELİ SATIŞ FORMU HTML KURGUSU */
         function get3TabbedPosFormHTML(p) {
             return `
                 <div class="flex flex-col h-full justify-between">
@@ -508,14 +531,12 @@
                             <button onclick="toggleFlipCard('${p.id}')" class="text-slate-400 hover:text-rose-600 font-bold px-1.5 py-0.5 bg-slate-100 rounded text-xs">✕</button>
                         </div>
 
-                        <!-- 3 SEKMELİ BUTONLAR -->
                         <div class="flex bg-slate-100 p-0.5 rounded-lg text-[10px] font-bold mb-2">
                             <button onclick="switchFormTab('${p.id}', 1)" id="tab-btn-1-${p.id}" class="flex-1 py-1 rounded bg-white text-[#00205b] shadow-sm">1. Customer</button>
                             <button onclick="switchFormTab('${p.id}', 2)" id="tab-btn-2-${p.id}" class="flex-1 py-1 rounded text-slate-500">2. Order</button>
                             <button onclick="switchFormTab('${p.id}', 3)" id="tab-btn-3-${p.id}" class="flex-1 py-1 rounded text-slate-500">3. Delivery</button>
                         </div>
 
-                        <!-- TAB 1: MÜŞTERİ BİLGİLERİ -->
                         <div id="form-tab-1-${p.id}" class="space-y-1.5 text-left text-xs">
                             <div>
                                 <label class="block text-[8px] font-extrabold text-slate-500 uppercase">Full Name</label>
@@ -531,7 +552,6 @@
                             </div>
                         </div>
 
-                        <!-- TAB 2: SİPARİŞ DETAYI VE DİNAMİK TUTAR -->
                         <div id="form-tab-2-${p.id}" class="space-y-2 text-left text-xs hidden">
                             <div class="flex justify-between items-center bg-slate-100 p-1.5 rounded text-[11px]">
                                 <span class="text-slate-500 font-bold">Unit Price:</span>
@@ -547,7 +567,6 @@
                             </div>
                         </div>
 
-                        <!-- TAB 3: TESLİMAT & KAPORA -->
                         <div id="form-tab-3-${p.id}" class="space-y-1.5 text-left text-xs hidden">
                             <div>
                                 <label class="block text-[8px] font-extrabold text-slate-500 uppercase">Planned Delivery Date</label>
@@ -632,7 +651,7 @@
 
                 alert('POS Sale Successfully Recorded & Stock Deducted!');
                 toggleFlipCard(id);
-                fetchLiveProducts(); // Kataloğu tekrar süzüp stok sıfırlananları kaldırır
+                fetchLiveProducts();
             } else {
                 alert('Insufficient Stock for this Sale!');
             }
@@ -645,8 +664,12 @@
             let { data } = await supabaseClient.from('shipments').select('*').eq('dealer_code', searchCode);
             pendingShipmentsList = (data || []).filter(s => String(s.status).toUpperCase() === 'PENDING');
 
+            // 999+ LİMİT DÜZELTMESİ ROZETİ
             const badgeEl = document.getElementById('pendingBadge');
-            if (badgeEl) badgeEl.innerText = pendingShipmentsList.length;
+            if (badgeEl) {
+                const pLen = pendingShipmentsList.length;
+                badgeEl.innerText = pLen > 999 ? '999+' : pLen;
+            }
 
             populateInvoiceFilterOptions();
             renderShipmentsTable();
@@ -662,6 +685,7 @@
 
         function onInvoiceFilterChange() { renderShipmentsTable(); }
 
+        /* MAL KABUL TABLOSU: VARSAYILAN OLARAK FATURADAKİ ADET COUNTED QTY OLARAK GELİR, COGS VE FİYAT DÜZENLENEBİLİR */
         function renderShipmentsTable() {
             const selectedInv = document.getElementById('invoiceFilter').value;
             const tbody = document.getElementById('shipmentTableBody');
@@ -671,7 +695,7 @@
             if (selectedInv !== 'ALL') filtered = pendingShipmentsList.filter(s => String(s.invoice_no) === String(selectedInv));
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-semibold">No pending shipments found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-semibold">No pending shipments found.</td></tr>`;
                 return;
             }
 
@@ -682,8 +706,12 @@
                 const matchedProduct = globalProducts.find(p => p.code === s.product_code);
                 const imgUrl = matchedProduct && matchedProduct.image ? matchedProduct.image : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
                 const invoiceQty = Number(s.quantity) || 0;
-                const defaultCountedQty = s.counted_qty !== undefined ? Number(s.counted_qty) : invoiceQty;
                 
+                // VARSAYILAN OLARAK FATURADAKİ ADET DOLDURULUR
+                const defaultCountedQty = s.counted_qty !== undefined ? Number(s.counted_qty) : invoiceQty;
+                const defaultCogs = matchedProduct ? matchedProduct.cogs : 130;
+                const defaultPrice = matchedProduct ? matchedProduct.price : 250;
+
                 totalInvoiceQty += invoiceQty;
                 totalCountedQty += defaultCountedQty;
 
@@ -693,15 +721,23 @@
                     <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
                     <td class="p-4">
                         <div class="flex items-center gap-3">
-                            <img src="${imgUrl}" alt="${s.product_name}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm shrink-0">
+                            <img src="${imgUrl}" alt="${s.product_name}" class="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm shrink-0">
                             <div class="min-w-0">
                                 <span class="text-[10px] font-extrabold text-[#00205b] font-mono block">${s.product_code}</span>
-                                <span class="font-bold text-slate-900 text-xs block truncate max-w-md">${s.product_name || ''}</span>
+                                <span class="font-bold text-slate-900 text-xs block truncate max-w-xs">${s.product_name || ''}</span>
                             </div>
                         </div>
                     </td>
                     <td class="p-4 text-center font-extrabold text-slate-700">${invoiceQty} Pcs</td>
-                    <td class="p-4 text-center font-extrabold text-emerald-600">${defaultCountedQty} Pcs</td>
+                    <td class="p-4 text-center">
+                        <input type="number" min="0" id="counted-input-${s.id}" value="${defaultCountedQty}" class="w-16 text-center py-1 bg-slate-50 border border-slate-300 rounded text-xs font-black text-[#00205b]">
+                    </td>
+                    <td class="p-4 text-center">
+                        <input type="number" min="0" id="cogs-input-${s.id}" value="${defaultCogs}" class="w-20 text-center py-1 bg-slate-50 border border-slate-300 rounded text-xs font-black text-indigo-700">
+                    </td>
+                    <td class="p-4 text-center">
+                        <input type="number" min="0" id="price-input-${s.id}" value="${defaultPrice}" class="w-20 text-center py-1 bg-slate-50 border border-slate-300 rounded text-xs font-black text-emerald-700">
+                    </td>
                     <td class="p-4 text-right">
                         <button onclick="approveSingleShipment('${s.id}', '${s.product_code}', ${invoiceQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow">
                             Confirm & Add to Stock
@@ -717,12 +753,21 @@
 
         async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
             const product = globalProducts.find(p => p.code === productCode);
+            const inputCounted = document.getElementById(`counted-input-${shipmentId}`);
+            const inputCogs = document.getElementById(`cogs-input-${shipmentId}`);
+            const inputPrice = document.getElementById(`price-input-${shipmentId}`);
+
+            const finalCountedQty = inputCounted ? (Number(inputCounted.value) || origInvoiceQty) : origInvoiceQty;
+            const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
+            const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
+
             try {
                 if (product) {
-                    await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + origInvoiceQty });
+                    await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + finalCountedQty });
+                    await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
                 }
-                await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: origInvoiceQty, counted_qty: origInvoiceQty }).eq('id', shipmentId);
-                alert('Shipment confirmed and imported to store stock!');
+                await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: finalCountedQty, counted_qty: finalCountedQty }).eq('id', shipmentId);
+                alert('Shipment confirmed and imported to store stock with updated SMM and Price!');
                 fetchPendingShipments();
                 fetchLiveProducts();
             } catch (err) { console.error(err); }
@@ -736,11 +781,19 @@
             try {
                 for (let s of targetShipments) {
                     const product = globalProducts.find(p => p.code === s.product_code);
-                    const origInvoiceQty = Number(s.quantity);
+                    const inputCounted = document.getElementById(`counted-input-${s.id}`);
+                    const inputCogs = document.getElementById(`cogs-input-${s.id}`);
+                    const inputPrice = document.getElementById(`price-input-${s.id}`);
+
+                    const finalCountedQty = inputCounted ? (Number(inputCounted.value) || Number(s.quantity)) : Number(s.quantity);
+                    const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
+                    const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
+
                     if (product) {
-                        await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + origInvoiceQty });
+                        await supabaseClient.from('stocks').upsert({ dealer_id: currentDealer.id, product_id: product.id, quantity: product.stock + finalCountedQty });
+                        await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
                     }
-                    await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: origInvoiceQty, counted_qty: origInvoiceQty }).eq('id', s.id);
+                    await supabaseClient.from('shipments').update({ status: 'APPROVED', approved_qty: finalCountedQty, counted_qty: finalCountedQty }).eq('id', s.id);
                 }
                 alert('All selected invoice items confirmed and imported to store stock!');
                 fetchPendingShipments();
@@ -748,19 +801,18 @@
             } catch (err) { console.error(err); }
         }
 
+        /* 7'Lİ KPI HESAPLAMASI & CANLI MARK-UP (SATIŞ FİYATI / SMM) */
         function updateKPIs() {
-            // Yalnızca mağazada stoğu >0 olan ürünler hesaba katılır
             const inStockProducts = globalProducts.filter(p => p.stock > 0);
             
             const totalStockCount = inStockProducts.reduce((acc, p) => acc + p.stock, 0);
             const totalStockCostValue = inStockProducts.reduce((acc, p) => acc + (p.stock * p.cogs), 0);
             const totalStockSalesValue = inStockProducts.reduce((acc, p) => acc + (p.stock * p.price), 0);
 
-            // Critical Alert: Sadece mağazasında stoğu var olan VE stoğu <= 3 Pcs olan ürünler!
             const criticalAlertCount = inStockProducts.filter(p => p.stock <= 3).length;
 
-            const totalCOGSValue = inStockProducts.reduce((acc, p) => acc + p.cogs, 0);
-            const avgMarkup = totalCOGSValue > 0 ? (totalStockSalesValue / totalStockCostValue) : 1.92;
+            // CANLI GERÇEK MARK-UP HESABI
+            const liveMarkup = totalStockCostValue > 0 ? (totalStockSalesValue / totalStockCostValue) : 1.92;
 
             document.getElementById('kpiTodaySales').innerText = todaySalesCount + ' Pcs';
             document.getElementById('kpiTodayRevenue').innerText = '$' + todayTotalRevenue.toLocaleString('en-US', {minimumFractionDigits:2});
@@ -769,11 +821,51 @@
             document.getElementById('kpiMonthlyRevenue').innerText = '$' + monthlyTotalRevenue.toLocaleString('en-US', {minimumFractionDigits:2});
 
             document.getElementById('kpiCOGS').innerText = '$' + (todaySalesCount * 130).toLocaleString('en-US', {minimumFractionDigits:2});
-            document.getElementById('kpiMarkup').innerText = avgMarkup.toFixed(2) + ' x';
+            document.getElementById('kpiMarkup').innerText = liveMarkup.toFixed(2) + ' x';
 
             document.getElementById('kpiTotalStock').innerText = totalStockCount + ' Pcs';
             document.getElementById('kpiStockCost').innerText = '$' + totalStockCostValue.toLocaleString('en-US', {minimumFractionDigits:2});
             document.getElementById('kpiCriticalStock').innerText = criticalAlertCount + ' Items';
+        }
+
+        function renderCogsTableBody() {
+            const tbody = document.getElementById('cogsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = globalProducts.slice(0, 30).map(p => {
+                const markup = p.cogs > 0 ? (p.price / p.cogs).toFixed(2) : '1.92';
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-2.5 font-mono text-[#00205b] font-bold">${p.code}</td>
+                        <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
+                        <td class="p-2.5 text-center"><input type="number" id="m-cogs-${p.id}" value="${p.cogs}" class="w-20 text-center bg-slate-50 border rounded p-1 font-bold text-indigo-700"></td>
+                        <td class="p-2.5 text-center"><input type="number" id="m-price-${p.id}" value="${p.price}" class="w-20 text-center bg-slate-50 border rounded p-1 font-bold text-emerald-700"></td>
+                        <td class="p-2.5 text-center font-black text-amber-600">${markup} x</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleCogsModal(show) {
+            const modal = document.getElementById('cogsManagerModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        async function saveCogsUpdates() {
+            try {
+                for (let p of globalProducts.slice(0, 30)) {
+                    const cogsEl = document.getElementById(`m-cogs-${p.id}`);
+                    const priceEl = document.getElementById(`m-price-${p.id}`);
+                    if (cogsEl && priceEl) {
+                        const newCogs = Number(cogsEl.value);
+                        const newPrice = Number(priceEl.value);
+                        await supabaseClient.from('products').update({ cogs: newCogs, price: newPrice }).eq('id', p.id);
+                    }
+                }
+                alert('Product SMM & Prices Updated!');
+                toggleCogsModal(false);
+                fetchLiveProducts();
+            } catch (e) { console.error(e); }
         }
 
         function filterProducts() {
@@ -783,23 +875,6 @@
             renderProducts(filtered);
         }
 
-        function pushToB2BCartSilent(productId, btnEl) {
-            const product = globalProducts.find(p => p.id === productId);
-            if (!product) return;
-            const recommendedQty = 10;
-            let cart = JSON.parse(localStorage.getItem('b2b_cart')) || [];
-            
-            const existingIdx = cart.findIndex(item => item.code === product.code);
-            if (existingIdx > -1) { cart[existingIdx].qty += recommendedQty; } 
-            else {
-                cart.push({ code: product.code, name: product.name, qty: recommendedQty, price: product.price, m3: 0.45, weight: 12.5, image: product.image });
-            }
-
-            localStorage.setItem('b2b_cart', JSON.stringify(cart));
-            updateCartBadgeCount();
-            showToastNotice(product.name, recommendedQty);
-        }
-
         function updateCartBadgeCount() {
             let cart = JSON.parse(localStorage.getItem('b2b_cart')) || [];
             const totalItems = cart.reduce((acc, i) => acc + (Number(i.qty) || 0), 0);
@@ -807,26 +882,8 @@
             if (badgeEl) badgeEl.innerText = totalItems;
         }
 
-        function showToastNotice(productName, qty) {
-            const toast = document.getElementById('toastNotice');
-            const titleEl = document.getElementById('toastTitle');
-            const descEl = document.getElementById('toastDesc');
-            if (!toast) return;
-
-            titleEl.innerText = `Added +${qty} Pcs to B2B Cart`;
-            descEl.innerText = `${productName}`;
-
-            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
-
-            setTimeout(() => {
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-            }, 2000);
-        }
-
         function changeLanguage(lang) {
-            // Dil Değiştirme Motoru
+            // Dil Motoru
         }
     </script>
 </body>
