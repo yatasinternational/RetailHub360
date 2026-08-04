@@ -5,274 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yataş Group - RetailHub360</title>
     
-    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
-            --glass-bg: rgba(255, 255, 255, 0.55);
-            --glass-border: rgba(255, 255, 255, 0.7);
-            --glass-shadow: 0 20px 40px rgba(0, 32, 91, 0.08);
-            --sidebar-bg: rgba(255, 255, 255, 0.75);
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --yatas-navy: #00205b;
-            --accent-blue: #007bff;
-            --accent-green: #10b981;
-            --accent-purple: #6f42c1;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg-gradient); min-height: 100vh; display: flex; color: var(--text-main); overflow-x: hidden; }
-
-        #loginOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(238, 242, 243, 0.85); backdrop-filter: blur(15px);
-            z-index: 9999; display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.85); border: 1px solid var(--glass-border);
-            box-shadow: 0 30px 60px rgba(0, 32, 91, 0.12); backdrop-filter: blur(20px);
-            border-radius: 24px; padding: 40px; width: 100%; max-width: 420px; text-align: center;
-        }
-
-        .login-card img { max-width: 180px; margin-bottom: 20px; border-radius: 8px; }
-        .login-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; color: var(--yatas-navy); }
-        .input-group { margin-bottom: 16px; text-align: left; }
-        .input-group label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; }
-        .input-group input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.1); background: rgba(255, 255, 255, 0.9); outline: none; font-size: 0.95rem; font-weight: 600; }
-
-        .btn-login {
-            width: 100%; padding: 14px; border: none; border-radius: 12px; background: var(--yatas-navy); color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 32, 91, 0.2);
-        }
-
-        .app-container { display: flex; width: 100%; min-height: 100vh; }
-        .sidebar { width: 270px; background: var(--sidebar-bg); backdrop-filter: blur(25px); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; position: fixed; height: 100vh; top: 0; left: 0; z-index: 100; }
-        .sidebar-top { display: flex; flex-direction: column; align-items: center; }
-        .brand-logo { max-width: 170px; height: auto; margin-bottom: 35px; border-radius: 6px; }
-        .nav-menu { width: 100%; list-style: none; }
-        .nav-item { margin-bottom: 8px; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-main); text-decoration: none; font-weight: 700; font-size: 0.9rem; border-radius: 14px; transition: all 0.2s ease; }
-        .nav-link:hover, .nav-link.active { background: rgba(255, 255, 255, 0.9); box-shadow: 0 4px 15px rgba(0, 32, 91, 0.06); color: var(--yatas-navy); }
-
-        .btn-logout { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; background: rgba(220, 53, 69, 0.08); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.2); border-radius: 14px; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
-
-        .main-content { margin-left: 270px; flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .top-right-bar { position: absolute; top: 30px; right: 40px; display: flex; align-items: center; gap: 12px; }
-        .lang-selector { background: rgba(255, 255, 255, 0.8); border: 1px solid var(--glass-border); color: var(--text-main); padding: 8px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; cursor: pointer; outline: none; }
-
-        .header-title { margin-bottom: 35px; }
-        .header-title h1 { font-size: 2.4rem; font-weight: 800; color: var(--yatas-navy); }
-        .header-title p { color: var(--text-muted); font-size: 1rem; font-weight: 600; margin-top: 6px; }
-
-        .tiles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; max-width: 1250px; }
-        .tile-card { background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); backdrop-filter: blur(20px); border-radius: 22px; padding: 35px 28px; text-decoration: none; color: var(--text-main); display: flex; flex-direction: column; justify-content: space-between; min-height: 290px; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        .tile-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.75); box-shadow: 0 30px 60px rgba(0, 32, 91, 0.14); border-color: var(--yatas-navy); }
-        .tile-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; }
-        .tile-1::before { background: linear-gradient(90deg, #007bff, #00c6ff); }
-        .tile-2::before { background: linear-gradient(90deg, #10b981, #a8ff78); }
-        .tile-3::before { background: linear-gradient(90deg, #6f42c1, #f78ca0); }
-
-        .tile-icon { width: 62px; height: 62px; border-radius: 18px; background: rgba(255, 255, 255, 0.85); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin-bottom: 22px; }
-        .tile-1 .tile-icon { color: var(--accent-blue); }
-        .tile-2 .tile-icon { color: var(--accent-green); }
-        .tile-3 .tile-icon { color: var(--accent-purple); }
-
-        .tile-info h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 10px; }
-        .tile-info p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; font-weight: 500; }
-        .tile-action { margin-top: 22px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 800; color: var(--yatas-navy); }
-
-        @media (max-width: 1100px) { .tiles-grid { grid-template-columns: repeat(1, 1fr); } .sidebar { width: 220px; } .main-content { margin-left: 220px; } }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .bg-yatas-navy { background-color: #0f2744; }
+        .text-yatas-navy { color: #0f2744; }
+        .hub-card { transition: all 0.25s ease-in-out; background: white; border: 1px solid #e2e8f0; }
+        .hub-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px -4px rgba(15, 39, 68, 0.12); }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-100 flex">
 
-    <!-- LOGIN OVERLAY -->
-    <div id="loginOverlay">
-        <div class="login-card">
-            <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
-            <h2>RetailHub360</h2>
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="input-group">
-                    <label for="username" data-i18n="lbl_username">Username / Dealer Code</label>
-                    <input type="text" id="username" placeholder="e.g. 4000001368 or BY-0601" required>
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white border-r border-slate-200 p-6 flex flex-col justify-between shrink-0">
+        <div class="space-y-8">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#0f2744] text-[#c59b27] rounded-xl flex items-center justify-center font-black text-xl">Y</div>
+                <div>
+                    <h2 class="font-extrabold text-[#0f2744] text-sm leading-tight">[yataş]</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GROUP</p>
                 </div>
-                <div class="input-group">
-                    <label for="password" data-i18n="lbl_password">Password</label>
-                    <input type="password" id="password" value="123456" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-login" data-i18n="btn_login">Sign In</button>
-            </form>
+            </div>
+
+            <nav class="space-y-2 text-xs font-bold">
+                <a href="index.html" target="_self" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0f2744] text-white shadow-sm">
+                    <i class="fa-solid fa-house"></i> Home Dashboard
+                </a>
+                <a href="SellTrackIQ.html" target="_self" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-chart-line"></i> Sales & Stock
+                </a>
+                <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" target="_self" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-cart-shopping"></i> Order Portal
+                </a>
+                <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" target="_self" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-book-open"></i> Catalogues
+                </a>
+                <a href="Admin.html" target="_self" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100">
+                    <i class="fa-solid fa-sliders"></i> Master Data & KPI
+                </a>
+            </nav>
         </div>
-    </div>
 
-    <!-- MAIN PORTAL CONTAINER -->
-    <div class="app-container">
-        
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-top">
-                <img src="Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Logo" class="brand-logo" onerror="this.src='https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg'">
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="index.html" class="nav-link active">
-                            <i class="fa-solid fa-house"></i>
-                            <span data-i18n="nav_home">Home Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="SellTrackIQ.html" target="_blank" class="nav-link">
-                            <i class="fa-solid fa-chart-line"></i>
-                            <span data-i18n="nav_sellout">Sales & Stock</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" target="_blank" class="nav-link">
-                            <i class="fa-solid fa-cart-flatbed"></i>
-                            <span data-i18n="nav_b2b">Order Portal</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" target="_blank" class="nav-link">
-                            <i class="fa-solid fa-book-open"></i>
-                            <span data-i18n="nav_catalog">Catalogues</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Admin.html" target="_blank" class="nav-link">
-                            <i class="fa-solid fa-sliders"></i>
-                            <span data-i18n="nav_admin">Master Data & KPI</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <a href="index.html" class="flex items-center justify-center gap-2 py-3 bg-rose-50 text-rose-600 font-bold text-xs rounded-xl hover:bg-rose-100 transition">
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+        </a>
+    </aside>
 
-            <div class="sidebar-bottom">
-                <button class="btn-logout" onclick="handleLogout()">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span data-i18n="btn_logout">Sign Out</span>
-                </button>
-            </div>
-        </aside>
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-10 space-y-8 overflow-y-auto">
+        <div>
+            <h1 class="text-3xl font-black text-[#0f2744]">RetailHub360</h1>
+            <p class="text-xs text-slate-500 font-bold mt-1">Yataş Group International Sales, Order & Master Data Portal</p>
+        </div>
 
-        <!-- CONTENT AREA -->
-        <main class="main-content">
-            <div class="top-right-bar">
-                <select class="lang-selector" id="langSelect" onchange="changeLanguage(this.value)">
-                    <option value="EN" selected>EN</option>
-                    <option value="TR">TR</option>
-                    <option value="DE">DE</option>
-                    <option value="RU">RU</option>
-                </select>
-            </div>
-
-            <div class="header-title">
-                <h1>RetailHub360</h1>
-                <p data-i18n="header_sub">Yataş Group International Sales, Order & Master Data Portal</p>
-            </div>
-
-            <!-- TILES GRID WITH TARGET BLANK -->
-            <div class="tiles-grid">
-                <a href="SellTrackIQ.html" target="_blank" class="tile-card tile-1">
-                    <div>
-                        <div class="tile-icon"><i class="fa-solid fa-chart-pie"></i></div>
-                        <div class="tile-info">
-                            <h3 data-i18n="tile1_title">SellTrackIQ Portal</h3>
-                            <p data-i18n="tile1_desc">Real-time sell-out analytics, regional stock deduction, and live KPI tracking.</p>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- CARD 1: SellTrackIQ -->
+            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-sky-500">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-chart-pie"></i>
                     </div>
-                    <div class="tile-action">
-                        <span data-i18n="go_to_portal">Launch Portal</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" target="_blank" class="tile-card tile-2">
-                    <div>
-                        <div class="tile-icon"><i class="fa-solid fa-cart-flatbed"></i></div>
-                        <div class="tile-info">
-                            <h3 data-i18n="tile2_title">B2B Order Portal</h3>
-                            <p data-i18n="tile2_desc">Interactive B2B order building, Excel exports with photos, and container volume calculations.</p>
-                        </div>
-                    </div>
-                    <div class="tile-action">
-                        <span data-i18n="go_to_portal">Launch Portal</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" target="_blank" class="tile-card tile-3">
-                    <div>
-                        <div class="tile-icon"><i class="fa-solid fa-book-open"></i></div>
-                        <div class="tile-info">
-                            <h3 data-i18n="tile3_title">Brands' Catalogues & Decks</h3>
-                            <p data-i18n="tile3_desc">Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.</p>
-                        </div>
-                    </div>
-                    <div class="tile-action">
-                        <span data-i18n="go_to_portal">Launch Portal</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
+                    <h3 class="text-base font-extrabold text-[#0f2744]">SellTrackIQ Portal</h3>
+                    <p class="text-xs text-slate-500 font-medium">Real-time sell-out analytics, regional stock deduction, and live KPI tracking.</p>
+                </div>
+                <a href="SellTrackIQ.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-sky-600">
+                    Launch Portal <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
-        </main>
-    </div>
 
-    <!-- SCRIPT & SINGLE SIGN-ON LOGIC -->
-    <script>
-        const i18n = {
-            EN: {
-                lbl_username: "Username / Dealer Code", lbl_password: "Password", btn_login: "Sign In", nav_home: "Home Dashboard", nav_sellout: "Sales & Stock", nav_b2b: "Order Portal", nav_catalog: "Catalogues", nav_admin: "Master Data & KPI", btn_logout: "Sign Out", header_sub: "Yataş Group International Sales, Order & Master Data Portal", tile1_title: "SellTrackIQ Portal", tile1_desc: "Real-time sell-out analytics, regional stock deduction, and live KPI tracking.", tile2_title: "B2B Order Portal", tile2_desc: "Interactive B2B order building, Excel exports with photos, and container volume calculations.", tile3_title: "Brands' Catalogues & Decks", tile3_desc: "Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.", go_to_portal: "Launch Portal"
-            },
-            TR: {
-                lbl_username: "Kullanıcı Adı / Bayi Kodu", lbl_password: "Şifre", btn_login: "Giriş Yap", nav_home: "Ana Sayfa", nav_sellout: "Satış & Stok Takip", nav_b2b: "Sipariş Portalı", nav_catalog: "Kataloglar", nav_admin: "Master Data & KPI", btn_logout: "Çıkış Yap", header_sub: "Yataş Group Uluslararası Satış, Sipariş ve Master Data Yönetim Portalı", tile1_title: "SellTrackIQ Portal", tile1_desc: "Canlı satış analizleri, bölgesel stok düşümleri ve anlık KPI takibi.", tile2_title: "B2B Order Portal", tile2_desc: "İnteraktif B2B sipariş oluşturma, fotoğraflı Excel çıktısı ve konteyner hacim hesabı.", tile3_title: "Brands' Catalogues & Decks", tile3_desc: "Güncel 2026 Yataş Bedding, Enza Home PDF katalogları ve kurumsal sunumlar.", go_to_portal: "Portala Git"
-            }
-        };
+            <!-- CARD 2: B2B Order Portal -->
+            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-emerald-500">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-cart-flatbed"></i>
+                    </div>
+                    <h3 class="text-base font-extrabold text-[#0f2744]">B2B Order Portal</h3>
+                    <p class="text-xs text-slate-500 font-medium">Interactive B2B order building, Excel exports with photos, and container volume calculations.</p>
+                </div>
+                <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-emerald-600">
+                    Launch Portal <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
 
-        function changeLanguage(lang) {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (i18n[lang] && i18n[lang][key]) { el.innerText = i18n[lang][key]; }
-            });
-            localStorage.setItem('retailhub_lang', lang);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedLang = localStorage.getItem('retailhub_lang') || 'EN';
-            document.getElementById('langSelect').value = savedLang;
-            changeLanguage(savedLang);
-
-            const isLoggedIn = localStorage.getItem('retailhub_session');
-            const overlay = document.getElementById('loginOverlay');
-            if (isLoggedIn === 'active') { overlay.style.display = 'none'; } else { overlay.style.display = 'flex'; }
-        });
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-
-            localStorage.setItem('retailhub_session', 'active');
-            localStorage.setItem('retailhub_dealer_code', username || '4000001368');
-            localStorage.setItem('retailhub_password', pass || '123456');
-
-            const overlay = document.getElementById('loginOverlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 400);
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('retailhub_session');
-            localStorage.removeItem('retailhub_dealer_code');
-            localStorage.removeItem('retailhub_password');
-            location.reload();
-        }
-    </script>
+            <!-- CARD 3: Catalogues & Decks -->
+            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-purple-500">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+                    <h3 class="text-base font-extrabold text-[#0f2744]">Brands' Catalogues & Decks</h3>
+                    <p class="text-xs text-slate-500 font-medium">Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.</p>
+                </div>
+                <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-purple-600">
+                    Launch Portal <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
