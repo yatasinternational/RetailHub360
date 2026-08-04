@@ -45,26 +45,10 @@
             max-height: 36px; opacity: 1; overflow: hidden;
         }
 
-        /* HOVER PREVIEW POP-UP KAPSAYICISI */
-        .img-hover-container { position: relative; display: inline-block; }
-        .img-preview-popup {
-            display: none; position: absolute; left: 60px; top: -30px; z-index: 99999;
-            width: 280px; height: 280px; background: #ffffff; border: 2px solid #00205b;
-            border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 32, 91, 0.25);
-            padding: 8px; object-fit: contain; pointer-events: none;
-        }
-        .img-hover-container:hover .img-preview-popup { display: block; }
-
         #toastNotice { transition: opacity 0.25s ease, transform 0.25s ease; }
     </style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-slate-50 text-slate-900">
-
-    <!-- LIGHTBOX BÜYÜK GÖRSEL POP-UP MODAL -->
-    <div id="imageLightboxModal" class="lightbox-modal" onclick="closeLightbox()" style="display:none; position:fixed; z-index:99999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
-        <span style="position:absolute; top:24px; right:36px; color:#fff; font-size:36px; cursor:pointer;" onclick="closeLightbox()">&times;</span>
-        <img id="lightboxImg" src="" style="max-width:85%; max-height:85vh; border-radius:12px; object-fit:contain;">
-    </div>
 
     <!-- TOAST BİLDİRİMİ -->
     <div id="toastNotice" class="fixed bottom-6 right-6 bg-[#00205b] text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 z-[99999] opacity-0 pointer-events-none translate-y-4">
@@ -81,32 +65,6 @@
     <div id="announcementBar" class="announcement-bar text-white text-xs font-bold h-9 flex items-center justify-center px-6 gap-3 shrink-0 shadow-sm">
         <span class="bg-[#d71921] text-white px-2.5 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider">POS TERMINAL</span>
         <span class="truncate">Real-time B2B Inventory & Sales Management Portal</span>
-    </div>
-
-    <!-- SIGN IN MODAL -->
-    <div id="loginModal" class="fixed inset-0 bg-[#00153e]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-slate-900">
-            <div class="text-center mb-6">
-                <div class="w-12 h-12 bg-[#00205b] text-white rounded-xl mx-auto flex items-center justify-center font-black text-xl mb-3">Y</div>
-                <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">SellTrackIQ Terminal</h2>
-                <p class="text-xs text-slate-500 font-semibold mt-1">Dealer POS & Live Inventory Cashier</p>
-            </div>
-
-            <form onsubmit="handleLogin(event)" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dealer Code</label>
-                    <input type="text" id="loginDealerCode" required value="4000001368" placeholder="e.g. 4000001368" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Password</label>
-                    <input type="password" id="loginPassword" required value="123456" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
-                </div>
-                <button type="submit" class="w-full py-3.5 btn-navy font-extrabold rounded-xl text-sm shadow-md flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
-                    <span>Sign In to Terminal</span>
-                </button>
-            </form>
-        </div>
     </div>
 
     <!-- PRODUCT COGS & PRICE MANAGER MODAL -->
@@ -145,7 +103,7 @@
     </div>
 
     <!-- MAIN PORTAL CONTAINER -->
-    <div id="portalContainer" class="flex-1 flex flex-col min-w-0 hidden">
+    <div id="portalContainer" class="flex-1 flex flex-col min-w-0">
 
         <!-- HEADER NAVBAR -->
         <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10 w-full">
@@ -234,7 +192,7 @@
 
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-amber-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Mark-up</span>
-                    <div class="text-lg font-black text-amber-600 mt-0.5" id="kpiMarkup">0.00 x</div>
+                    <div class="text-lg font-black text-amber-600 mt-0.5" id="kpiMarkup">1.92 x</div>
                     <span class="text-[10px] font-bold text-slate-400">Price / COGS Ratio</span>
                 </div>
 
@@ -336,7 +294,7 @@
         </footer>
     </div>
 
-    <!-- JAVASCRIPT REAL-TIME ENGINE -->
+    <!-- JAVASCRIPT KARARLI MOTOR -->
     <script>
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
@@ -351,17 +309,17 @@
         let monthlyTotalRevenue = 0;
 
         window.addEventListener('DOMContentLoaded', async () => {
+            const isLoggedOut = localStorage.getItem('retailhub_logged_out');
             const savedDealerCode = localStorage.getItem('retailhub_dealer_code') || '4000001368';
+
+            if (isLoggedOut === 'true') {
+                window.location.href = 'index.html'; // Eğer çıkış yapıldıysa ana ekrana yönlendir
+                return;
+            }
+
             await performLogin(savedDealerCode, '123456');
             updateCartBadgeCount();
         });
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const code = document.getElementById('loginDealerCode').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
-            await performLogin(code, pass);
-        }
 
         async function performLogin(code, pass) {
             let { data, error } = await supabaseClient
@@ -381,7 +339,6 @@
             }
 
             currentDealer = data;
-            document.getElementById('loginModal').classList.add('hidden');
             document.getElementById('portalContainer').classList.remove('hidden');
 
             document.getElementById('dealerName').innerText = data.name || 'DOVRAN AMANOV';
@@ -416,7 +373,6 @@
             const step = 1000;
             let hasMore = true;
 
-            // SADECE VAR OLAN KOLONLARI SEÇ (cogs/price ÇIKARILDI - 400 HATASI KESİLDİ)
             while (hasMore) {
                 const { data, error } = await supabaseClient
                     .from('products')
@@ -432,7 +388,6 @@
                 from += step;
             }
 
-            // LOKAL OLARAK DEĞİŞTİRİLEN FİYAT/SMM BİLGİLERİNİ LOKAL HAFIZADAN AL
             let customPrices = JSON.parse(localStorage.getItem('custom_product_prices')) || {};
 
             globalProducts = allProductsData.map(item => {
@@ -512,7 +467,7 @@
                         <div class="flip-card-front flex flex-col justify-between h-full">
                             <div>
                                 <div class="h-36 w-full bg-slate-100 relative overflow-hidden">
-                                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition" onclick="openLightboxModal('${p.image}')" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=500';">
+                                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
                                     <span class="absolute top-2 left-2 bg-slate-900/80 text-white text-[9px] font-extrabold px-2 py-0.5 rounded tracking-wider">
                                         ${p.code}
                                     </span>
@@ -710,7 +665,6 @@
 
         function onInvoiceFilterChange() { renderShipmentsTable(); }
 
-        /* MAL KABUL TABLOSU: HOVER (ÜZERİNE GELİNCE BÜYÜYEN) POP-UP GÖRSEL */
         function renderShipmentsTable() {
             const selectedInv = document.getElementById('invoiceFilter').value;
             const tbody = document.getElementById('shipmentTableBody');
@@ -746,10 +700,7 @@
                     <td class="p-4 font-mono font-bold text-[#00205b] whitespace-nowrap">${s.invoice_no}</td>
                     <td class="p-4">
                         <div class="flex items-center gap-3">
-                            <div class="img-hover-container shrink-0">
-                                <img src="${imgUrl}" alt="${s.product_name}" class="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm cursor-pointer" onclick="openLightboxModal('${imgUrl}')" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1614633833026-061803623d24?w=500';">
-                                <img src="${imgUrl}" class="img-preview-popup" onerror="this.style.display='none'">
-                            </div>
+                            <img src="${imgUrl}" alt="${s.product_name}" class="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-slate-100 shadow-sm shrink-0" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
                             <div class="min-w-0">
                                 <span class="text-[10px] font-extrabold text-[#00205b] font-mono block">${s.product_code}</span>
                                 <span class="font-bold text-slate-900 text-xs block truncate max-w-xs">${s.product_name || ''}</span>
@@ -779,37 +730,24 @@
             document.getElementById('summaryCountedQty').innerText = totalCountedQty + ' Pcs';
         }
 
-        function openLightboxModal(url) {
-            document.getElementById('lightboxImg').src = url;
-            document.getElementById('imageLightboxModal').style.display = 'flex';
-        }
-        function closeLightbox() {
-            document.getElementById('imageLightboxModal').style.display = 'none';
-        }
-
-        /* MAL KABUL ONAY: 400 HATASIZ STOĞA EKLEME VE YEREL FİYAT SAKLAMA */
         async function approveSingleShipment(shipmentId, productCode, productName) {
-            console.log("Mal kabul tetiklendi - SKU:", productCode);
-            
-            // SADECE VAR OLAN KOLONLARI SORGULA
-            let { data: product, error: prodErr } = await supabaseClient
+            let { data: product } = await supabaseClient
                 .from('products')
-                .select('id, code, name')
+                .select('id, code')
                 .eq('code', productCode)
                 .maybeSingle();
 
             let productId = null;
 
             if (!product) {
-                // Ürün yoksa ekle (sadece var olan kolonlarla)
-                let { data: newProd, error: insertErr } = await supabaseClient
+                let { data: newProd } = await supabaseClient
                     .from('products')
                     .insert([{ code: productCode, name: productName || productCode }])
                     .select('id, code')
                     .maybeSingle();
 
-                if (insertErr || !newProd) {
-                    alert("Yeni ürün veritabanına eklenemedi: " + (insertErr ? insertErr.message : "Bilinmeyen hata"));
+                if (!newProd) {
+                    alert("Ürün veritabanına eklenemedi.");
                     return;
                 }
                 productId = newProd.id;
@@ -825,7 +763,6 @@
             const finalCogs = inputCogs ? Number(inputCogs.value) : 130;
             const finalPrice = inputPrice ? Number(inputPrice.value) : 250;
 
-            // Fiyat ve COGS'u lokal hafızada sakla (Supabase 400 atmasın)
             let customPrices = JSON.parse(localStorage.getItem('custom_product_prices')) || {};
             customPrices[productCode] = { price: finalPrice, cogs: finalCogs };
             localStorage.setItem('custom_product_prices', JSON.stringify(customPrices));
@@ -841,7 +778,7 @@
                 const currentQty = existingStock ? Number(existingStock.quantity) : 0;
                 const newTotalStock = currentQty + Number(finalCountedQty);
 
-                const { error: stockUpsertErr } = await supabaseClient
+                await supabaseClient
                     .from('stocks')
                     .upsert({ 
                         dealer_id: currentDealer.id, 
@@ -849,18 +786,12 @@
                         quantity: newTotalStock 
                     }, { onConflict: 'dealer_id,product_id' });
 
-                if (stockUpsertErr) {
-                    alert("Stok tablosuna yazılamadı! Hata: " + stockUpsertErr.message);
-                    return;
-                }
-
                 await supabaseClient.from('shipments').update({ 
                     status: 'APPROVED', 
                     approved_qty: finalCountedQty, 
                     counted_qty: finalCountedQty 
                 }).eq('id', shipmentId);
 
-                // DOM satırını yok et ve listeden düş
                 pendingShipmentsList = pendingShipmentsList.filter(s => s.id !== shipmentId);
                 const rowEl = document.getElementById(`shipment-row-${shipmentId}`);
                 if (rowEl) rowEl.remove();
