@@ -93,7 +93,7 @@
         </div>
     </div>
 
-    <!-- PRODUCT COGS / SMM & PRICE MANAGEMENT MODAL -->
+    <!-- PRODUCT COGS & PRICE MANAGER MODAL -->
     <div id="cogsManagerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white border border-slate-200 w-full max-w-3xl rounded-2xl p-6 shadow-2xl text-slate-900 max-h-[85vh] flex flex-col justify-between">
             <div>
@@ -111,7 +111,7 @@
                             <tr class="bg-slate-100 text-[#00205b] font-extrabold uppercase border-b">
                                 <th class="p-2.5">SKU / Code</th>
                                 <th class="p-2.5">Product Name</th>
-                                <th class="p-2.5 text-center">Unit COGS ($)</th>
+                                <th class="p-2.5 text-center">Unit COGS ($ SMM)</th>
                                 <th class="p-2.5 text-center">Sales Price ($)</th>
                                 <th class="p-2.5 text-center">Mark-up</th>
                             </tr>
@@ -131,7 +131,7 @@
     <!-- MAIN PORTAL CONTAINER -->
     <div id="portalContainer" class="flex-1 flex flex-col min-w-0 hidden">
 
-        <!-- HEADER NAVBAR (SAĞ ÜST SİGN-OUT SİLİNDİ) -->
+        <!-- HEADER NAVBAR -->
         <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-10 w-full">
             <div class="flex items-center gap-5">
                 <a href="index.html" target="_self" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#00205b] transition">
@@ -151,7 +151,6 @@
                     <button onclick="switchTab('sales')" id="btnTabSales" class="px-4 py-2 rounded-full text-xs font-extrabold bg-[#00205b] text-white shadow-sm flex items-center gap-1.5 transition">
                         <i class="fa-solid fa-cash-register"></i> <span>Sales & Stock</span>
                     </button>
-                    <!-- GOODS RECEIPT (999+ LİMİT DÜZELTMESİ) -->
                     <button onclick="switchTab('receipt')" id="btnTabReceipt" class="px-4 py-2 rounded-full text-xs font-extrabold border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
                         <i class="fa-solid fa-truck-ramp-box"></i> <span>Goods Receipt</span>
                         <span id="pendingBadge" class="bg-[#d71921] text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">0</span>
@@ -163,7 +162,7 @@
                 </div>
             </div>
 
-            <!-- SAĞ ÜST KONTROLLER VE BAYİ PROFİLİ (ÇIKIŞ BUTONU SİLİNDİ) -->
+            <!-- SAĞ ÜST KONTROLLER -->
             <div class="flex items-center gap-4">
                 <div class="relative w-48 hidden lg:block">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -197,7 +196,7 @@
         <!-- MAIN BODY AREA -->
         <main id="mainScrollArea" class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 w-full max-w-[1800px] mx-auto">
 
-            <!-- 1. GENİŞLETİLMİŞ DİNAMİK 7'Lİ KPI STRIP (MARK-UP CANLI HESAPLANIR) -->
+            <!-- 1. 7'Lİ KPI STRIP -->
             <section class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3.5">
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-emerald-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Today's Sales</span>
@@ -217,7 +216,6 @@
                     <span class="text-[10px] font-bold text-slate-400">Total Product Cost</span>
                 </div>
 
-                <!-- CANLI HESAPLANAN MARK-UP -->
                 <div class="ui-card p-3.5 rounded-2xl border-l-4 border-amber-500">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Mark-up</span>
                     <div class="text-lg font-black text-amber-600 mt-0.5" id="kpiMarkup">0.00 x</div>
@@ -257,7 +255,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: GOODS RECEIPT (DİNAMİK FİYAT, SMM VE COUNTED QTY DOLU GELİR) -->
+            <!-- TAB 2: GOODS RECEIPT -->
             <div id="tab-receipt-content" class="space-y-6 hidden">
                 <div class="ui-card p-5 rounded-2xl border border-slate-200 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -357,7 +355,14 @@
                 .maybeSingle();
 
             if (!data) {
-                data = { id: 'temp-id-1', code: code, name: 'Enza Home Dealer (' + code + ')' };
+                // Eğer bayi veritabanında yoksa otomatik oluştur veya geçici ID ata
+                let { data: newDealer } = await supabaseClient
+                    .from('dealers')
+                    .insert([{ code: code, name: 'Enza Home Dealer (' + code + ')' }])
+                    .select()
+                    .maybeSingle();
+                
+                data = newDealer || { id: 'temp-id-1', code: code, name: 'Enza Home Dealer (' + code + ')' };
             }
 
             currentDealer = data;
@@ -368,9 +373,9 @@
             document.getElementById('dealerCode').innerText = 'Code: ' + data.code;
             document.getElementById('dealerAvatar').innerText = String(data.code).substring(0, 2).toUpperCase();
 
-            fetchLiveProducts();
-            fetchPendingShipments();
-            fetchSalesAnalytics();
+            await fetchLiveProducts();
+            await fetchPendingShipments();
+            await fetchSalesAnalytics();
         }
 
         function switchTab(tab) {
@@ -432,7 +437,7 @@
         }
 
         async function fetchSalesAnalytics() {
-            if (!currentDealer) return;
+            if (!currentDealer || currentDealer.id === 'temp-id-1') return;
             let { data: moveData } = await supabaseClient
                 .from('stock_movements')
                 .select('*')
@@ -664,7 +669,6 @@
             let { data } = await supabaseClient.from('shipments').select('*').eq('dealer_code', searchCode);
             pendingShipmentsList = (data || []).filter(s => String(s.status).toUpperCase() === 'PENDING');
 
-            // 999+ LİMİT DÜZELTMESİ ROZETİ
             const badgeEl = document.getElementById('pendingBadge');
             if (badgeEl) {
                 const pLen = pendingShipmentsList.length;
@@ -685,7 +689,6 @@
 
         function onInvoiceFilterChange() { renderShipmentsTable(); }
 
-        /* MAL KABUL TABLOSU: VARSAYILAN OLARAK FATURADAKİ ADET COUNTED QTY OLARAK GELİR, COGS VE FİYAT DÜZENLENEBİLİR */
         function renderShipmentsTable() {
             const selectedInv = document.getElementById('invoiceFilter').value;
             const tbody = document.getElementById('shipmentTableBody');
@@ -707,7 +710,6 @@
                 const imgUrl = matchedProduct && matchedProduct.image ? matchedProduct.image : `https://yatasinternational.github.io/Products-Photos/${s.product_code}.jpg`;
                 const invoiceQty = Number(s.quantity) || 0;
                 
-                // VARSAYILAN OLARAK FATURADAKİ ADET DOLDURULUR
                 const defaultCountedQty = s.counted_qty !== undefined ? Number(s.counted_qty) : invoiceQty;
                 const defaultCogs = matchedProduct ? matchedProduct.cogs : 130;
                 const defaultPrice = matchedProduct ? matchedProduct.price : 250;
@@ -739,7 +741,7 @@
                         <input type="number" min="0" id="price-input-${s.id}" value="${defaultPrice}" class="w-20 text-center py-1 bg-slate-50 border border-slate-300 rounded text-xs font-black text-emerald-700">
                     </td>
                     <td class="p-4 text-right">
-                        <button onclick="approveSingleShipment('${s.id}', '${s.product_code}', ${invoiceQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow">
+                        <button onclick="approveSingleShipment('${s.id}', '${s.product_code}', '${s.product_name || ''}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow">
                             Confirm & Add to Stock
                         </button>
                     </td>
@@ -751,21 +753,44 @@
             document.getElementById('summaryCountedQty').innerText = totalCountedQty + ' Pcs';
         }
 
-async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
-            const product = globalProducts.find(p => p.code === productCode);
+        /* MAL KABUL ONAY: PRODUCT ID VEYA CODE İLE KESİN EŞLEŞTİRME VE STOĞA EKLEME */
+        async function approveSingleShipment(shipmentId, productCode, productName) {
+            let product = globalProducts.find(p => p.code === productCode);
+            
+            // Eğer globalProducts içinde ürün anında bulunamadıysa Supabase'den ID'sini çek
+            if (!product) {
+                let { data: fetchedProd } = await supabaseClient.from('products').select('*').eq('code', productCode).maybeSingle();
+                if (fetchedProd) {
+                    product = { id: fetchedProd.id, code: fetchedProd.code, stock: 0, cogs: fetchedProd.cogs || 130, price: fetchedProd.price || 250 };
+                } else {
+                    // Ürün veritabanında yoksa otomatik oluştur
+                    let { data: newProd } = await supabaseClient.from('products').insert([{ code: productCode, name: productName || productCode, price: 250, cogs: 130 }]).select().maybeSingle();
+                    if (newProd) product = { id: newProd.id, code: newProd.code, stock: 0, cogs: 130, price: 250 };
+                }
+            }
+
             const inputCounted = document.getElementById(`counted-input-${shipmentId}`);
             const inputCogs = document.getElementById(`cogs-input-${shipmentId}`);
             const inputPrice = document.getElementById(`price-input-${shipmentId}`);
 
-            const finalCountedQty = inputCounted ? (Number(inputCounted.value) || origInvoiceQty) : origInvoiceQty;
+            const finalCountedQty = inputCounted ? (Number(inputCounted.value) || 1) : 1;
             const finalCogs = inputCogs ? Number(inputCogs.value) : (product ? product.cogs : 130);
             const finalPrice = inputPrice ? Number(inputPrice.value) : (product ? product.price : 250);
 
             try {
-                if (product) {
-                    const newTotalStock = Number(product.stock) + Number(finalCountedQty);
-                    
-                    // 1. Supabase stocks tablosunu güncelle
+                if (product && product.id) {
+                    // Mevcut stoğu çek veya 0 al
+                    let { data: existingStock } = await supabaseClient
+                        .from('stocks')
+                        .select('quantity')
+                        .eq('dealer_id', currentDealer.id)
+                        .eq('product_id', product.id)
+                        .maybeSingle();
+
+                    const currentQty = existingStock ? Number(existingStock.quantity) : 0;
+                    const newTotalStock = currentQty + Number(finalCountedQty);
+
+                    // Stocks tablosuna kaydet
                     const { error: stockErr } = await supabaseClient
                         .from('stocks')
                         .upsert({ 
@@ -775,27 +800,27 @@ async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
                         }, { onConflict: 'dealer_id,product_id' });
 
                     if (stockErr) {
-                        console.error("Stock update error:", stockErr);
-                        alert("Stok güncellenirken hata oluştu: " + stockErr.message);
+                        alert("Stock DB Error: " + stockErr.message);
                         return;
                     }
 
-                    // 2. Ürün SMM ve Fiyatını güncelle
+                    // Ürün SMM ve Fiyatını güncelle
                     await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
                 }
 
-                // 3. Sevkiyat durumunu APPROVED yap
+                // Sevkiyatı onayla
                 await supabaseClient.from('shipments').update({ 
                     status: 'APPROVED', 
                     approved_qty: finalCountedQty, 
                     counted_qty: finalCountedQty 
                 }).eq('id', shipmentId);
 
-                alert('Shipment confirmed and imported to store stock successfully!');
+                alert('Goods successfully received and added to store stock!');
                 await fetchPendingShipments();
                 await fetchLiveProducts();
             } catch (err) { 
                 console.error("Approval Exception:", err); 
+                alert("Mal kabul onay hatası: " + err.message);
             }
         }
 
@@ -806,43 +831,14 @@ async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
 
             try {
                 for (let s of targetShipments) {
-                    const product = globalProducts.find(p => p.code === s.product_code);
-                    const inputCounted = document.getElementById(`counted-input-${s.id}`);
-                    const inputCogs = document.getElementById(`cogs-input-${s.id}`);
-                    const inputPrice = document.getElementById(`price-input-${s.id}`);
-
-                    const finalCountedQty = inputCounted ? (Number(inputCounted.value) || Number(s.quantity)) : Number(s.quantity);
-                    const finalCogs = inputCogs ? Number(inputCogs.value) : (product ? product.cogs : 130);
-                    const finalPrice = inputPrice ? Number(inputPrice.value) : (product ? product.price : 250);
-
-                    if (product) {
-                        const newTotalStock = Number(product.stock) + Number(finalCountedQty);
-                        
-                        await supabaseClient
-                            .from('stocks')
-                            .upsert({ 
-                                dealer_id: currentDealer.id, 
-                                product_id: product.id, 
-                                quantity: newTotalStock 
-                            }, { onConflict: 'dealer_id,product_id' });
-
-                        await supabaseClient.from('products').update({ cogs: finalCogs, price: finalPrice }).eq('id', product.id);
-                    }
-                    await supabaseClient.from('shipments').update({ 
-                        status: 'APPROVED', 
-                        approved_qty: finalCountedQty, 
-                        counted_qty: finalCountedQty 
-                    }).eq('id', s.id);
+                    await approveSingleShipment(s.id, s.product_code, s.product_name);
                 }
                 alert('All selected invoice items confirmed and imported to store stock!');
-                await fetchPendingShipments();
-                await fetchLiveProducts();
             } catch (err) { 
                 console.error("Bulk Approval Exception:", err); 
             }
         }
 
-        /* 7'Lİ KPI HESAPLAMASI & CANLI MARK-UP (SATIŞ FİYATI / SMM) */
         function updateKPIs() {
             const inStockProducts = globalProducts.filter(p => p.stock > 0);
             
@@ -851,8 +847,6 @@ async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
             const totalStockSalesValue = inStockProducts.reduce((acc, p) => acc + (p.stock * p.price), 0);
 
             const criticalAlertCount = inStockProducts.filter(p => p.stock <= 3).length;
-
-            // CANLI GERÇEK MARK-UP HESABI
             const liveMarkup = totalStockCostValue > 0 ? (totalStockSalesValue / totalStockCostValue) : 1.92;
 
             document.getElementById('kpiTodaySales').innerText = todaySalesCount + ' Pcs';
@@ -903,9 +897,9 @@ async function approveSingleShipment(shipmentId, productCode, origInvoiceQty) {
                         await supabaseClient.from('products').update({ cogs: newCogs, price: newPrice }).eq('id', p.id);
                     }
                 }
-                alert('Product SMM & Prices Updated!');
+                alert('Product SMM & Prices Updated Successfully!');
                 toggleCogsModal(false);
-                fetchLiveProducts();
+                await fetchLiveProducts();
             } catch (e) { console.error(e); }
         }
 
