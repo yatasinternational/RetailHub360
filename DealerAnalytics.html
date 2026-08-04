@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yataş Group - Dealer Master Data & Analytics</title>
+
+    <!-- Fonts & Libraries -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .ui-card { background-color: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(0, 32, 91, 0.05); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER BAR -->
+    <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm">
+        <div class="flex items-center gap-4">
+            <a href="index.html" target="_self" class="flex items-center gap-2 bg-slate-100 text-[#00205b] px-3.5 py-2 rounded-xl text-xs font-extrabold border border-slate-300 hover:bg-slate-200 transition">
+                <i class="fa-solid fa-arrow-left"></i> Back to Hub
+            </a>
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-[#00205b] text-white flex items-center justify-center font-black text-sm">Y</div>
+                <span class="font-extrabold text-[#00205b] text-sm">Dealer Master Data & Analytics</span>
+            </div>
+        </div>
+
+        <!-- FİLTRELER (AY / YIL & ÇOKLU DİL) -->
+        <div class="flex items-center gap-3">
+            <select id="filterYear" onchange="updateDealerAnalytics()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800">
+                <option value="2026" selected>Year: 2026</option>
+                <option value="2025">Year: 2025</option>
+            </select>
+
+            <select id="filterMonth" onchange="updateDealerAnalytics()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800">
+                <option value="ALL" selected>All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+            </select>
+
+            <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-100 border border-slate-300 text-xs font-bold px-3 py-1.5 rounded-xl text-slate-800">
+                <option value="EN" selected>EN</option>
+                <option value="TR">TR</option>
+                <option value="DE">DE</option>
+                <option value="RU">RU</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-6 flex-1 w-full">
+        <!-- KPI STRIP -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="ui-card p-5 rounded-2xl border-l-4 border-[#00205b]">
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="today_rev">Today's Sales Revenue</span>
+                <div class="text-2xl font-black text-[#00205b] mt-1" id="kpiTodayRev">$4,850.00</div>
+            </div>
+            <div class="ui-card p-5 rounded-2xl border-l-4 border-emerald-500">
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="delivered_rev">Delivered Revenue</span>
+                <div class="text-2xl font-black text-emerald-600 mt-1" id="kpiDeliveredRev">$12,400.00</div>
+            </div>
+            <div class="ui-card p-5 rounded-2xl border-l-4 border-sky-500">
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="stock_val">Inventory Stock Valuation ($)</span>
+                <div class="text-2xl font-black text-sky-600 mt-1" id="kpiStockVal">$85,200.00</div>
+            </div>
+            <div class="ui-card p-5 rounded-2xl border-l-4 border-amber-500">
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase" data-i18n="stock_count">Current Inventory Count</span>
+                <div class="text-2xl font-black text-amber-600 mt-1" id="kpiStockCount">142 Pcs</div>
+            </div>
+        </div>
+
+        <!-- GRAFİKLER (PASTA & ÇİZGİ GRAFİK) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Pie Chart: Brand Distribution -->
+            <div class="ui-card p-6 rounded-2xl border border-slate-200">
+                <h3 class="font-extrabold text-sm text-[#00205b] mb-4" data-i18n="chart_pie_title">Revenue Share by Brand & Category</h3>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="chartBrandPie"></canvas>
+                </div>
+            </div>
+
+            <!-- Line Chart: Monthly Trend -->
+            <div class="ui-card p-6 rounded-2xl border border-slate-200">
+                <h3 class="font-extrabold text-sm text-[#00205b] mb-4" data-i18n="chart_trend_title">Monthly Sales Revenue Trend</h3>
+                <div class="h-64">
+                    <canvas id="chartSalesTrend"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-12 border-t border-slate-200 bg-white px-8 flex items-center justify-between text-[11px] font-bold text-[#00205b]">
+        <div>Copyright © 2026 Yataş International. All rights reserved.</div>
+        <div>Proudly presented by International Sales Development Team</div>
+    </footer>
+
+    <script>
+        let pieChart = null;
+        let trendChart = null;
+
+        const i18n = {
+            EN: {
+                today_rev: "Today's Sales Revenue",
+                delivered_rev: "Delivered Revenue",
+                stock_val: "Inventory Stock Valuation ($)",
+                stock_count: "Current Inventory Count",
+                chart_pie_title: "Revenue Share by Brand & Category",
+                chart_trend_title: "Monthly Sales Revenue Trend"
+            },
+            TR: {
+                today_rev: "Bugünün Kasa Cirosu",
+                delivered_rev: "Teslim Edilen Ciro",
+                stock_val: "Envanter Stok Maliyeti ($)",
+                stock_count: "Mevcut Stok Adedi",
+                chart_pie_title: "Marka ve Kategoriye Göre Ciro Payı",
+                chart_trend_title: "Aylık Satış Değişim Trendi"
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+        });
+
+        function initCharts() {
+            const ctxPie = document.getElementById('chartBrandPie').getContext('2d');
+            pieChart = new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['Yataş Bedding', 'Enza Home', 'Puffy', 'Tekstil'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: ['#00205b', '#c59b27', '#0284c7', '#10b981']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxTrend = document.getElementById('chartSalesTrend').getContext('2d');
+            trendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                    datasets: [{
+                        label: 'Sales Revenue ($)',
+                        data: [12000, 15000, 18000, 14000, 22000, 25000, 28000, 31000],
+                        borderColor: '#00205b',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(0,32,91,0.05)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function updateDealerAnalytics() {
+            document.getElementById('kpiTodayRev').innerText = "$5,120.00";
+            document.getElementById('kpiStockVal').innerText = "$89,400.00";
+        }
+
+        function changeLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerText = i18n[lang][key];
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -56,6 +56,13 @@
             --brand-ambient: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
         }
 
+        /* KOYU MODDA MARKA LOGOLARININ PARLAMASI VE GÖRÜNÜR OLMASI */
+        [data-theme="dark"] .brand-logo-btn img,
+        [data-theme="dark"] .filter-chip-logo {
+            filter: brightness(0) invert(1) !important;
+            opacity: 0.95;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
@@ -1285,6 +1292,2880 @@
             changeLanguage(currentLang);
 
             // SellTrackIQ'den yönlenen sepet panelinin otomatik açılış kontrolü
+            if (localStorage.getItem('open_b2b_cart_panel') === 'true') {
+                localStorage.removeItem('open_b2b_cart_panel');
+                toggleCart(true);
+            }
+        });
+
+        function initScrollTopButton() {
+            const btn = document.getElementById('scrollTopBtn');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) btn.classList.add('visible');
+                else btn.classList.remove('visible');
+            });
+        }
+
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function initNoticeTicker() {
+            let tIdx = 0;
+            setInterval(() => {
+                const t1 = document.getElementById('ticker1');
+                const t2 = document.getElementById('ticker2');
+                if (tIdx === 0) { t1.classList.remove('active'); t2.classList.add('active'); tIdx = 1; }
+                else { t2.classList.remove('active'); t1.classList.add('active'); tIdx = 0; }
+            }, 5000);
+        }
+
+        function switchView(viewName) {
+            const portalSec = document.getElementById('mainPortalSection');
+            const catalogSec = document.getElementById('catalogViewSection');
+            const btnP = document.getElementById('btnOrderPortal');
+            const btnC = document.getElementById('btnCatalogViewer');
+
+            if (viewName === 'portal') {
+                portalSec.style.display = 'block'; catalogSec.style.display = 'none';
+                btnP.classList.add('active'); btnC.classList.remove('active');
+            } else {
+                portalSec.style.display = 'none'; catalogSec.style.display = 'block';
+                btnC.classList.add('active'); btnP.classList.remove('active');
+            }
+        }
+
+        function toggleChatWindow() { document.getElementById('chatWindow').classList.toggle('active'); }
+
+        function sendChatQuery(queryText) {
+            const msgBox = document.getElementById('chatMessages');
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg user'; userMsg.innerText = queryText;
+            msgBox.appendChild(userMsg);
+
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-msg bot';
+
+                if (queryText.includes('Firmness') || queryText.includes('Sertlik')) {
+                    botMsg.innerText = currentLang === 'TR' ? "Sırt üstü yatanlar için omurga desteği sunan Orta-Sert veya Sert yataklar (örn. Activio, Supreme Pedic) önerilir." : "For back sleepers, Medium-Firm or Firm mattresses (e.g. Activio, Supreme Pedic) are recommended for spinal alignment.";
+                } else if (queryText.includes('Sizes') || queryText.includes('Ölçüler')) {
+                    botMsg.innerText = currentLang === 'TR' ? "Popüler uluslararası ölçüler: Tek Kişilik (90x190/200), Çift Kişilik (140x200), Queen (160x200), King (180x200)." : "Popular international sizes: Single (90x190/200), Double (140x200), Queen (160x200), King (180x200).";
+                } else {
+                    botMsg.innerText = currentLang === 'TR' ? "18'den fazla kumaş seçeneğimiz bulunmaktadır. Başlık veya Baza seçerek kumaş ve renk kartelalarını inceleyebilirsiniz." : "We offer over 18 fabric colors including Anthracite, Mink, Cream, and Pacific Blue. Select any Headboard/Base to preview available swatches!";
+                }
+
+                msgBox.appendChild(botMsg);
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }, 600);
+
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        let touchStartX = 0; let touchEndX = 0;
+
+        function initSwipeGestures() {
+            const gContainer = document.getElementById('galleryContainer');
+            if (!gContainer) return;
+
+            gContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            gContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (Math.abs(touchEndX - touchStartX) > 40) {
+                    if (touchEndX < touchStartX) nextModalPhoto();
+                    else prevModalPhoto();
+                }
+            }, { passive: true });
+        }
+
+        function initKeyboardShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault(); openSpotlight();
+                }
+                if (e.key === 'Escape') { closeSpotlight(); closeModal(); closeLightbox(); }
+                if (document.getElementById('productModal').classList.contains('active')) {
+                    if (e.key === 'ArrowRight') nextModalPhoto();
+                    if (e.key === 'ArrowLeft') prevModalPhoto();
+                }
+                if (document.getElementById('imageLightboxModal').classList.contains('active')) {
+                    if (e.key === 'ArrowRight') nextLightboxPhoto();
+                    if (e.key === 'ArrowLeft') prevLightboxPhoto();
+                }
+            });
+        }
+
+        function openSpotlight() {
+            document.getElementById('spotlightModal').classList.add('active');
+            const input = document.getElementById('spotlightInput');
+            input.value = ''; input.focus(); handleSpotlightSearch();
+        }
+
+        function closeSpotlight() { document.getElementById('spotlightModal').classList.remove('active'); }
+        function closeSpotlightOnBackdrop(e) { if (e.target === e.currentTarget) closeSpotlight(); }
+
+        function handleSpotlightSearch() {
+            const query = document.getElementById('spotlightInput').value.toLowerCase().trim();
+            const resultsBox = document.getElementById('spotlightResults');
+            let matches = [];
+
+            Object.values(productFamilies).forEach(fam => {
+                if (fam.familyName.toLowerCase().includes(query)) {
+                    matches.push({ type: 'Family', name: fam.familyName, brand: fam.brand });
+                } else {
+                    Object.values(fam.categories).forEach(cat => {
+                        cat.variants.forEach(v => {
+                            if (v.code.toLowerCase().includes(query) || (v.desc && v.desc.toLowerCase().includes(query))) {
+                                matches.push({ type: 'Variant', name: `${fam.familyName} (${v.size})`, brand: fam.brand, code: v.code, famName: fam.familyName });
+                            }
+                        });
+                    });
+                }
+            });
+
+            resultsBox.innerHTML = matches.slice(0, 8).map(m => `
+                <div class="spotlight-item" onclick="selectSpotlightResult('${m.famName || m.name}')">
+                    <div>
+                        <strong style="font-size:13.5px;">${m.name}</strong>
+                        <div style="font-size:11px; color:var(--text-muted);">${m.brand} • ${m.type}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="font-size:12px; color:var(--text-muted);"></i>
+                </div>
+            `).join('') || `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">No matching products found</div>`;
+        }
+
+        function selectSpotlightResult(famName) { closeSpotlight(); openProductModal(famName); }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light'); icon.className = 'fa-solid fa-moon';
+            } else {
+                html.setAttribute('data-theme', 'dark'); icon.className = 'fa-solid fa-sun';
+            }
+        }
+
+        function initScrollFooterBehavior() {
+            const footer = document.getElementById('appFooter');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 40) footer.classList.add('hidden-on-scroll');
+                else footer.classList.remove('hidden-on-scroll');
+            });
+        }
+
+        async function loadExcelData() {
+            try {
+                const response = await fetch('tr_v2.xlsx');
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                rawProducts = XLSX.utils.sheet_to_json(firstSheet);
+                
+                processRawData();
+                buildBrandChips();
+                buildNavigationTree();
+                renderProductGrid();
+            } catch (err) {
+                console.warn("Excel import execution:", err);
+            }
+        }
+
+        function processRawData() {
+            productFamilies = {};
+            rawProducts.forEach(item => {
+                const familyName = item['Ürün Ailesi'] || item['Malzeme Tanım'] || 'Activio Collection';
+                let category = item['Kategori'] || 'Yatak';
+                
+                if (category === 'Çocuk Yatak' || category === 'Çocuk Mattress' || category.includes('Çocuk')) {
+                    category = 'Kids Mattress';
+                }
+
+                let rawPhoto = item['Foto weblink'] || item['Görsel Link'] || '';
+                let photoList = String(rawPhoto).split(',').map(p => p.trim()).filter(p => p.startsWith('http'));
+                let mainPhoto = photoList.length > 0 ? photoList[0] : 'https://via.placeholder.com/300x200?text=Yatas+Bedding';
+
+                if (!productFamilies[familyName]) {
+                    productFamilies[familyName] = { familyName: familyName, brand: item['Marka'] || 'Yataş Bedding', categories: {} };
+                }
+
+                if (!productFamilies[familyName].categories[category]) {
+                    productFamilies[familyName].categories[category] = { categoryName: category, photoUrl: mainPhoto, allPhotos: new Set(photoList), variants: [] };
+                } else {
+                    photoList.forEach(p => productFamilies[familyName].categories[category].allPhotos.add(p));
+                }
+
+                productFamilies[familyName].categories[category].variants.push({
+                    code: String(item['Ürün Kodu'] || 'SKU-100'),
+                    size: String(item['Ölçü'] || '160x200'),
+                    desc: item['Malzeme Tanım'] || familyName,
+                    usdPrice: parseFloat(item['Birim USD Fiyat']) || 0,
+                    eurPrice: parseFloat(item['Birim EUR Fiyat']) || 0,
+                    height: item['Yükseklik CM'] || 0,
+                    status: item['Sipariş Statü'] || 'MTO',
+                    barcode: String(item['Barkod'] || '-'),
+                    gtip: String(item['GTIP'] || '9404.21'),
+                    volume: parseFloat(item['Birim Hacim M3']) || 0,
+                    weight: parseFloat(item['Birim Ağırlık KG']) || 0,
+                    feature: item['Özellik'] || '-',
+                    kartela: String(item['Kartela'] || '-').trim(),
+                    color: String(item['Renk'] || '-').trim(),
+                    hardness: String(item['Sertlik'] || '-').trim(),
+                    photoUrl: mainPhoto
+                });
+            });
+        }
+
+        function buildBrandChips() {
+            const chipContainer = document.getElementById('brandFilterChips');
+            let chipsHtml = `
+                <div class="filter-chip ${activeBrandFilter === 'ALL' ? 'active' : ''}" onclick="filterByBrand('ALL')">
+                    <i class="fa-solid fa-layer-group"></i> <span data-i18n="all_brands">All Brands</span>
+                </div>
+                <div class="filter-chip ${activeBrandFilter === 'Yataş Bedding' ? 'active' : ''}" onclick="filterByBrand('Yataş Bedding')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/yatas/logo.webp" alt="Yataş Bedding" class="filter-chip-logo">
+                </div>
+                <div class="filter-chip ${activeBrandFilter === 'Enza Home' ? 'active' : ''}" onclick="filterByBrand('Enza Home')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/enza/logo.webp" alt="Enza Home" class="filter-chip-logo">
+                </div>
+            `;
+            chipContainer.innerHTML = chipsHtml;
+        }
+
+        function buildNavigationTree() {
+            const tree = {};
+            rawProducts.forEach(i => {
+                const b = i['Marka'] || 'Yataş Bedding';
+                let c = i['Kategori'] || 'Genel';
+                if (c.includes('Çocuk')) c = 'Kids Mattress';
+                const fam = i['Ürün Ailesi'] || 'General';
+                if (!tree[b]) tree[b] = {}; if (!tree[b][c]) tree[b][c] = new Set();
+                tree[b][c].add(fam);
+            });
+
+            const navContainer = document.getElementById('navigationTree');
+            let html = '';
+            for (const [brand, categories] of Object.entries(tree)) {
+                html += `<div class="nav-tree-item">
+                    <div class="nav-tree-header" onclick="toggleNavAccordion(this)">
+                        <span><i class="fa-solid fa-store" style="margin-right:8px;"></i> ${brand}</span><i class="fa-solid fa-chevron-down"></i>
+                    </div><div class="nav-tree-children">`;
+                for (const [cat, families] of Object.entries(categories)) {
+                    const translatedCat = autoTranslateText(cat, currentLang);
+                    html += `<div class="cat-tree-header" onclick="toggleNavAccordion(this)">
+                        <span><i class="fa-regular fa-folder" style="margin-right:6px;"></i> ${translatedCat}</span><i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+                    </div><div class="cat-tree-children">`;
+                    Array.from(families).forEach(fam => {
+                        html += `<div class="sub-link-item" onclick="filterByFamily('${brand}', '${cat}', '${fam}')"><i class="fa-solid fa-angle-right" style="font-size:10px; color:var(--text-muted);"></i> ${fam}</div>`;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div></div>`;
+            }
+            navContainer.innerHTML = html;
+        }
+
+        function toggleNavAccordion(el) { if (el.nextElementSibling) el.nextElementSibling.classList.toggle('active'); }
+
+        async function renderProductGrid() {
+            const grid = document.getElementById('productGrid');
+            let families = Object.values(productFamilies);
+
+            const selectedH = document.getElementById('filterHardness').value;
+            const sortVal = document.getElementById('sortSelect').value;
+
+            families = families.filter(f => {
+                const matchBrand = (activeBrandFilter === 'ALL' || f.brand === activeBrandFilter);
+                let matchCat = !activeCategoryFilter || Object.keys(f.categories).includes(activeCategoryFilter);
+                const matchFam = (!activeFamilyFilter || f.familyName === activeFamilyFilter);
+
+                let matchHardness = true;
+                if (selectedH !== 'ALL') {
+                    matchHardness = Object.values(f.categories).some(c => 
+                        c.variants.some(v => v.hardness.toLowerCase().includes(selectedH.toLowerCase()))
+                    );
+                }
+
+                return matchBrand && matchCat && matchFam && matchHardness;
+            });
+
+            if (sortVal === 'NAME_ASC') families.sort((a,b) => a.familyName.localeCompare(b.familyName));
+            if (sortVal === 'NAME_DESC') families.sort((a,b) => b.familyName.localeCompare(a.familyName));
+
+            grid.innerHTML = families.map(f => {
+                let allVariants = []; let mainPhoto = '';
+                Object.values(f.categories).forEach(c => { if (!mainPhoto && c.photoUrl) mainPhoto = c.photoUrl; allVariants.push(...c.variants); });
+                const minPrice = Math.min(...allVariants.map(v => currentCurrency === 'USD' ? v.usdPrice : v.eurPrice));
+                const currencySymbol = currentCurrency === 'USD' ? '$' : '€';
+                const fromLabel = i18n[currentLang].from || 'from';
+
+                return `
+                <div class="product-card" onclick="openProductModal('${f.familyName}')">
+                    <div class="card-img-wrap">
+                        <img src="${mainPhoto}" alt="${f.familyName}" onerror="this.src='https://via.placeholder.com/300x200?text=Yatas+Bedding'">
+                        <div class="card-badge">${Object.keys(f.categories).length} Categories</div>
+                        <div class="card-magnifier-btn" onclick="openLightboxFromGrid(event, '${mainPhoto}')" title="Zoom Photo">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <div class="card-brand">${f.brand}</div>
+                            <h3 class="card-title">${f.familyName}</h3>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">${fromLabel} ${formatCurrency(minPrice, currencySymbol)}</div>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function applyFilters() { renderProductGrid(); }
+
+        function resetToHome() {
+            activeBrandFilter = 'ALL'; activeCategoryFilter = null; activeFamilyFilter = null;
+            buildBrandChips(); renderProductGrid();
+        }
+
+        function getCategoryIcon(catKey) {
+            const key = String(catKey).toLowerCase();
+            if (key.includes('yatak') || key.includes('mattress')) return 'fa-bed';
+            if (key.includes('baza') || key.includes('base') || key.includes('boxspring')) return 'fa-box-archive';
+            if (key.includes('başlık') || key.includes('headboard')) return 'fa-couch';
+            if (key.includes('yastık') || key.includes('pillow')) return 'fa-feather';
+            if (key.includes('yorgan') || key.includes('duvet')) return 'fa-scroll';
+            if (key.includes('karyola') || key.includes('frame')) return 'fa-border-all';
+            if (key.includes('aksesuar') || key.includes('accessories')) return 'fa-shapes';
+            if (key.includes('kids') || key.includes('çocuk')) return 'fa-child';
+            return 'fa-layer-group';
+        }
+
+        function openProductModal(familyName) {
+            currentActiveFamily = productFamilies[familyName];
+            document.getElementById('modalFamilyTitle').innerText = currentActiveFamily.familyName;
+            document.getElementById('modalQty').value = 1;
+
+            const categoryKeys = Object.keys(currentActiveFamily.categories);
+            const tabsContainer = document.getElementById('familyTabsBar');
+
+            tabsContainer.innerHTML = categoryKeys.map((catKey, index) => `
+                <button class="family-tab-btn ${index === 0 ? 'active' : ''}" onclick="switchFamilyCategory('${catKey}', this)">
+                    <i class="fa-solid ${getCategoryIcon(catKey)}"></i> ${autoTranslateText(catKey, currentLang)}
+                </button>
+            `).join('');
+
+            switchFamilyCategory(categoryKeys[0]);
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function switchFamilyCategory(catKey, btnEl = null) {
+            currentActiveCategoryKey = catKey;
+            document.getElementById('modalQty').value = 1;
+
+            if (btnEl) {
+                document.querySelectorAll('.family-tab-btn').forEach(b => b.classList.remove('active'));
+                btnEl.classList.add('active');
+            }
+            const catData = currentActiveFamily.categories[catKey];
+            document.getElementById('modalBrandCategory').innerText = `${currentActiveFamily.brand} | ${autoTranslateText(catKey, currentLang)}`;
+
+            modalPhotosList = Array.from(catData.allPhotos);
+            if (modalPhotosList.length === 0 && catData.photoUrl) {
+                modalPhotosList = [catData.photoUrl];
+            }
+            currentPhotoIndex = 0;
+            updateModalPhotoDisplay();
+
+            renderKartelaSection(catData.variants);
+        }
+
+        function updateModalPhotoDisplay() {
+            if (modalPhotosList.length === 0) return;
+            const imgEl = document.getElementById('modalImg');
+            const counterEl = document.getElementById('modalPhotoCounter');
+            const thumbsBar = document.getElementById('modalThumbnailsBar');
+
+            imgEl.src = modalPhotosList[currentPhotoIndex];
+            counterEl.innerText = `${currentPhotoIndex + 1} / ${modalPhotosList.length}`;
+
+            if (modalPhotosList.length > 1) {
+                thumbsBar.style.display = 'flex';
+                thumbsBar.innerHTML = modalPhotosList.map((pUrl, i) => `
+                    <img src="${pUrl}" class="thumb-img ${i === currentPhotoIndex ? 'active' : ''}" onclick="setModalPhotoIndex(${i})" onerror="this.style.display='none'">
+                `).join('');
+            } else {
+                thumbsBar.style.display = 'none';
+            }
+        }
+
+        function setModalPhotoIndex(idx) { currentPhotoIndex = idx; updateModalPhotoDisplay(); }
+        function nextModalPhoto(e = null) { if (e) e.stopPropagation(); if (modalPhotosList.length <= 1) return; currentPhotoIndex = (currentPhotoIndex + 1) % modalPhotosList.length; updateModalPhotoDisplay(); }
+        function prevModalPhoto(e = null) { if (e) e.stopPropagation(); if (modalPhotosList.length <= 1) return; currentPhotoIndex = (currentPhotoIndex - 1 + modalPhotosList.length) % modalPhotosList.length; updateModalPhotoDisplay(); }
+        function handleMainImageClick(e) { if (e.target.closest('.modal-nav-arrow')) return; openLightboxFromMain(); }
+
+        function openLightboxFromMain() { openLightboxWithList(modalPhotosList, currentPhotoIndex); }
+        function openLightboxFromGrid(e, src) { e.stopPropagation(); openLightboxWithList([src], 0); }
+
+        function openLightboxWithList(photosArray, startIndex) {
+            modalPhotosList = photosArray && photosArray.length > 0 ? photosArray : [document.getElementById('modalImg').src];
+            currentPhotoIndex = startIndex || 0;
+            updateLightboxDisplay();
+            document.getElementById('imageLightboxModal').classList.add('active');
+        }
+
+        function updateLightboxDisplay() {
+            if (modalPhotosList.length === 0) return;
+            document.getElementById('lightboxImg').src = modalPhotosList[currentPhotoIndex];
+            document.getElementById('lightboxCounter').innerText = `${currentPhotoIndex + 1} / ${modalPhotosList.length}`;
+        }
+
+        function nextLightboxPhoto(e = null) {
+            if (e) e.stopPropagation();
+            if (modalPhotosList.length <= 1) return;
+            currentPhotoIndex = (currentPhotoIndex + 1) % modalPhotosList.length;
+            updateLightboxDisplay(); updateModalPhotoDisplay();
+        }
+
+        function prevLightboxPhoto(e = null) {
+            if (e) e.stopPropagation();
+            if (modalPhotosList.length <= 1) return;
+            currentPhotoIndex = (currentPhotoIndex - 1 + modalPhotosList.length) % modalPhotosList.length;
+            updateLightboxDisplay(); updateModalPhotoDisplay();
+        }
+
+        function closeLightbox() { document.getElementById('imageLightboxModal').classList.remove('active'); }
+        function closeLightboxOnBackdrop(e) { if (e.target === e.currentTarget) closeLightbox(); }
+
+        function renderKartelaSection(variants) {
+            const kartelaSec = document.getElementById('kartelaSection');
+            const kartelaGrid = document.getElementById('kartelaCardsGrid');
+
+            const uniqueKartelas = [...new Set(variants.map(v => v.kartela))].filter(k => k && k !== '-' && k !== 'undefined');
+
+            if (uniqueKartelas.length > 0) {
+                kartelaSec.style.display = 'block';
+                kartelaGrid.innerHTML = uniqueKartelas.map((kCode, idx) => `
+                    <div class="kartela-card ${idx === 0 ? 'active' : ''}" onclick="selectKartela('${kCode}', this)">
+                        <div class="kartela-swatch-box">
+                            <i class="fa-solid fa-swatchbook" style="color:var(--text-muted); font-size:18px;"></i>
+                        </div>
+                        <span class="kartela-code-text">${kCode}</span>
+                    </div>
+                `).join('');
+                
+                selectKartela(uniqueKartelas[0]);
+            } else {
+                kartelaSec.style.display = 'none';
+                activeSelectedKartela = '-';
+                renderColorSection(variants);
+            }
+        }
+
+        function selectKartela(kCode, el = null) {
+            activeSelectedKartela = kCode;
+            if (el) {
+                document.querySelectorAll('.kartela-card').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            const catData = currentActiveFamily.categories[currentActiveCategoryKey];
+            const matchingVariants = catData.variants.filter(v => activeSelectedKartela === '-' || v.kartela === activeSelectedKartela);
+
+            renderColorSection(matchingVariants);
+        }
+
+        function renderColorSection(variants) {
+            const colorSec = document.getElementById('colorSection');
+            const colorGrid = document.getElementById('colorChipsGrid');
+
+            const uniqueColors = [...new Set(variants.map(v => v.color))].filter(c => c && c !== '-' && c !== 'undefined');
+
+            if (uniqueColors.length > 0) {
+                colorSec.style.display = 'block';
+                colorGrid.innerHTML = uniqueColors.map((cName, idx) => `
+                    <div class="color-chip ${idx === 0 ? 'active' : ''}" onclick="selectColor('${cName}', this)">
+                        <span style="width:8px; height:8px; border-radius:50%; background:#00205b; display:inline-block;"></span>
+                        ${autoTranslateText(cName, currentLang)}
+                    </div>
+                `).join('');
+
+                selectColor(uniqueColors[0]);
+            } else {
+                colorSec.style.display = 'none';
+                activeSelectedColor = '-';
+                renderSizeChips(variants);
+            }
+        }
+
+        function selectColor(cName, el = null) {
+            activeSelectedColor = cName;
+            if (el) {
+                document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            const catData = currentActiveFamily.categories[currentActiveCategoryKey];
+            const matchingVariants = catData.variants.filter(v => {
+                const matchK = activeSelectedKartela === '-' || v.kartela === activeSelectedKartela;
+                const matchC = activeSelectedColor === '-' || v.color === activeSelectedColor;
+                return matchK && matchC;
+            });
+
+            renderSizeChips(matchingVariants);
+        }
+
+        function renderSizeChips(matchingVariants) {
+            const sizeGrid = document.getElementById('sizeChipsGrid');
+            const uniqueSizes = [...new Set(matchingVariants.map(v => v.size))];
+
+            sizeGrid.innerHTML = uniqueSizes.map((sVal, idx) => `
+                <div class="size-chip ${idx === 0 ? 'active' : ''}" onclick="selectSize('${sVal}', this)">${sVal}</div>
+            `).join('');
+
+            if (uniqueSizes.length > 0) { selectSize(uniqueSizes[0]); }
+        }
+
+        function selectSize(sVal, el = null) {
+            if (el) {
+                document.querySelectorAll('.size-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            const catData = currentActiveFamily.categories[currentActiveCategoryKey];
+            
+            activeSelectedVariant = catData.variants.find(v => {
+                const matchK = activeSelectedKartela === '-' || v.kartela === activeSelectedKartela;
+                const matchC = activeSelectedColor === '-' || v.color === activeSelectedColor;
+                const matchS = v.size === sVal;
+                return matchK && matchC && matchS;
+            }) || catData.variants[0];
+
+            const v = activeSelectedVariant;
+
+            document.getElementById('specGtip').innerText = v.gtip;
+            document.getElementById('specVolume').innerText = `${v.volume} m³`;
+            document.getElementById('specWeight').innerText = `${v.weight} kg`;
+            document.getElementById('specHeight').innerText = `${v.height} cm`;
+            document.getElementById('specStatus').innerText = v.status || 'MTO';
+            document.getElementById('specFeature').innerText = autoTranslateText(v.feature, currentLang) || '-';
+            document.getElementById('specKartela').innerText = v.kartela || '-';
+            document.getElementById('specColor').innerText = autoTranslateText(v.color, currentLang) || '-';
+
+            const isMattress = currentActiveCategoryKey.toLowerCase().includes('yatak') || currentActiveCategoryKey.toLowerCase().includes('mattress');
+            const firmnessSec = document.getElementById('firmnessSection');
+            
+            if (isMattress && v.hardness && v.hardness !== '-') {
+                firmnessSec.style.display = 'flex';
+                updateFirmnessGauge(v.hardness);
+            } else {
+                firmnessSec.style.display = 'none';
+            }
+
+            updateModalPrice();
+        }
+
+        function updateFirmnessGauge(hardnessVal) {
+            const val = String(hardnessVal).toLowerCase();
+            const labelEl = document.getElementById('firmnessLabelText');
+            labelEl.innerText = autoTranslateText(hardnessVal, currentLang) || 'Medium';
+
+            const d1 = document.getElementById('fDot1'); const d2 = document.getElementById('fDot2');
+            const d3 = document.getElementById('fDot3'); const d4 = document.getElementById('fDot4');
+
+            [d1, d2, d3, d4].forEach(d => d.classList.remove('active'));
+
+            if (val.includes('yumuşak') || val.includes('soft')) {
+                d1.classList.add('active');
+            } else if (val.includes('medium') || val.includes('orta')) {
+                d1.classList.add('active'); d2.classList.add('active');
+            } else if (val.includes('ultra')) {
+                d1.classList.add('active'); d2.classList.add('active'); d3.classList.add('active'); d4.classList.add('active');
+            } else if (val.includes('sert') || val.includes('hard') || val.includes('firm')) {
+                d1.classList.add('active'); d2.classList.add('active'); d3.classList.add('active');
+            } else {
+                d1.classList.add('active'); d2.classList.add('active');
+            }
+        }
+
+        function updateModalQty(delta) {
+            const qtyInput = document.getElementById('modalQty');
+            let val = parseInt(qtyInput.value || 1) + delta;
+            if (val < 1) val = 1; qtyInput.value = val; updateModalPrice();
+        }
+
+        function updateModalPrice() {
+            const qty = parseInt(document.getElementById('modalQty').value || 1);
+            if (!activeSelectedVariant) return;
+            const unitPrice = currentCurrency === 'USD' ? activeSelectedVariant.usdPrice : activeSelectedVariant.eurPrice;
+            const symbol = currentCurrency === 'USD' ? '$' : '€';
+            document.getElementById('modalTotalPrice').innerText = formatCurrency(unitPrice * qty, symbol);
+        }
+
+        function closeModal() { document.getElementById('productModal').classList.remove('active'); }
+        function handleBackdropClick(e) { if (e.target === e.currentTarget) closeModal(); }
+
+        function addCurrentToCart() {
+            if (!activeSelectedVariant) return;
+            const qty = parseInt(document.getElementById('modalQty').value || 1);
+            const v = activeSelectedVariant;
+            const unitPrice = currentCurrency === 'USD' ? v.usdPrice : v.eurPrice;
+
+            const existingIndex = cart.findIndex(i => i.code === v.code && i.currency === currentCurrency);
+            if (existingIndex > -1) { cart[existingIndex].qty += qty; }
+            else {
+                cart.push({
+                    family: currentActiveFamily.familyName,
+                    category: currentActiveCategoryKey,
+                    brand: currentActiveFamily.brand,
+                    photoUrl: document.getElementById('modalImg').src,
+                    code: v.code, size: v.size, gtip: v.gtip, volume: v.volume, weight: v.weight,
+                    height: v.height, status: v.status, barcode: v.barcode, feature: v.feature,
+                    hardness: v.hardness, kartela: v.kartela, color: v.color,
+                    qty: qty, unitPrice: unitPrice, currency: currentCurrency
+                });
+            }
+            
+            // LocalStorage Senkronizasyonu
+            localStorage.setItem('b2b_cart', JSON.stringify(cart.map(c => ({
+                code: c.code, name: `${c.family} (${c.size})`, qty: c.qty, price: c.unitPrice, m3: c.volume, weight: c.weight, image: c.photoUrl
+            }))));
+
+            updateCartDisplay(); toggleCart(true); closeModal();
+        }
+
+        function updateCartDisplay() {
+            document.getElementById('cartBadge').innerText = cart.reduce((acc, i) => acc + i.qty, 0);
+            const list = document.getElementById('cartItemsList');
+            let totalVal = 0, totalM3 = 0, totalKg = 0, totalPcs = 0;
+
+            list.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.qty * item.unitPrice;
+                totalVal += itemTotal; totalM3 += item.qty * item.volume; totalKg += item.qty * item.weight; totalPcs += item.qty;
+                const symbol = item.currency === 'USD' ? '$' : '€';
+
+                return `
+                <div class="cart-item-card">
+                    <img src="${item.photoUrl}" onerror="this.src='https://via.placeholder.com/50'">
+                    <div class="cart-item-info">
+                        <h4>${item.family} (${autoTranslateText(item.category, currentLang)}) - ${item.size}</h4>
+                        <p>${item.kartela !== '-' ? 'Kartela: ' + item.kartela + ' • ' : ''}${item.color !== '-' ? autoTranslateText(item.color, currentLang) + ' • ' : ''}${item.qty} x ${formatCurrency(item.unitPrice, symbol)}</p>
+                        <div class="cart-item-price">${formatCurrency(itemTotal, symbol)}</div>
+                    </div>
+                    <button style="background:none; border:none; color:var(--yatas-red); cursor:pointer;" onclick="removeFromCart(${idx})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `}).join('');
+
+            const mainSymbol = currentCurrency === 'USD' ? '$' : '€';
+            document.getElementById('cartGrandTotal').innerText = formatCurrency(totalVal, mainSymbol);
+            calculateLogistics(totalM3, totalKg, totalPcs);
+        }
+
+        function removeFromCart(idx) { 
+            cart.splice(idx, 1); 
+            localStorage.setItem('b2b_cart', JSON.stringify(cart.map(c => ({
+                code: c.code, name: `${c.family} (${c.size})`, qty: c.qty, price: c.unitPrice, m3: c.volume, weight: c.weight, image: c.photoUrl
+            }))));
+            updateCartDisplay(); 
+        }
+
+        function clearCart() { 
+            if (confirm("Clear all items from proforma?")) { 
+                cart = []; 
+                localStorage.removeItem('b2b_cart');
+                updateCartDisplay(); 
+            } 
+        }
+
+        function calculateLogistics(totalM3, totalKg, totalPcs) {
+            const HQ_CAPACITY = 68.0; const TRUCK_CAPACITY = 90.0;
+            const hqPercent = Math.min(100, Math.round((totalM3 / HQ_CAPACITY) * 100));
+            const truckPercent = Math.min(100, Math.round((totalM3 / TRUCK_CAPACITY) * 100));
+
+            document.getElementById('hqCountText').innerText = `${(totalM3 / HQ_CAPACITY).toFixed(1)} Cont. (%${hqPercent})`;
+            document.getElementById('hqProgressFill').style.width = `${hqPercent}%`;
+
+            document.getElementById('truckCountText').innerText = `${(totalM3 / TRUCK_CAPACITY).toFixed(1)} Truck (%${truckPercent})`;
+            document.getElementById('truckProgressFill').style.width = `${truckPercent}%`;
+
+            document.getElementById('logisticsMeta').innerText = `Total Pcs: ${totalPcs} | Total Vol: ${formatNumber(totalM3)} m³ | Total Wt: ${formatNumber(totalKg)} kg`;
+        }
+
+        function toggleCart(forceOpen) {
+            const drawer = document.getElementById('cartDrawer');
+            const overlay = document.getElementById('cartOverlay');
+            if (forceOpen === true) { drawer.classList.add('open'); overlay.classList.add('active'); }
+            else if (forceOpen === false) { drawer.classList.remove('open'); overlay.classList.remove('active'); }
+            else { drawer.classList.toggle('open'); overlay.classList.toggle('active'); }
+        }
+
+        function toggleSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            const overlay = document.getElementById('sidebarOverlay');
+            nav.classList.toggle('open'); overlay.classList.toggle('active');
+        }
+
+        function filterByBrand(b) { activeBrandFilter = b; buildBrandChips(); renderProductGrid(); }
+        function filterByFamily(brand, cat, fam) { activeBrandFilter = brand; activeCategoryFilter = cat; activeFamilyFilter = fam; renderProductGrid(); toggleSidebar(); }
+        function changeCurrency(curr) { currentCurrency = curr; renderProductGrid(); updateCartDisplay(); }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) el.innerText = i18n[lang][key];
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (i18n[lang] && i18n[lang][key]) el.placeholder = i18n[lang][key];
+            });
+
+            const chatWelcome = document.getElementById('chatWelcomeMsg');
+            if (chatWelcome && i18n[lang]['chat_welcome']) chatWelcome.innerText = i18n[lang]['chat_welcome'];
+
+            buildBrandChips(); buildNavigationTree(); renderProductGrid(); updateCartDisplay();
+        }
+
+        async function getImageBuffer(url) {
+            try {
+                const response = await fetch(url, { mode: 'cors' });
+                if (!response.ok) throw new Error('Fetch failed');
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+                const ext = url.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+                return { buffer: arrayBuffer, extension: ext };
+            } catch (e) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth || img.width;
+                        canvas.height = img.naturalHeight || img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        canvas.toBlob((blob) => {
+                            if (blob) blob.arrayBuffer().then(buf => resolve({ buffer: buf, extension: 'png' }));
+                            else reject('Canvas blob failed');
+                        }, 'image/png');
+                    };
+                    img.onerror = () => reject('Image load failed');
+                    img.src = url;
+                });
+            }
+        }
+
+        async function exportProformaExcel() {
+            if (cart.length === 0) { alert("Cart is empty!"); return; }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Proforma Order');
+
+            worksheet.columns = [
+                { header: 'Image', key: 'img', width: 22 },
+                { header: 'Brand', key: 'brand', width: 18 },
+                { header: 'Product Family', key: 'family', width: 22 },
+                { header: 'Category', key: 'category', width: 16 },
+                { header: 'Dimension / Size', key: 'size', width: 16 },
+                { header: 'Kartela', key: 'kartela', width: 14 },
+                { header: 'Color', key: 'color', width: 16 },
+                { header: 'Status', key: 'status', width: 12 },
+                { header: 'Height (cm)', key: 'height', width: 14 },
+                { header: 'Feature', key: 'feature', width: 16 },
+                { header: 'Hardness', key: 'hardness', width: 14 },
+                { header: 'Product Code', key: 'code', width: 20 },
+                { header: 'Barcode', key: 'barcode', width: 18 },
+                { header: 'HS CODE (GTİP)', key: 'gtip', width: 18 },
+                { header: 'Qty', key: 'qty', width: 10 },
+                { header: 'Unit Price', key: 'unitPrice', width: 16 },
+                { header: 'Total Price', key: 'totalPrice', width: 18 },
+                { header: 'Total Vol (m³)', key: 'vol', width: 16 },
+                { header: 'Total Wt (kg)', key: 'wt', width: 16 }
+            ];
+
+            worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' }, size: 11 };
+            worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '00205B' } };
+            worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+
+            let sumQty = 0, sumPrice = 0, sumVol = 0, sumWt = 0;
+
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+                const itemTotal = item.qty * item.unitPrice;
+                const itemVol = item.qty * item.volume;
+                const itemWt = item.qty * item.weight;
+
+                sumQty += item.qty; sumPrice += itemTotal; sumVol += itemVol; sumWt += itemWt;
+
+                const row = worksheet.addRow({
+                    brand: item.brand,
+                    family: item.family,
+                    category: autoTranslateText(item.category, currentLang),
+                    size: item.size,
+                    kartela: item.kartela || '-',
+                    color: autoTranslateText(item.color, currentLang) || '-',
+                    status: item.status || 'MTO',
+                    height: item.height || '-',
+                    feature: autoTranslateText(item.feature, currentLang) || '-',
+                    hardness: autoTranslateText(item.hardness, currentLang) || '-',
+                    code: item.code,
+                    barcode: item.barcode,
+                    gtip: item.gtip,
+                    qty: item.qty,
+                    unitPrice: `${formatNumber(item.unitPrice)} ${item.currency}`,
+                    totalPrice: `${formatNumber(itemTotal)} ${item.currency}`,
+                    vol: itemVol,
+                    wt: itemWt
+                });
+
+                row.height = 65;
+                row.alignment = { vertical: 'middle', horizontal: 'center' };
+
+                row.getCell('vol').numFmt = '#,##0.000';
+                row.getCell('wt').numFmt = '#,##0.00';
+                row.getCell('qty').numFmt = '#,##0';
+
+                if (item.photoUrl && item.photoUrl.startsWith('http')) {
+                    try {
+                        const imgData = await getImageBuffer(item.photoUrl);
+                        const imageId = workbook.addImage({
+                            buffer: imgData.buffer,
+                            extension: imgData.extension,
+                        });
+
+                        worksheet.addImage(imageId, {
+                            tl: { col: 0, row: row.number - 1 },
+                            ext: { width: 110, height: 75 }
+                        });
+                    } catch (e) {
+                        console.warn("Görsel Excel'e eklenemedi:", item.photoUrl, e);
+                    }
+                }
+            }
+
+            const totalRow = worksheet.addRow({
+                family: 'TOTAL / TOPLAM',
+                qty: sumQty,
+                totalPrice: `${formatNumber(sumPrice)} ${cart[0].currency}`,
+                vol: sumVol,
+                wt: sumWt
+            });
+
+            totalRow.height = 32;
+            totalRow.font = { bold: true, color: { argb: 'FFFFFF' }, size: 12 };
+            totalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '00205B' } };
+            totalRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+            totalRow.getCell('vol').numFmt = '#,##0.000';
+            totalRow.getCell('wt').numFmt = '#,##0.00';
+            totalRow.getCell('qty').numFmt = '#,##0';
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Yatas_Proforma_Order_${new Date().toISOString().slice(0,10)}.xlsx`;
+            link.click();
+        }
+    </script>
+</body>
+</html>
+<div class="spotlight-trigger" onclick="openSpotlight()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span data-i18n-ph="spotlight_ph">Quick search SKU, family...</span>
+                <span class="spotlight-key">Ctrl K</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+
+            <select class="currency-selector" id="currencySelect" onchange="changeCurrency(this.value)">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+            </select>
+
+            <select class="lang-selector" id="langSelect" onchange="changeLanguage(this.value)">
+                <option value="TR">TR</option>
+                <option value="EN" selected>EN</option>
+                <option value="DE">DE</option>
+                <option value="RU">RU</option>
+            </select>
+
+            <button class="cart-trigger-btn" onclick="toggleCart(true)">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span data-i18n="cart">Cart</span>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SIDEBAR OVERLAY & DRAWER -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar-nav" id="sidebarNav">
+        <div class="sidebar-header-logo">
+            <img src="../yatas_grup_logo.jpg" alt="Yataş Group" onclick="resetToHome()" onerror="this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png'">
+            <i class="fa-solid fa-xmark" style="cursor:pointer; color:var(--text-muted);" onclick="toggleSidebar()"></i>
+        </div>
+        <div id="navigationTree"></div>
+    </div>
+
+    <!-- MAIN PORTAL SECTION -->
+    <main id="mainPortalSection">
+        <div class="hero-banner-container" id="heroBanner">
+            <div class="hero-slide active" style="background-image: url('https://yatasinternational.github.io/Products-Photos/Activio/activio.jpg');">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="hero-tag">YATAŞ BEDDING COLLECTION</span>
+                    <h1 class="hero-title">Not All Sleep Is The Same. This is Yataş Sleep.</h1>
+                    <p class="hero-desc">Engineered for global comfort with premium spinal support & innovative fabric technology.</p>
+                    <a href="https://www.yatasbedding.com/en-EN/" target="_blank" class="hero-cta-btn">
+                        <span>Explore Yataş World</span> <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-slide" style="background-image: url('https://yatasinternational.github.io/Products-Photos/Supreme%20Pedic/supreme_pedic_baza.jpg');">
+                <div class="hero-overlay" style="background: linear-gradient(90deg, rgba(120, 50, 20, 0.88) 0%, rgba(120, 50, 20, 0.3) 60%, transparent 100%);"></div>
+                <div class="hero-content">
+                    <span class="hero-tag" style="background: rgba(215, 25, 33, 0.4);">ENZA HOME DESIGN</span>
+                    <h1 class="hero-title">Contemporary Living & Dining Solutions</h1>
+                    <p class="hero-desc">Transforming global homes with aesthetic furniture, upholstery & bedroom concepts.</p>
+                    <a href="https://www.enzahome.com/en-EN/" target="_blank" class="hero-cta-btn">
+                        <span>Discover Enza Home</span> <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-control-panel">
+            <div class="quick-filters" id="brandFilterChips">
+                <div class="filter-chip active" onclick="filterByBrand('ALL')">
+                    <i class="fa-solid fa-layer-group"></i> <span data-i18n="all_brands">All Brands</span>
+                </div>
+                <div class="filter-chip" onclick="filterByBrand('Yataş Bedding')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/yatas/logo.webp" alt="Yataş Bedding" class="filter-chip-logo">
+                </div>
+                <div class="filter-chip" onclick="filterByBrand('Enza Home')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/enza/logo.webp" alt="Enza Home" class="filter-chip-logo">
+                </div>
+            </div>
+
+            <div class="filter-dropdown-group">
+                <select class="filter-select" id="filterHardness" onchange="applyFilters()">
+                    <option value="ALL" data-i18n="hardness_all">All Firmness Levels</option>
+                    <option value="Soft" data-i18n="hardness_soft">Soft / Yumuşak</option>
+                    <option value="Medium" data-i18n="hardness_medium">Medium / Orta</option>
+                    <option value="Firm" data-i18n="hardness_firm">Firm / Sert</option>
+                    <option value="Extra Firm" data-i18n="hardness_extrafirm">Extra Firm / Ultra Sert</option>
+                </select>
+
+                <select class="filter-select" id="sortSelect" onchange="applyFilters()">
+                    <option value="DEFAULT" data-i18n="sort_default">Sort By: Recommended</option>
+                    <option value="NAME_ASC" data-i18n="sort_name_asc">Name (A-Z)</option>
+                    <option value="NAME_DESC" data-i18n="sort_name_desc">Name (Z-A)</option>
+                    <option value="PRICE_ASC" data-i18n="sort_price_asc">Price (Low to High)</option>
+                    <option value="PRICE_DESC" data-i18n="sort_price_desc">Price (High to Low)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+    </main>
+
+    <!-- CANLI KATALOG SİTESİ -->
+    <main id="catalogViewSection" style="display:none; text-align:center; padding:16px 32px;">
+        <iframe src="https://yatasinternational.github.io/Yatas-Corporate-Deck/" style="width:100%; height:82vh; border:1px solid var(--border-color); border-radius:var(--radius-lg); box-shadow:var(--shadow-subtle);"></iframe>
+    </main>
+
+    <!-- AI SALES ASSISTANT CHATBOT WIDGET (Z-INDEX: 4000) -->
+    <div class="chat-widget-btn" onclick="toggleChatWindow()" title="AI Sales Assistant">
+        <i class="fa-solid fa-headset"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-headset" style="font-size:18px;"></i>
+                <div>
+                    <h4 style="font-size:14px; font-weight:800;" data-i18n="chat_title">Yataş B2B AI Assistant</h4>
+                    <span style="font-size:10px; opacity:0.8;" data-i18n="chat_status">Online • Product Advisor</span>
+                </div>
+            </div>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot" id="chatWelcomeMsg" data-i18n="chat_welcome">
+                Hello! I am your Yataş B2B Product Advisor. How can I assist you with mattress firmness, dimensions, or fabric recommendations today?
+            </div>
+        </div>
+
+        <div style="padding:12px; border-top:1px solid var(--border-color); background:var(--bg-main);">
+            <div class="chat-options-group" id="chatOptionsGroup">
+                <button class="chat-opt-btn" onclick="sendChatQuery('Firmness Guide')" data-i18n="chat_opt1">🛌 How to choose Firmness?</button>
+                <button class="chat-opt-btn" onclick="sendChatQuery('Mattress Sizes')" data-i18n="chat_opt2">📐 Standard Sizes</button>
+                <button class="chat-opt-btn" onclick="sendChatQuery('Fabric Options')" data-i18n="chat_opt3">🎨 Fabrics & Colors</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Scroll to top">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+
+    <!-- SPOTLIGHT SEARCH MODAL -->
+    <div class="spotlight-modal" id="spotlightModal" onclick="closeSpotlightOnBackdrop(event)">
+        <div class="spotlight-box">
+            <div class="spotlight-input-wrap">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted);"></i>
+                <input type="text" id="spotlightInput" placeholder="Type product name, material code, or GTIP..." oninput="handleSpotlightSearch()">
+            </div>
+            <div class="spotlight-results" id="spotlightResults"></div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div class="modal-overlay" id="productModal" onclick="handleBackdropClick(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-left">
+                <div class="gallery-main-container" id="galleryContainer" onclick="handleMainImageClick(event)">
+                    <span class="modal-photo-counter" id="modalPhotoCounter">1 / 1</span>
+                    <button class="modal-nav-arrow prev" onclick="prevModalPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <img id="modalImg" src="" alt="Product Main Image">
+                    <button class="modal-nav-arrow next" onclick="nextModalPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="modal-thumbnails-bar" id="modalThumbnailsBar"></div>
+            </div>
+
+            <div class="modal-right">
+                <div class="modal-header">
+                    <div class="modal-subtitle" id="modalBrandCategory">Yataş Bedding | Collection</div>
+                    <h2 id="modalFamilyTitle">Activio Collection</h2>
+                </div>
+
+                <div class="family-tabs-bar" id="familyTabsBar"></div>
+
+                <div class="variant-box">
+                    <div class="form-group" id="kartelaSection" style="display:none;">
+                        <label data-i18n="select_kartela">SELECT FABRIC COLLECTION / KARTELA</label>
+                        <div class="kartela-cards-grid" id="kartelaCardsGrid"></div>
+                    </div>
+
+                    <div class="form-group" id="colorSection" style="display:none;">
+                        <label data-i18n="select_color">SELECT COLOR / RENK</label>
+                        <div class="color-chips-grid" id="colorChipsGrid"></div>
+                    </div>
+
+                    <div class="form-group" id="sizeSection">
+                        <label data-i18n="select_size">SELECT DIMENSION / SIZE</label>
+                        <div class="size-chips-grid" id="sizeChipsGrid"></div>
+                    </div>
+
+                    <div id="firmnessSection" style="margin-bottom: 12px; display: none; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;" data-i18n="firmness_title">FIRMNESS / SERTLİK</span>
+                        
+                        <div class="firmness-gauge-container">
+                            <div class="firmness-icon-circle" title="Soft"><i class="fa-solid fa-feather"></i></div>
+                            <span id="firmnessLabelText" style="margin: 0 4px;">Medium</span>
+                            <div class="firmness-dots-wrapper">
+                                <div class="firmness-dot" id="fDot1"></div>
+                                <div class="firmness-dot" id="fDot2"></div>
+                                <div class="firmness-dot" id="fDot3"></div>
+                                <div class="firmness-dot" id="fDot4"></div>
+                            </div>
+                            <div class="firmness-icon-circle" title="Hard"><i class="fa-solid fa-cube"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="specs-grid">
+                        <div class="spec-item"><span data-i18n="gtip">HS CODE</span><strong id="specGtip">-</strong></div>
+                        <div class="spec-item"><span data-i18n="volume">UNIT VOL</span><strong id="specVolume">0 m³</strong></div>
+                        <div class="spec-item"><span data-i18n="weight">UNIT WT</span><strong id="specWeight">0 kg</strong></div>
+                        <div class="spec-item"><span data-i18n="height">HEIGHT</span><strong id="specHeight">0 cm</strong></div>
+                        <div class="spec-item"><span data-i18n="status">STATUS</span><strong id="specStatus" style="color:var(--yatas-red);">MTO</strong></div>
+                        <div class="spec-item"><span data-i18n="feature">FEATURE</span><strong id="specFeature">-</strong></div>
+                        <div class="spec-item"><span data-i18n="kartela_label">KARTELA</span><strong id="specKartela">-</strong></div>
+                        <div class="spec-item"><span data-i18n="color">COLOR</span><strong id="specColor">-</strong></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="qty-row">
+                        <div class="qty-picker">
+                            <button class="qty-btn" onclick="updateModalQty(-1)">-</button>
+                            <input type="number" class="qty-input" id="modalQty" value="1" min="1" oninput="updateModalPrice()">
+                            <button class="qty-btn" onclick="updateModalQty(1)">+</button>
+                        </div>
+                        <div class="total-price-tag" id="modalTotalPrice">$0.00</div>
+                    </div>
+
+                    <button class="add-cart-btn" onclick="addCurrentToCart()">
+                        <i class="fa-solid fa-cart-plus"></i> <span data-i18n="add_to_cart">Add Selected Item to Order</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="imageLightboxModal" class="lightbox-modal" onclick="closeLightboxOnBackdrop(event)">
+        <span style="position:absolute; top:24px; right:36px; color:#fff; font-size:36px; cursor:pointer; z-index:10001;" onclick="closeLightbox()">&times;</span>
+        <span class="lightbox-counter" id="lightboxCounter">1 / 1</span>
+        
+        <button class="lightbox-nav-arrow prev" onclick="prevLightboxPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
+        <img class="lightbox-content" id="lightboxImg" src="" alt="Zoomed Photo" onclick="nextLightboxPhoto(event)">
+        <button class="lightbox-nav-arrow next" onclick="nextLightboxPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <!-- CART DRAWER & OVERLAY (Z-INDEX: 99999 - EN ÜSTTE) -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart(false)"></div>
+
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3 data-i18n="cart_title"><i class="fa-solid fa-file-invoice-dollar"></i> Proforma Order Summary</h3>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button style="background:none; border:none; color:var(--yatas-red); cursor:pointer; font-size:15px; font-weight:700;" onclick="clearCart()" title="Clear Cart">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <button class="modal-close" onclick="toggleCart(false)" style="position:static;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+
+        <div class="cart-items-list" id="cartItemsList"></div>
+
+        <div class="logistics-bar-container">
+            <div class="logistics-title">
+                <i class="fa-solid fa-truck-ramp-box"></i> <span data-i18n="logistics_calc">LOGISTICS & VEHICLE CAPACITY</span>
+            </div>
+
+            <div class="logistics-row">
+                <div class="logistics-label">
+                    <span><i class="fa-solid fa-ship"></i> <span data-i18n="hq_container">40' HQ Container (68 m³)</span></span>
+                    <strong id="hqCountText">0 Cont. (%0)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill-hq" id="hqProgressFill"></div></div>
+            </div>
+
+            <div class="logistics-row">
+                <div class="logistics-label">
+                    <span><i class="fa-solid fa-truck-front"></i> <span data-i18n="std_truck">Standard Truck (90 m³)</span></span>
+                    <strong id="truckCountText">0 Truck (%0)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill-truck" id="truckProgressFill"></div></div>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top:10px; font-weight:700;" id="logisticsMeta">
+                Total Pcs: 0 | Total Vol: 0.00 m³ | Total Wt: 0.0 kg
+            </div>
+        </div>
+
+        <div class="cart-footer">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:18px; margin-bottom:16px;">
+                <span data-i18n="grand_total">Grand Total:</span>
+                <span id="cartGrandTotal" style="color:var(--yatas-navy);">$0.00</span>
+            </div>
+
+            <button class="export-excel-btn" onclick="exportProformaExcel()">
+                <i class="fa-solid fa-file-excel"></i> <span data-i18n="export_excel">Export Excel Order with Photos</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer id="appFooter">
+        <div>Copyright © 2026 Yataş International. All rights reserved.</div>
+        <div class="footer-right">Proudly presented by International Sales Development Team</div>
+    </footer>
+
+    <script>
+        const i18n = {
+            TR: {
+                notice_badge: "DUYURU",
+                notice1: "Fiyatlarımız 2026 Temmuz ayında güncellenmiştir.",
+                notice2: "Yeni 2026 Yataş Bedding & Enza Home Koleksiyonları B2B Portala Eklenmiştir.",
+                tab_portal: "Sipariş Portalı",
+                tab_catalog: "Kataloglar & Sunumlar",
+                spotlight_ph: "Hızlı SKU, koleksiyon veya GTİP ara...",
+                all_brands: "Tüm Markalar",
+                sort_default: "Sıralama: Önerilen",
+                sort_name_asc: "İsim (A-Z)",
+                sort_name_desc: "İsim (Z-A)",
+                sort_price_asc: "Fiyat (Düşükten Yükseğe)",
+                sort_price_desc: "Fiyat (Yüksekten Düşüğe)",
+                hardness_all: "Tüm Sertlik Seviyeleri",
+                hardness_soft: "Soft / Yumuşak",
+                hardness_medium: "Medium / Orta",
+                hardness_firm: "Firm / Sert",
+                hardness_extrafirm: "Extra Firm / Ultra Sert",
+                select_kartela: "KUMAŞ KOLEKSİYONU / KARTELA SEÇİNİZ",
+                select_color: "RENK SEÇİNİZ",
+                select_size: "ÖLÇÜ / EBAT SEÇİNİZ",
+                firmness_title: "SERTLİK DERECESİ",
+                gtip: "GTİP KODU", volume: "BİRİM HACİM", weight: "BİRİM AĞIRLIK", height: "YÜKSEKLİK", status: "DURUM",
+                feature: "ÖZELLİK", kartela_label: "KARTELA", color: "RENK", hardness: "SERTLİK",
+                add_to_cart: "Seçileni Siparişe Ekle", cart_title: "Proforma Sipariş Özeti",
+                logistics_calc: "LOJİSTİK KAPASİTE VE ARAÇ HESABI", hq_container: "40' HQ Konteyner (68 m³)", std_truck: "Standart Tır (90 m³)",
+                grand_total: "Genel Toplam:", export_excel: "Fotoğraflı Excel Sipariş Listesi İndir", from: "başlayan fiyatlar",
+                cart: "Sepet",
+                chat_title: "Yataş B2B AI Asistanı", chat_status: "Çevrimiçi • Ürün Danışmanı",
+                chat_welcome: "Merhaba! Yataş B2B Ürün Danışmanınızım. Sertlik derecesi, ölçü seçimi veya kumaş önerileri konusunda size nasıl yardımcı olabilirim?",
+                chat_opt1: "🛌 Sertlik Seçim Rehberi", chat_opt2: "📐 Standart Ölçüler", chat_opt3: "🎨 Kumaş & Renk Seçenekleri"
+            },
+            EN: {
+                notice_badge: "Notice",
+                notice1: "Our prices have been updated as of July 2026.",
+                notice2: "New 2026 Yataş Bedding & Enza Home Collections added to B2B Portal.",
+                tab_portal: "Order Portal",
+                tab_catalog: "Catalogues & Decks",
+                spotlight_ph: "Quick search SKU, family...",
+                all_brands: "All Brands",
+                sort_default: "Sort By: Recommended",
+                sort_name_asc: "Name (A-Z)",
+                sort_name_desc: "Name (Z-A)",
+                sort_price_asc: "Price (Low to High)",
+                sort_price_desc: "Price (High to Low)",
+                hardness_all: "All Firmness Levels",
+                hardness_soft: "Soft / Yumuşak",
+                hardness_medium: "Medium / Orta",
+                hardness_firm: "Firm / Sert",
+                hardness_extrafirm: "Extra Firm / Ultra Sert",
+                select_kartela: "SELECT FABRIC COLLECTION / KARTELA",
+                select_color: "SELECT COLOR / RENK",
+                select_size: "SELECT DIMENSION / SIZE",
+                firmness_title: "FIRMNESS / SERTLİK",
+                gtip: "HS CODE", volume: "UNIT VOL", weight: "UNIT WT", height: "HEIGHT", status: "STATUS",
+                feature: "FEATURE", kartela_label: "KARTELA", color: "COLOR", hardness: "HARDNESS",
+                add_to_cart: "Add Selected Item to Order", cart_title: "Proforma Order Summary",
+                logistics_calc: "LOGISTICS & VEHICLE CAPACITY", hq_container: "40' HQ Container (68 m³)", std_truck: "Standard Truck (90 m³)",
+                grand_total: "Grand Total:", export_excel: "Export Excel Order with Photos", from: "from",
+                cart: "Cart",
+                chat_title: "Yataş B2B AI Assistant", chat_status: "Online • Product Advisor",
+                chat_welcome: "Hello! I am your Yataş B2B Product Advisor. How can I assist you with mattress firmness, dimensions, or fabric recommendations today?",
+                chat_opt1: "🛌 How to choose Firmness?", chat_opt2: "📐 Standard Sizes", chat_opt3: "🎨 Fabrics & Colors"
+            },
+            DE: {
+                notice_badge: "HINWEIS",
+                notice1: "Unsere Preise wurden im Juli 2026 aktualisiert.",
+                notice2: "Neue Kollektionen 2026 Yataş Bedding & Enza Home wurden hinzugefügt.",
+                tab_portal: "Bestellportal",
+                tab_catalog: "Kataloge & Präsentationen",
+                spotlight_ph: "Schnellsuche SKU, Kollektion...",
+                all_brands: "Alle Marken",
+                sort_default: "Sortierung: Empfohlen",
+                sort_name_asc: "Name (A-Z)",
+                sort_name_desc: "Name (Z-A)",
+                sort_price_asc: "Preis (Aufsteigend)",
+                sort_price_desc: "Preis (Absteigend)",
+                hardness_all: "Alle Härtegradstufen",
+                hardness_soft: "Weich / Soft",
+                hardness_medium: "Mittel / Medium",
+                hardness_firm: "Hart / Firm",
+                hardness_extrafirm: "Sehr Hart / Extra Firm",
+                select_kartela: "STOFFKOLLEKTION WÄHLEN",
+                select_color: "FARBE WÄHLEN",
+                select_size: "GRÖSSE WÄHLEN",
+                firmness_title: "HÄRTEGRAD",
+                gtip: "HS CODE", volume: "VOLUMEN", weight: "GEWICHT", height: "HÖHE", status: "STATUS",
+                feature: "EIGENSCHAFT", kartela_label: "KARTELA", color: "FARBE", hardness: "HÄRTE",
+                add_to_cart: "Ausgewähltes Element hinzufügen", cart_title: "Proforma-Bestellübersicht",
+                logistics_calc: "LOGISTIK- UND FAHRZEUGKAPAZITÄT", hq_container: "40' HQ Container (68 m³)", std_truck: "Standard LKW (90 m³)",
+                grand_total: "Gesamtsumme:", export_excel: "Excel-Bestellung mit Fotos exportieren", from: "ab",
+                cart: "Warenkorb",
+                chat_title: "Yataş B2B AI Assistent", chat_status: "Online • Produktberater",
+                chat_welcome: "Hallo! Ich bin Ihr Yataş B2B Produktberater. Wie kann ich Ihnen bei Matratzenhärte, Größen oder Stoffen helfen?",
+                chat_opt1: "🛌 Härtegrad-Ratgeber", chat_opt2: "📐 Standardgrößen", chat_opt3: "🎨 Stoffe & Farben"
+            },
+            RU: {
+                notice_badge: "УВЕДОМЛЕНИЕ",
+                notice1: "Наши цены были обновлены в июле 2026 года.",
+                notice2: "Новые коллекции 2026 Yataş Bedding и Enza Home добавлены на портал.",
+                tab_portal: "Портал заказов",
+                tab_catalog: "Каталоги и презентации",
+                spotlight_ph: "Быстрый поиск SKU, коллекции...",
+                all_brands: "Все бренды",
+                sort_default: "Сортировка: Рекомендуем",
+                sort_name_asc: "Название (А-Я)",
+                sort_name_desc: "Название (Я-А)",
+                sort_price_asc: "Цена (По возрастанию)",
+                sort_price_desc: "Цена (По убыванию)",
+                hardness_all: "Все уровни жесткости",
+                hardness_soft: "Мягкий / Soft",
+                hardness_medium: "Средний / Medium",
+                hardness_firm: "Жесткий / Firm",
+                hardness_extrafirm: "Очень жесткий / Extra Firm",
+                select_kartela: "ВЫБЕРИТЕ КОЛЛЕКЦИЮ ТКАНИ",
+                select_color: "ВЫБЕРИТЕ ЦВЕТ",
+                select_size: "ВЫБЕРИТЕ РАЗМЕР",
+                firmness_title: "ЖЕСТКОСТЬ",
+                gtip: "ТН ВЭД", volume: "ОБЪЕМ", weight: "ВЕС", height: "ВЫСОТА", status: "СТАТУС",
+                feature: "СВОЙСТВО", kartela_label: "КАРТЕЛЯ", color: "ЦВЕТ", hardness: "ЖЕСТКОСТЬ",
+                add_to_cart: "Добавить выбранный товар", cart_title: "Сводка Проформа-Заказа",
+                logistics_calc: "ЛОГИСТИКА И ЕМКОСТЬ ТРАНСПОРТА", hq_container: "40' HQ Контейнер (68 m³)", std_truck: "Стандартная Фура (90 m³)",
+                grand_total: "Итого:", export_excel: "Скачать Excel с фото", from: "от",
+                cart: "Корзина",
+                chat_title: "Yataş B2B AI Консультант", chat_status: "Онлайн • Консультант",
+                chat_welcome: "Здравствуйте! Я ваш B2B консультант Yataş. Как я могу помочь вам с выбором жесткости, размеров или тканей?",
+                chat_opt1: "🛌 Руководство по жесткости", chat_opt2: "📐 Стандартные размеры", chat_opt3: "🎨 Варианты тканей и цветов"
+            }
+        };
+
+        const termTranslations = {
+            "Yatak": { EN: "Mattress", DE: "Matratze", RU: "Матрас" },
+            "Baza": { EN: "Base / Boxspring", DE: "Bettkasten", RU: "Основание" },
+            "Başlık": { EN: "Headboard", DE: "Kopfteil", RU: "Изголовье" },
+            "Yastık": { EN: "Pillow", DE: "Kissen", RU: "Подушка" },
+            "Yorgan": { EN: "Duvet", DE: "Bettdecke", RU: "Одеяло" },
+            "Alez": { EN: "Mattress Protector", DE: "Matratzenschoner", RU: "Наматрасник" },
+            "Karyola": { EN: "Bed Frame", DE: "Bettgestell", RU: "Кровать" },
+            "Aksesuar": { EN: "Accessories", DE: "Zubehör", RU: "Аксессуары" },
+            "Çocuk Yatak": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" },
+            "Çocuk Mattress": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" },
+            "Pacific": { EN: "Pacific Blue", DE: "Pazifikblau", RU: "Тихий океан" },
+            "Krem": { EN: "Cream", DE: "Creme", RU: "Кремовый" },
+            "Vizon": { EN: "Mink / Taupe", DE: "Mink", RU: "Норковый" },
+            "Açık Gri": { EN: "Light Gray", DE: "Hellgrau", RU: "Светло-серый" },
+            "Antrasit": { EN: "Anthracite", DE: "Anthrazit", RU: "Антрацит" },
+            "Mavi": { EN: "Blue", DE: "Blau", RU: "Синий" },
+            "Çağla": { EN: "Almond Green", DE: "Mandelgrün", RU: "Миндально-зеленый" },
+            "Koyu Gri": { EN: "Dark Gray", DE: "Dunkelgrau", RU: "Темно-серый" },
+            "Gri": { EN: "Gray", DE: "Grau", RU: "Серый" },
+            "Kum": { EN: "Sand", DE: "Sand", RU: "Песочный" },
+            "Bej": { EN: "Beige", DE: "Beige", RU: "Бежевый" },
+            "Pudra": { EN: "Powder Pink", DE: "Puder", RU: "Пудровый" },
+            "Lacivert": { EN: "Navy Blue", DE: "Marineblau", RU: "Темно-синий" },
+            "Ekru": { EN: "Ecru", DE: "Ekrü", RU: "Экрю" },
+            "Kemik": { EN: "Bone", DE: "Elfenbein", RU: "Слоновая кость" },
+            "Kül": { EN: "Ash", DE: "Asche", RU: "Пепельный" },
+            "Sütlü Kahve": { EN: "Milk Coffee", DE: "Milchkaffee", RU: "Кофе с молоком" },
+            "Spring": { EN: "Spring", DE: "Federkern", RU: "Пружинный" },
+            "Springless": { EN: "Foam / Springless", DE: "Schaumstoff", RU: "Беспружинный" },
+            "Hibrit": { EN: "Hybrid", DE: "Hybrid", RU: "Гибридный" },
+            "Foam": { EN: "Foam", DE: "Schaumstoff", RU: "Поролоновый" },
+            "Storage Base": { EN: "Storage Base", DE: "Bettkasten Baza", RU: "Основание с ящиком" },
+            "Sert": { EN: "Firm / Hard", DE: "Hart", RU: "Жесткий" },
+            "Medium": { EN: "Medium", DE: "Mittel", RU: "Средний" },
+            "Ultra Sert": { EN: "Extra Firm", DE: "Sehr Hart", RU: "Супер жесткий" }
+        };
+
+        function autoTranslateText(text, targetLang) {
+            if (!text || targetLang === 'TR') return text;
+            let translated = String(text);
+            for (const [trTerm, langMap] of Object.entries(termTranslations)) {
+                if (langMap[targetLang]) {
+                    const regex = new RegExp(`\\b${trTerm}\\b`, 'gi');
+                    translated = translated.replace(regex, langMap[targetLang]);
+                }
+            }
+            return translated;
+        }
+
+        function formatCurrency(amount, currencySymbol = '$') {
+            const num = parseFloat(amount) || 0;
+            return `${currencySymbol}${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function formatNumber(amount) {
+            const num = parseFloat(amount) || 0;
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        let currentLang = 'EN';
+        let currentCurrency = 'USD';
+        let rawProducts = [];
+        let productFamilies = {};
+        let activeBrandFilter = 'ALL';
+        let activeCategoryFilter = null;
+        let activeFamilyFilter = null;
+        let cart = [];
+
+        let currentActiveFamily = null;
+        let currentActiveCategoryKey = null;
+
+        let activeSelectedKartela = null;
+        let activeSelectedColor = null;
+        let activeSelectedVariant = null;
+
+        let modalPhotosList = [];
+        let currentPhotoIndex = 0;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            let storedCart = JSON.parse(localStorage.getItem('b2b_cart'));
+            if (storedCart && storedCart.length > 0) {
+                cart = storedCart.map(item => ({
+                    family: item.name || 'B2B Proforma Item',
+                    category: 'Collection',
+                    brand: 'Yataş Group',
+                    photoUrl: item.image || 'https://via.placeholder.com/100',
+                    code: item.code,
+                    size: 'Standard',
+                    gtip: '9404.21',
+                    volume: item.m3 || 0.45,
+                    weight: item.weight || 12.5,
+                    height: 25,
+                    status: 'MTO',
+                    barcode: '-',
+                    feature: '-',
+                    hardness: '-',
+                    kartela: '-',
+                    color: '-',
+                    qty: Number(item.qty) || 1,
+                    unitPrice: Number(item.price) || 250,
+                    currency: 'USD'
+                }));
+                updateCartDisplay();
+            }
+
+            await loadExcelData();
+            initScrollFooterBehavior();
+            initKeyboardShortcuts();
+            initSwipeGestures();
+            initNoticeTicker();
+            initScrollTopButton();
+            changeLanguage(currentLang);
+
+            if (localStorage.getItem('open_b2b_cart_panel') === 'true') {
+                localStorage.removeItem('open_b2b_cart_panel');
+                toggleCart(true);
+            }
+        });
+
+        function initScrollTopButton() {
+            const btn = document.getElementById('scrollTopBtn');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) btn.classList.add('visible');
+                else btn.classList.remove('visible');
+            });
+        }
+
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function initNoticeTicker() {
+            let tIdx = 0;
+            setInterval(() => {
+                const t1 = document.getElementById('ticker1');
+                const t2 = document.getElementById('ticker2');
+                if (tIdx === 0) { t1.classList.remove('active'); t2.classList.add('active'); tIdx = 1; }
+                else { t2.classList.remove('active'); t1.classList.add('active'); tIdx = 0; }
+            }, 5000);
+        }
+
+        function switchView(viewName) {
+            const portalSec = document.getElementById('mainPortalSection');
+            const catalogSec = document.getElementById('catalogViewSection');
+            const btnP = document.getElementById('btnOrderPortal');
+            const btnC = document.getElementById('btnCatalogViewer');
+
+            if (viewName === 'portal') {
+                portalSec.style.display = 'block'; catalogSec.style.display = 'none';
+                btnP.classList.add('active'); btnC.classList.remove('active');
+            } else {
+                portalSec.style.display = 'none'; catalogSec.style.display = 'block';
+                btnC.classList.add('active'); btnP.classList.remove('active');
+            }
+        }
+
+        function toggleChatWindow() { document.getElementById('chatWindow').classList.toggle('active'); }
+
+        function sendChatQuery(queryText) {
+            const msgBox = document.getElementById('chatMessages');
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg user'; userMsg.innerText = queryText;
+            msgBox.appendChild(userMsg);
+
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-msg bot';
+
+                if (queryText.includes('Firmness') || queryText.includes('Sertlik')) {
+                    botMsg.innerText = currentLang === 'TR' ? "Sırt üstü yatanlar için omurga desteği sunan Orta-Sert veya Sert yataklar (örn. Activio, Supreme Pedic) önerilir." : "For back sleepers, Medium-Firm or Firm mattresses (e.g. Activio, Supreme Pedic) are recommended for spinal alignment.";
+                } else if (queryText.includes('Sizes') || queryText.includes('Ölçüler')) {
+                    botMsg.innerText = currentLang === 'TR' ? "Popüler uluslararası ölçüler: Tek Kişilik (90x190/200), Çift Kişilik (140x200), Queen (160x200), King (180x200)." : "Popular international sizes: Single (90x190/200), Double (140x200), Queen (160x200), King (180x200).";
+                } else {
+                    botMsg.innerText = currentLang === 'TR' ? "18'den fazla kumaş seçeneğimiz bulunmaktadır. Başlık veya Baza seçerek kumaş ve renk kartelalarını inceleyebilirsiniz." : "We offer over 18 fabric colors including Anthracite, Mink, Cream, and Pacific Blue. Select any Headboard/Base to preview available swatches!";
+                }
+
+                msgBox.appendChild(botMsg);
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }, 600);
+
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        let touchStartX = 0; let touchEndX = 0;
+
+        function initSwipeGestures() {
+            const gContainer = document.getElementById('galleryContainer');
+            if (!gContainer) return;
+
+            gContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            gContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (Math.abs(touchEndX - touchStartX) > 40) {
+                    if (touchEndX < touchStartX) nextModalPhoto();
+                    else prevModalPhoto();
+                }
+            }, { passive: true });
+        }
+
+        function initKeyboardShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault(); openSpotlight();
+                }
+                if (e.key === 'Escape') { closeSpotlight(); closeModal(); closeLightbox(); }
+                if (document.getElementById('productModal').classList.contains('active')) {
+                    if (e.key === 'ArrowRight') nextModalPhoto();
+                    if (e.key === 'ArrowLeft') prevModalPhoto();
+                }
+                if (document.getElementById('imageLightboxModal').classList.contains('active')) {
+                    if (e.key === 'ArrowRight') nextLightboxPhoto();
+                    if (e.key === 'ArrowLeft') prevLightboxPhoto();
+                }
+            });
+        }
+
+        function openSpotlight() {
+            document.getElementById('spotlightModal').classList.add('active');
+            const input = document.getElementById('spotlightInput');
+            input.value = ''; input.focus(); handleSpotlightSearch();
+        }
+
+        function closeSpotlight() { document.getElementById('spotlightModal').classList.remove('active'); }
+        function closeSpotlightOnBackdrop(e) { if (e.target === e.currentTarget) closeSpotlight(); }
+
+        function handleSpotlightSearch() {
+            const query = document.getElementById('spotlightInput').value.toLowerCase().trim();
+            const resultsBox = document.getElementById('spotlightResults');
+            let matches = [];
+
+            Object.values(productFamilies).forEach(fam => {
+                if (fam.familyName.toLowerCase().includes(query)) {
+                    matches.push({ type: 'Family', name: fam.familyName, brand: fam.brand });
+                } else {
+                    Object.values(fam.categories).forEach(cat => {
+                        cat.variants.forEach(v => {
+                            if (v.code.toLowerCase().includes(query) || (v.desc && v.desc.toLowerCase().includes(query))) {
+                                matches.push({ type: 'Variant', name: `${fam.familyName} (${v.size})`, brand: fam.brand, code: v.code, famName: fam.familyName });
+                            }
+                        });
+                    });
+                }
+            });
+
+            resultsBox.innerHTML = matches.slice(0, 8).map(m => `
+                <div class="spotlight-item" onclick="selectSpotlightResult('${m.famName || m.name}')">
+                    <div>
+                        <strong style="font-size:13.5px;">${m.name}</strong>
+                        <div style="font-size:11px; color:var(--text-muted);">${m.brand} • ${m.type}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="font-size:12px; color:var(--text-muted);"></i>
+                </div>
+            `).join('') || `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">No matching products found</div>`;
+        }
+
+        function selectSpotlightResult(famName) { closeSpotlight(); openProductModal(famName); }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light'); icon.className = 'fa-solid fa-moon';
+            } else {
+                html.setAttribute('data-theme', 'dark'); icon.className = 'fa-solid fa-sun';
+            }
+        }
+
+        function initScrollFooterBehavior() {
+            const footer = document.getElementById('appFooter');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 40) footer.classList.add('hidden-on-scroll');
+                else footer.classList.remove('hidden-on-scroll');
+            });
+        }
+
+        async function loadExcelData() {
+            try {
+                const response = await fetch('tr_v2.xlsx');
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                rawProducts = XLSX.utils.sheet_to_json(firstSheet);
+                
+                processRawData();
+                buildBrandChips();
+                buildNavigationTree();
+                renderProductGrid();
+            } catch (err) {
+                console.warn("Excel import execution:", err);
+            }
+        }
+
+        function processRawData() {
+            productFamilies = {};
+            rawProducts.forEach(item => {
+                const familyName = item['Ürün Ailesi'] || item['Malzeme Tanım'] || 'Activio Collection';
+                let category = item['Kategori'] || 'Yatak';
+                
+                if (category === 'Çocuk Yatak' || category === 'Çocuk Mattress' || category.includes('Çocuk')) {
+                    category = 'Kids Mattress';
+                }
+
+                let rawPhoto = item['Foto weblink'] || item['Görsel Link'] || '';
+                let photoList = String(rawPhoto).split(',').map(p => p.trim()).filter(p => p.startsWith('http'));
+                let mainPhoto = photoList.length > 0 ? photoList[0] : 'https://via.placeholder.com/300x200?text=Yatas+Bedding';
+
+                if (!productFamilies[familyName]) {
+                    productFamilies[familyName] = { familyName: familyName, brand: item['Marka'] || 'Yataş Bedding', categories: {} };
+                }
+
+                if (!productFamilies[familyName].categories[category]) {
+                    productFamilies[familyName].categories[category] = { categoryName: category, photoUrl: mainPhoto, allPhotos: new Set(photoList), variants: [] };
+                } else {
+                    photoList.forEach(p => productFamilies[familyName].categories[category].allPhotos.add(p));
+                }
+
+                productFamilies[familyName].categories[category].variants.push({
+                    code: String(item['Ürün Kodu'] || 'SKU-100'),
+                    size: String(item['Ölçü'] || '160x200'),
+                    desc: item['Malzeme Tanım'] || familyName,
+                    usdPrice: parseFloat(item['Birim USD Fiyat']) || 0,
+                    eurPrice: parseFloat(item['Birim EUR Fiyat']) || 0,
+                    height: item['Yükseklik CM'] || 0,
+                    status: item['Sipariş Statü'] || 'MTO',
+                    barcode: String(item['Barkod'] || '-'),
+                    gtip: String(item['GTIP'] || '9404.21'),
+                    volume: parseFloat(item['Birim Hacim M3']) || 0,
+                    weight: parseFloat(item['Birim Ağırlık KG']) || 0,
+                    feature: item['Özellik'] || '-',
+                    kartela: String(item['Kartela'] || '-').trim(),
+                    color: String(item['Renk'] || '-').trim(),
+                    hardness: String(item['Sertlik'] || '-').trim(),
+                    photoUrl: mainPhoto
+                });
+            });
+        }
+
+        function buildBrandChips() {
+            const chipContainer = document.getElementById('brandFilterChips');
+            let chipsHtml = `
+                <div class="filter-chip ${activeBrandFilter === 'ALL' ? 'active' : ''}" onclick="filterByBrand('ALL')">
+                    <i class="fa-solid fa-layer-group"></i> <span data-i18n="all_brands">All Brands</span>
+                </div>
+                <div class="filter-chip ${activeBrandFilter === 'Yataş Bedding' ? 'active' : ''}" onclick="filterByBrand('Yataş Bedding')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/yatas/logo.webp" alt="Yataş Bedding" class="filter-chip-logo">
+                </div>
+                <div class="filter-chip ${activeBrandFilter === 'Enza Home' ? 'active' : ''}" onclick="filterByBrand('Enza Home')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/enza/logo.webp" alt="Enza Home" class="filter-chip-logo">
+                </div>
+            `;
+            chipContainer.innerHTML = chipsHtml;
+        }
+
+        function buildNavigationTree() {
+            const tree = {};
+            rawProducts.forEach(i => {
+                const b = i['Marka'] || 'Yataş Bedding';
+                let c = i['Kategori'] || 'Genel';
+                if (c.includes('Çocuk')) c = 'Kids Mattress';
+                const fam = i['Ürün Ailesi'] || 'General';
+                if (!tree[b]) tree[b] = {}; if (!tree[b][c]) tree[b][c] = new Set();
+                tree[b][c].add(fam);
+            });
+
+            const navContainer = document.getElementById('navigationTree');
+            let html = '';
+            for (const [brand, categories] of Object.entries(tree)) {
+                html += `<div class="nav-tree-item">
+                    <div class="nav-tree-header" onclick="toggleNavAccordion(this)">
+                        <span><i class="fa-solid fa-store" style="margin-right:8px;"></i> ${brand}</span><i class="fa-solid fa-chevron-down"></i>
+                    </div><div class="nav-tree-children">`;
+                for (const [cat, families] of Object.entries(categories)) {
+                    const translatedCat = autoTranslateText(cat, currentLang);
+                    html += `<div class="cat-tree-header" onclick="toggleNavAccordion(this)">
+                        <span><i class="fa-regular fa-folder" style="margin-right:6px;"></i> ${translatedCat}</span><i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+                    </div><div class="cat-tree-children">`;
+                    Array.from(families).forEach(fam => {
+                        html += `<div class="sub-link-item" onclick="filterByFamily('${brand}', '${cat}', '${fam}')"><i class="fa-solid fa-angle-right" style="font-size:10px; color:var(--text-muted);"></i> ${fam}</div>`;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div></div>`;
+            }
+            navContainer.innerHTML = html;
+        }
+
+        function toggleNavAccordion(el) { if (el.nextElementSibling) el.nextElementSibling.classList.toggle('active'); }
+
+        async function renderProductGrid() {
+            const grid = document.getElementById('productGrid');
+            let families = Object.values(productFamilies);
+
+            const selectedH = document.getElementById('filterHardness').value;
+            const sortVal = document.getElementById('sortSelect').value;
+
+            families = families.filter(f => {
+                const matchBrand = (activeBrandFilter === 'ALL' || f.brand === activeBrandFilter);
+                let matchCat = !activeCategoryFilter || Object.keys(f.categories).includes(activeCategoryFilter);
+                const matchFam = (!activeFamilyFilter || f.familyName === activeFamilyFilter);
+
+                let matchHardness = true;
+                if (selectedH !== 'ALL') {
+                    matchHardness = Object.values(f.categories).some(c => 
+                        c.variants.some(v => v.hardness.toLowerCase().includes(selectedH.toLowerCase()))
+                    );
+                }
+
+                return matchBrand && matchCat && matchFam && matchHardness;
+            });
+
+            if (sortVal === 'NAME_ASC') families.sort((a,b) => a.familyName.localeCompare(b.familyName));
+            if (sortVal === 'NAME_DESC') families.sort((a,b) => b.familyName.localeCompare(a.familyName));
+
+            grid.innerHTML = families.map(f => {
+                let allVariants = []; let mainPhoto = '';
+                Object.values(f.categories).forEach(c => { if (!mainPhoto && c.photoUrl) mainPhoto = c.photoUrl; allVariants.push(...c.variants); });
+                const minPrice = Math.min(...allVariants.map(v => currentCurrency === 'USD' ? v.usdPrice : v.eurPrice));
+                const currencySymbol = currentCurrency === 'USD' ? '$' : '€';
+                const fromLabel = i18n[currentLang].from || 'from';
+
+                return `
+                <div class="product-card" onclick="openProductModal('${f.familyName}')">
+                    <div class="card-img-wrap">
+                        <img src="${mainPhoto}" alt="${f.familyName}" onerror="this.src='https://via.placeholder.com/300x200?text=Yatas+Bedding'">
+                        <div class="card-badge">${Object.keys(f.categories).length} Categories</div>
+                        <div class="card-magnifier-btn" onclick="openLightboxFromGrid(event, '${mainPhoto}')" title="Zoom Photo">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <div class="card-brand">${f.brand}</div>
+                            <h3 class="card-title">${f.familyName}</h3>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">${fromLabel} ${formatCurrency(minPrice, currencySymbol)}</div>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function applyFilters() { renderProductGrid(); }
+
+        function resetToHome() {
+            activeBrandFilter = 'ALL'; activeCategoryFilter = null; activeFamilyFilter = null;
+            buildBrandChips(); renderProductGrid();
+        }
+
+        function getCategoryIcon(catKey) {
+            const key = String(catKey).toLowerCase();
+            if (key.includes('yatak') || key.includes('mattress')) return 'fa-bed';
+            if (key.includes('baza') || key.includes('base') || key.includes('boxspring')) return 'fa-box-archive';
+            if (key.includes('başlık') || key.includes('headboard')) return 'fa-couch';
+            if (key.includes('yastık') || key.includes('pillow')) return 'fa-feather';
+            if (key.includes('yorgan') || key.includes('duvet')) return 'fa-scroll';
+            if (key.includes('karyola') || key.includes('frame')) return 'fa-border-all';
+            if (key.includes('aksesuar') || key.includes('accessories')) return 'fa-shapes';
+            if (key.includes('kids') || key.includes('çocuk')) return 'fa-child';
+            return 'fa-layer-group';
+        }
+
+        function openProductModal(familyName) {
+            currentActiveFamily = productFamilies[familyName];
+            document.getElementById('modalFamilyTitle').innerText = currentActiveFamily.familyName;
+            document.getElementById('modalQty').value = 1;
+
+            const categoryKeys = Object.keys(currentActiveFamily.categories);
+            const tabsContainer = document.getElementById('familyTabsBar');
+
+            tabsContainer.innerHTML = categoryKeys.map((catKey, index) => `
+                <button class="family-tab-btn ${index === 0 ? 'active' : ''}" onclick="switchFamilyCategory('${catKey}', this)">
+                    <i class="fa-solid ${getCategoryIcon(catKey)}"></i> ${autoTranslateText(catKey, currentLang)}
+                </button>
+            `).join('');
+
+            switchFamilyCategory(categoryKeys[0]);
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function switchFamilyCategory(catKey, btnEl = null) {
+            currentActiveCategoryKey = catKey;
+            document.getElementById('modalQty').value = 1;
+
+            if (btnEl) {
+                document.querySelectorAll('.family-tab-btn').forEach(b => b.classList.remove('active'));
+                btnEl.classList.add('active');
+            }
+            const catData = currentActiveFamily.categories[catKey];
+            document.getElementById('modalBrandCategory').innerText = `${currentActiveFamily.brand} | ${autoTranslateText(catKey, currentLang)}`;
+
+            modalPhotosList = Array.from(catData.allPhotos);
+            if (modalPhotosList.length === 0 && catData.photoUrl) {
+                modalPhotosList = [catData.photoUrl];
+            }
+            currentPhotoIndex = 0;
+            updateModalPhotoDisplay();
+
+            renderKartelaSection(catData.variants);
+        }
+
+        function updateModalPhotoDisplay() {
+            if (modalPhotosList.length === 0) return;
+            const imgEl = document.getElementById('modalImg');
+            const counterEl = document.getElementById('modalPhotoCounter');
+            const thumbsBar = document.getElementById('modalThumbnailsBar');
+
+            imgEl.src = modalPhotosList[currentPhotoIndex];
+            counterEl.innerText = `${currentPhotoIndex + 1} / ${modalPhotosList.length}`;
+
+            if (modalPhotosList.length > 1) {
+                thumbsBar.style.display = 'flex';
+                thumbsBar.innerHTML = modalPhotosList.map((pUrl, i) => `
+                    <img src="${pUrl}" class="thumb-img ${i === currentPhotoIndex ? 'active' : ''}" onclick="setModalPhotoIndex(${i})" onerror="this.style.display='none'">
+                `).join('');
+            } else {
+                thumbsBar.style.display = 'none';
+            }
+        }
+
+        function setModalPhotoIndex(idx) { currentPhotoIndex = idx; updateModalPhotoDisplay(); }
+        function nextModalPhoto(e = null) { if (e) e.stopPropagation(); if (modalPhotosList.length <= 1) return; currentPhotoIndex = (currentPhotoIndex + 1) % modalPhotosList.length; updateModalPhotoDisplay(); }
+        function prevModalPhoto(e = null) { if (e) e.stopPropagation(); if (modalPhotosList.length <= 1) return; currentPhotoIndex = (currentPhotoIndex - 1 + modalPhotosList.length) % modalPhotosList.length; updateModalPhotoDisplay(); }
+        function handleMainImageClick(e) { if (e.target.closest('.modal-nav-arrow')) return; openLightboxFromMain(); }
+
+        function openLightboxFromMain() { openLightboxWithList(modalPhotosList, currentPhotoIndex); }
+        function openLightboxFromGrid(e, src) { e.stopPropagation(); openLightboxWithList([src], 0); }
+
+        function openLightboxWithList(photosArray, startIndex) {
+            modalPhotosList = photosArray && photosArray.length > 0 ? photosArray : [document.getElementById('modalImg').src];
+            currentPhotoIndex = startIndex || 0;
+            updateLightboxDisplay();
+            document.getElementById('imageLightboxModal').classList.add('active');
+        }
+
+        function updateLightboxDisplay() {
+            if (modalPhotosList.length === 0) return;
+            document.getElementById('lightboxImg').src = modalPhotosList[currentPhotoIndex];
+            document.getElementById('lightboxCounter').innerText = `${currentPhotoIndex + 1} / ${modalPhotosList.length}`;
+        }
+
+        function nextLightboxPhoto(e = null) {
+            if (e) e.stopPropagation();
+            if (modalPhotosList.length <= 1) return;
+            currentPhotoIndex = (currentPhotoIndex + 1) % modalPhotosList.length;
+            updateLightboxDisplay(); updateModalPhotoDisplay();
+        }
+
+        function prevLightboxPhoto(e = null) {
+            if (e) e.stopPropagation();
+            if (modalPhotosList.length <= 1) return;
+            currentPhotoIndex = (currentPhotoIndex - 1 + modalPhotosList.length) % modalPhotosList.length;
+            updateLightboxDisplay(); updateModalPhotoDisplay();
+        }
+
+        function closeLightbox() { document.getElementById('imageLightboxModal').classList.remove('active'); }
+        function closeLightboxOnBackdrop(e) { if (e.target === e.currentTarget) closeLightbox(); }
+
+        function renderKartelaSection(variants) {
+            const kartelaSec = document.getElementById('kartelaSection');
+            const kartelaGrid = document.getElementById('kartelaCardsGrid');
+
+            const uniqueKartelas = [...new Set(variants.map(v => v.kartela))].filter(k => k && k !== '-' && k !== 'undefined');
+
+            if (uniqueKartelas.length > 0) {
+                kartelaSec.style.display = 'block';
+                kartelaGrid.innerHTML = uniqueKartelas.map((kCode, idx) => `
+                    <div class="kartela-card ${idx === 0 ? 'active' : ''}" onclick="selectKartela('${kCode}', this)">
+                        <div class="kartela-swatch-box">
+                            <i class="fa-solid fa-swatchbook" style="color:var(--text-muted); font-size:18px;"></i>
+                        </div>
+                        <span class="kartela-code-text">${kCode}</span>
+                    </div>
+                `).join('');
+                
+                selectKartela(uniqueKartelas[0]);
+            } else {
+                kartelaSec.style.display = 'none';
+                activeSelectedKartela = '-';
+                renderColorSection(variants);
+            }
+        }
+
+        function selectKartela(kCode, el = null) {
+            activeSelectedKartela = kCode;
+            if (el) {
+                document.querySelectorAll('.kartela-card').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            const catData = currentActiveFamily.categories[currentActiveCategoryKey];
+            const matchingVariants = catData.variants.filter(v => activeSelectedKartela === '-' || v.kartela === activeSelectedKartela);
+
+            renderColorSection(matchingVariants);
+        }
+
+        function renderColorSection(variants) {
+            const colorSec = document.getElementById('colorSection');
+            const colorGrid = document.getElementById('colorChipsGrid');
+
+            const uniqueColors = [...new Set(variants.map(v => v.color))].filter(c => c && c !== '-' && c !== 'undefined');
+
+            if (uniqueColors.length > 0) {
+                colorSec.style.display = 'block';
+                colorGrid.innerHTML = uniqueColors.map((cName, idx) => `
+                    <div class="color-chip ${idx === 0 ? 'active' : ''}" onclick="selectColor('${cName}', this)">
+                        <span style="width:8px; height:8px; border-radius:50%; background:#00205b; display:inline-block;"></span>
+                        ${autoTranslateText(cName, currentLang)}
+                    </div>
+                `).join('');
+
+                selectColor(uniqueColors[0]);
+            } else {
+                colorSec.style.display = 'none';
+                activeSelectedColor = '-';
+                renderSizeChips(variants);
+            }
+        }
+
+        function selectColor(cName, el = null) {
+            activeSelectedColor = cName;
+            if (el) {
+                document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            const catData = currentActiveFamily.categories[currentActiveCategoryKey];
+            const matchingVariants = catData.variants.filter(v => {
+                const matchK = activeSelectedKartela === '-' || v.kartela === activeSelectedKartela;
+                const matchC = activeSelectedColor === '-' || v.color === activeSelectedColor;
+                return matchK && matchC;
+            });
+
+            renderSizeChips(matchingVariants);
+        }
+
+        function renderSizeChips(matchingVariants) {
+            const sizeGrid = document.getElementById('sizeChipsGrid');
+            const uniqueSizes = [...new Set(matchingVariants.map(v => v.size))];
+
+            sizeGrid.innerHTML = uniqueSizes.map((sVal, idx) => `
+                <div class="size-chip ${idx === 0 ? 'active' : ''}" onclick="selectSize('${sVal}', this)">${sVal}</div>
+            `).join('');
+
+            if (uniqueSizes.length > 0) { selectSize(uniqueSizes[0]); }
+        }
+
+        function selectSize(sVal, el = null) {
+            if (el) {
+                document.querySelectorAll('.size-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            const catData = currentActiveFamily.categories[currentActiveCategoryKey];
+            
+            activeSelectedVariant = catData.variants.find(v => {
+                const matchK = activeSelectedKartela === '-' || v.kartela === activeSelectedKartela;
+                const matchC = activeSelectedColor === '-' || v.color === activeSelectedColor;
+                const matchS = v.size === sVal;
+                return matchK && matchC && matchS;
+            }) || catData.variants[0];
+
+            const v = activeSelectedVariant;
+
+            document.getElementById('specGtip').innerText = v.gtip;
+            document.getElementById('specVolume').innerText = `${v.volume} m³`;
+            document.getElementById('specWeight').innerText = `${v.weight} kg`;
+            document.getElementById('specHeight').innerText = `${v.height} cm`;
+            document.getElementById('specStatus').innerText = v.status || 'MTO';
+            document.getElementById('specFeature').innerText = autoTranslateText(v.feature, currentLang) || '-';
+            document.getElementById('specKartela').innerText = v.kartela || '-';
+            document.getElementById('specColor').innerText = autoTranslateText(v.color, currentLang) || '-';
+
+            const isMattress = currentActiveCategoryKey.toLowerCase().includes('yatak') || currentActiveCategoryKey.toLowerCase().includes('mattress');
+            const firmnessSec = document.getElementById('firmnessSection');
+            
+            if (isMattress && v.hardness && v.hardness !== '-') {
+                firmnessSec.style.display = 'flex';
+                updateFirmnessGauge(v.hardness);
+            } else {
+                firmnessSec.style.display = 'none';
+            }
+
+            updateModalPrice();
+        }
+
+        function updateFirmnessGauge(hardnessVal) {
+            const val = String(hardnessVal).toLowerCase();
+            const labelEl = document.getElementById('firmnessLabelText');
+            labelEl.innerText = autoTranslateText(hardnessVal, currentLang) || 'Medium';
+
+            const d1 = document.getElementById('fDot1'); const d2 = document.getElementById('fDot2');
+            const d3 = document.getElementById('fDot3'); const d4 = document.getElementById('fDot4');
+
+            [d1, d2, d3, d4].forEach(d => d.classList.remove('active'));
+
+            if (val.includes('yumuşak') || val.includes('soft')) {
+                d1.classList.add('active');
+            } else if (val.includes('medium') || val.includes('orta')) {
+                d1.classList.add('active'); d2.classList.add('active');
+            } else if (val.includes('ultra')) {
+                d1.classList.add('active'); d2.classList.add('active'); d3.classList.add('active'); d4.classList.add('active');
+            } else if (val.includes('sert') || val.includes('hard') || val.includes('firm')) {
+                d1.classList.add('active'); d2.classList.add('active'); d3.classList.add('active');
+            } else {
+                d1.classList.add('active'); d2.classList.add('active');
+            }
+        }
+
+        function updateModalQty(delta) {
+            const qtyInput = document.getElementById('modalQty');
+            let val = parseInt(qtyInput.value || 1) + delta;
+            if (val < 1) val = 1; qtyInput.value = val; updateModalPrice();
+        }
+
+        function updateModalPrice() {
+            const qty = parseInt(document.getElementById('modalQty').value || 1);
+            if (!activeSelectedVariant) return;
+            const unitPrice = currentCurrency === 'USD' ? activeSelectedVariant.usdPrice : activeSelectedVariant.eurPrice;
+            const symbol = currentCurrency === 'USD' ? '$' : '€';
+            document.getElementById('modalTotalPrice').innerText = formatCurrency(unitPrice * qty, symbol);
+        }
+
+        function closeModal() { document.getElementById('productModal').classList.remove('active'); }
+        function handleBackdropClick(e) { if (e.target === e.currentTarget) closeModal(); }
+
+        function addCurrentToCart() {
+            if (!activeSelectedVariant) return;
+            const qty = parseInt(document.getElementById('modalQty').value || 1);
+            const v = activeSelectedVariant;
+            const unitPrice = currentCurrency === 'USD' ? v.usdPrice : v.eurPrice;
+
+            const existingIndex = cart.findIndex(i => i.code === v.code && i.currency === currentCurrency);
+            if (existingIndex > -1) { cart[existingIndex].qty += qty; }
+            else {
+                cart.push({
+                    family: currentActiveFamily.familyName,
+                    category: currentActiveCategoryKey,
+                    brand: currentActiveFamily.brand,
+                    photoUrl: document.getElementById('modalImg').src,
+                    code: v.code, size: v.size, gtip: v.gtip, volume: v.volume, weight: v.weight,
+                    height: v.height, status: v.status, barcode: v.barcode, feature: v.feature,
+                    hardness: v.hardness, kartela: v.kartela, color: v.color,
+                    qty: qty, unitPrice: unitPrice, currency: currentCurrency
+                });
+            }
+            
+            // LocalStorage Senkronizasyonu
+            localStorage.setItem('b2b_cart', JSON.stringify(cart.map(c => ({
+                code: c.code, name: `${c.family} (${c.size})`, qty: c.qty, price: c.unitPrice, m3: c.volume, weight: c.weight, image: c.photoUrl
+            }))));
+
+            updateCartDisplay(); toggleCart(true); closeModal();
+        }
+
+        function updateCartDisplay() {
+            document.getElementById('cartBadge').innerText = cart.reduce((acc, i) => acc + i.qty, 0);
+            const list = document.getElementById('cartItemsList');
+            let totalVal = 0, totalM3 = 0, totalKg = 0, totalPcs = 0;
+
+            list.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.qty * item.unitPrice;
+                totalVal += itemTotal; totalM3 += item.qty * item.volume; totalKg += item.qty * item.weight; totalPcs += item.qty;
+                const symbol = item.currency === 'USD' ? '$' : '€';
+
+                return `
+                <div class="cart-item-card">
+                    <img src="${item.photoUrl}" onerror="this.src='https://via.placeholder.com/50'">
+                    <div class="cart-item-info">
+                        <h4>${item.family} (${autoTranslateText(item.category, currentLang)}) - ${item.size}</h4>
+                        <p>${item.kartela !== '-' ? 'Kartela: ' + item.kartela + ' • ' : ''}${item.color !== '-' ? autoTranslateText(item.color, currentLang) + ' • ' : ''}${item.qty} x ${formatCurrency(item.unitPrice, symbol)}</p>
+                        <div class="cart-item-price">${formatCurrency(itemTotal, symbol)}</div>
+                    </div>
+                    <button style="background:none; border:none; color:var(--yatas-red); cursor:pointer;" onclick="removeFromCart(${idx})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `}).join('');
+
+            const mainSymbol = currentCurrency === 'USD' ? '$' : '€';
+            document.getElementById('cartGrandTotal').innerText = formatCurrency(totalVal, mainSymbol);
+            calculateLogistics(totalM3, totalKg, totalPcs);
+        }
+
+        function removeFromCart(idx) { 
+            cart.splice(idx, 1); 
+            localStorage.setItem('b2b_cart', JSON.stringify(cart.map(c => ({
+                code: c.code, name: `${c.family} (${c.size})`, qty: c.qty, price: c.unitPrice, m3: c.volume, weight: c.weight, image: c.photoUrl
+            }))));
+            updateCartDisplay(); 
+        }
+
+        function clearCart() { 
+            if (confirm("Clear all items from proforma?")) { 
+                cart = []; 
+                localStorage.removeItem('b2b_cart');
+                updateCartDisplay(); 
+            } 
+        }
+
+        function calculateLogistics(totalM3, totalKg, totalPcs) {
+            const HQ_CAPACITY = 68.0; const TRUCK_CAPACITY = 90.0;
+            const hqPercent = Math.min(100, Math.round((totalM3 / HQ_CAPACITY) * 100));
+            const truckPercent = Math.min(100, Math.round((totalM3 / TRUCK_CAPACITY) * 100));
+
+            document.getElementById('hqCountText').innerText = `${(totalM3 / HQ_CAPACITY).toFixed(1)} Cont. (%${hqPercent})`;
+            document.getElementById('hqProgressFill').style.width = `${hqPercent}%`;
+
+            document.getElementById('truckCountText').innerText = `${(totalM3 / TRUCK_CAPACITY).toFixed(1)} Truck (%${truckPercent})`;
+            document.getElementById('truckProgressFill').style.width = `${truckPercent}%`;
+
+            document.getElementById('logisticsMeta').innerText = `Total Pcs: ${totalPcs} | Total Vol: ${formatNumber(totalM3)} m³ | Total Wt: ${formatNumber(totalKg)} kg`;
+        }
+
+        function toggleCart(forceOpen) {
+            const drawer = document.getElementById('cartDrawer');
+            const overlay = document.getElementById('cartOverlay');
+            if (forceOpen === true) { drawer.classList.add('open'); overlay.classList.add('active'); }
+            else if (forceOpen === false) { drawer.classList.remove('open'); overlay.classList.remove('active'); }
+            else { drawer.classList.toggle('open'); overlay.classList.toggle('active'); }
+        }
+
+        function toggleSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            const overlay = document.getElementById('sidebarOverlay');
+            nav.classList.toggle('open'); overlay.classList.toggle('active');
+        }
+
+        function filterByBrand(b) { activeBrandFilter = b; buildBrandChips(); renderProductGrid(); }
+        function filterByFamily(brand, cat, fam) { activeBrandFilter = brand; activeCategoryFilter = cat; activeFamilyFilter = fam; renderProductGrid(); toggleSidebar(); }
+        function changeCurrency(curr) { currentCurrency = curr; renderProductGrid(); updateCartDisplay(); }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) el.innerText = i18n[lang][key];
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (i18n[lang] && i18n[lang][key]) el.placeholder = i18n[lang][key];
+            });
+
+            const chatWelcome = document.getElementById('chatWelcomeMsg');
+            if (chatWelcome && i18n[lang]['chat_welcome']) chatWelcome.innerText = i18n[lang]['chat_welcome'];
+
+            buildBrandChips(); buildNavigationTree(); renderProductGrid(); updateCartDisplay();
+        }
+
+        async function getImageBuffer(url) {
+            try {
+                const response = await fetch(url, { mode: 'cors' });
+                if (!response.ok) throw new Error('Fetch failed');
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+                const ext = url.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+                return { buffer: arrayBuffer, extension: ext };
+            } catch (e) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth || img.width;
+                        canvas.height = img.naturalHeight || img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        canvas.toBlob((blob) => {
+                            if (blob) blob.arrayBuffer().then(buf => resolve({ buffer: buf, extension: 'png' }));
+                            else reject('Canvas blob failed');
+                        }, 'image/png');
+                    };
+                    img.onerror = () => reject('Image load failed');
+                    img.src = url;
+                });
+            }
+        }
+
+        async function exportProformaExcel() {
+            if (cart.length === 0) { alert("Cart is empty!"); return; }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Proforma Order');
+
+            worksheet.columns = [
+                { header: 'Image', key: 'img', width: 22 },
+                { header: 'Brand', key: 'brand', width: 18 },
+                { header: 'Product Family', key: 'family', width: 22 },
+                { header: 'Category', key: 'category', width: 16 },
+                { header: 'Dimension / Size', key: 'size', width: 16 },
+                { header: 'Kartela', key: 'kartela', width: 14 },
+                { header: 'Color', key: 'color', width: 16 },
+                { header: 'Status', key: 'status', width: 12 },
+                { header: 'Height (cm)', key: 'height', width: 14 },
+                { header: 'Feature', key: 'feature', width: 16 },
+                { header: 'Hardness', key: 'hardness', width: 14 },
+                { header: 'Product Code', key: 'code', width: 20 },
+                { header: 'Barcode', key: 'barcode', width: 18 },
+                { header: 'HS CODE (GTİP)', key: 'gtip', width: 18 },
+                { header: 'Qty', key: 'qty', width: 10 },
+                { header: 'Unit Price', key: 'unitPrice', width: 16 },
+                { header: 'Total Price', key: 'totalPrice', width: 18 },
+                { header: 'Total Vol (m³)', key: 'vol', width: 16 },
+                { header: 'Total Wt (kg)', key: 'wt', width: 16 }
+            ];
+
+            worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' }, size: 11 };
+            worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '00205B' } };
+            worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+
+            let sumQty = 0, sumPrice = 0, sumVol = 0, sumWt = 0;
+
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+                const itemTotal = item.qty * item.unitPrice;
+                const itemVol = item.qty * item.volume;
+                const itemWt = item.qty * item.weight;
+
+                sumQty += item.qty; sumPrice += itemTotal; sumVol += itemVol; sumWt += itemWt;
+
+                const row = worksheet.addRow({
+                    brand: item.brand,
+                    family: item.family,
+                    category: autoTranslateText(item.category, currentLang),
+                    size: item.size,
+                    kartela: item.kartela || '-',
+                    color: autoTranslateText(item.color, currentLang) || '-',
+                    status: item.status || 'MTO',
+                    height: item.height || '-',
+                    feature: autoTranslateText(item.feature, currentLang) || '-',
+                    hardness: autoTranslateText(item.hardness, currentLang) || '-',
+                    code: item.code,
+                    barcode: item.barcode,
+                    gtip: item.gtip,
+                    qty: item.qty,
+                    unitPrice: `${formatNumber(item.unitPrice)} ${item.currency}`,
+                    totalPrice: `${formatNumber(itemTotal)} ${item.currency}`,
+                    vol: itemVol,
+                    wt: itemWt
+                });
+
+                row.height = 65;
+                row.alignment = { vertical: 'middle', horizontal: 'center' };
+
+                row.getCell('vol').numFmt = '#,##0.000';
+                row.getCell('wt').numFmt = '#,##0.00';
+                row.getCell('qty').numFmt = '#,##0';
+
+                if (item.photoUrl && item.photoUrl.startsWith('http')) {
+                    try {
+                        const imgData = await getImageBuffer(item.photoUrl);
+                        const imageId = workbook.addImage({
+                            buffer: imgData.buffer,
+                            extension: imgData.extension,
+                        });
+
+                        worksheet.addImage(imageId, {
+                            tl: { col: 0, row: row.number - 1 },
+                            ext: { width: 110, height: 75 }
+                        });
+                    } catch (e) {
+                        console.warn("Görsel Excel'e eklenemedi:", item.photoUrl, e);
+                    }
+                }
+            }
+
+            const totalRow = worksheet.addRow({
+                family: 'TOTAL / TOPLAM',
+                qty: sumQty,
+                totalPrice: `${formatNumber(sumPrice)} ${cart[0].currency}`,
+                vol: sumVol,
+                wt: sumWt
+            });
+
+            totalRow.height = 32;
+            totalRow.font = { bold: true, color: { argb: 'FFFFFF' }, size: 12 };
+            totalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '00205B' } };
+            totalRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+            totalRow.getCell('vol').numFmt = '#,##0.000';
+            totalRow.getCell('wt').numFmt = '#,##0.00';
+            totalRow.getCell('qty').numFmt = '#,##0';
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Yatas_Proforma_Order_${new Date().toISOString().slice(0,10)}.xlsx`;
+            link.click();
+        }
+    </script>
+</body>
+</html>
+<div class="spotlight-trigger" onclick="openSpotlight()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span data-i18n-ph="spotlight_ph">Quick search SKU, family...</span>
+                <span class="spotlight-key">Ctrl K</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+
+            <select class="currency-selector" id="currencySelect" onchange="changeCurrency(this.value)">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+            </select>
+
+            <select class="lang-selector" id="langSelect" onchange="changeLanguage(this.value)">
+                <option value="TR">TR</option>
+                <option value="EN" selected>EN</option>
+                <option value="DE">DE</option>
+                <option value="RU">RU</option>
+            </select>
+
+            <button class="cart-trigger-btn" onclick="toggleCart(true)">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span data-i18n="cart">Cart</span>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SIDEBAR OVERLAY & DRAWER -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar-nav" id="sidebarNav">
+        <div class="sidebar-header-logo">
+            <img src="../yatas_grup_logo.jpg" alt="Yataş Group" onclick="resetToHome()" onerror="this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png'">
+            <i class="fa-solid fa-xmark" style="cursor:pointer; color:var(--text-muted);" onclick="toggleSidebar()"></i>
+        </div>
+        <div id="navigationTree"></div>
+    </div>
+
+    <!-- MAIN PORTAL SECTION -->
+    <main id="mainPortalSection">
+        <div class="hero-banner-container" id="heroBanner">
+            <div class="hero-slide active" style="background-image: url('https://yatasinternational.github.io/Products-Photos/Activio/activio.jpg');">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <span class="hero-tag">YATAŞ BEDDING COLLECTION</span>
+                    <h1 class="hero-title">Not All Sleep Is The Same. This is Yataş Sleep.</h1>
+                    <p class="hero-desc">Engineered for global comfort with premium spinal support & innovative fabric technology.</p>
+                    <a href="https://www.yatasbedding.com/en-EN/" target="_blank" class="hero-cta-btn">
+                        <span>Explore Yataş World</span> <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-slide" style="background-image: url('https://yatasinternational.github.io/Products-Photos/Supreme%20Pedic/supreme_pedic_baza.jpg');">
+                <div class="hero-overlay" style="background: linear-gradient(90deg, rgba(120, 50, 20, 0.88) 0%, rgba(120, 50, 20, 0.3) 60%, transparent 100%);"></div>
+                <div class="hero-content">
+                    <span class="hero-tag" style="background: rgba(215, 25, 33, 0.4);">ENZA HOME DESIGN</span>
+                    <h1 class="hero-title">Contemporary Living & Dining Solutions</h1>
+                    <p class="hero-desc">Transforming global homes with aesthetic furniture, upholstery & bedroom concepts.</p>
+                    <a href="https://www.enzahome.com/en-EN/" target="_blank" class="hero-cta-btn">
+                        <span>Discover Enza Home</span> <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-control-panel">
+            <div class="quick-filters" id="brandFilterChips">
+                <div class="filter-chip active" onclick="filterByBrand('ALL')">
+                    <i class="fa-solid fa-layer-group"></i> <span data-i18n="all_brands">All Brands</span>
+                </div>
+                <div class="filter-chip" onclick="filterByBrand('Yataş Bedding')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/yatas/logo.webp" alt="Yataş Bedding" class="filter-chip-logo">
+                </div>
+                <div class="filter-chip" onclick="filterByBrand('Enza Home')">
+                    <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/enza/logo.webp" alt="Enza Home" class="filter-chip-logo">
+                </div>
+            </div>
+
+            <div class="filter-dropdown-group">
+                <select class="filter-select" id="filterHardness" onchange="applyFilters()">
+                    <option value="ALL" data-i18n="hardness_all">All Firmness Levels</option>
+                    <option value="Soft" data-i18n="hardness_soft">Soft / Yumuşak</option>
+                    <option value="Medium" data-i18n="hardness_medium">Medium / Orta</option>
+                    <option value="Firm" data-i18n="hardness_firm">Firm / Sert</option>
+                    <option value="Extra Firm" data-i18n="hardness_extrafirm">Extra Firm / Ultra Sert</option>
+                </select>
+
+                <select class="filter-select" id="sortSelect" onchange="applyFilters()">
+                    <option value="DEFAULT" data-i18n="sort_default">Sort By: Recommended</option>
+                    <option value="NAME_ASC" data-i18n="sort_name_asc">Name (A-Z)</option>
+                    <option value="NAME_DESC" data-i18n="sort_name_desc">Name (Z-A)</option>
+                    <option value="PRICE_ASC" data-i18n="sort_price_asc">Price (Low to High)</option>
+                    <option value="PRICE_DESC" data-i18n="sort_price_desc">Price (High to Low)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+    </main>
+
+    <!-- CANLI KATALOG SİTESİ -->
+    <main id="catalogViewSection" style="display:none; text-align:center; padding:16px 32px;">
+        <iframe src="https://yatasinternational.github.io/Yatas-Corporate-Deck/" style="width:100%; height:82vh; border:1px solid var(--border-color); border-radius:var(--radius-lg); box-shadow:var(--shadow-subtle);"></iframe>
+    </main>
+
+    <!-- AI SALES ASSISTANT CHATBOT WIDGET (Z-INDEX: 4000) -->
+    <div class="chat-widget-btn" onclick="toggleChatWindow()" title="AI Sales Assistant">
+        <i class="fa-solid fa-headset"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-headset" style="font-size:18px;"></i>
+                <div>
+                    <h4 style="font-size:14px; font-weight:800;" data-i18n="chat_title">Yataş B2B AI Assistant</h4>
+                    <span style="font-size:10px; opacity:0.8;" data-i18n="chat_status">Online • Product Advisor</span>
+                </div>
+            </div>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot" id="chatWelcomeMsg" data-i18n="chat_welcome">
+                Hello! I am your Yataş B2B Product Advisor. How can I assist you with mattress firmness, dimensions, or fabric recommendations today?
+            </div>
+        </div>
+
+        <div style="padding:12px; border-top:1px solid var(--border-color); background:var(--bg-main);">
+            <div class="chat-options-group" id="chatOptionsGroup">
+                <button class="chat-opt-btn" onclick="sendChatQuery('Firmness Guide')" data-i18n="chat_opt1">🛌 How to choose Firmness?</button>
+                <button class="chat-opt-btn" onclick="sendChatQuery('Mattress Sizes')" data-i18n="chat_opt2">📐 Standard Sizes</button>
+                <button class="chat-opt-btn" onclick="sendChatQuery('Fabric Options')" data-i18n="chat_opt3">🎨 Fabrics & Colors</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Scroll to top">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+
+    <!-- SPOTLIGHT SEARCH MODAL -->
+    <div class="spotlight-modal" id="spotlightModal" onclick="closeSpotlightOnBackdrop(event)">
+        <div class="spotlight-box">
+            <div class="spotlight-input-wrap">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted);"></i>
+                <input type="text" id="spotlightInput" placeholder="Type product name, material code, or GTIP..." oninput="handleSpotlightSearch()">
+            </div>
+            <div class="spotlight-results" id="spotlightResults"></div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div class="modal-overlay" id="productModal" onclick="handleBackdropClick(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-left">
+                <div class="gallery-main-container" id="galleryContainer" onclick="handleMainImageClick(event)">
+                    <span class="modal-photo-counter" id="modalPhotoCounter">1 / 1</span>
+                    <button class="modal-nav-arrow prev" onclick="prevModalPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <img id="modalImg" src="" alt="Product Main Image">
+                    <button class="modal-nav-arrow next" onclick="nextModalPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="modal-thumbnails-bar" id="modalThumbnailsBar"></div>
+            </div>
+
+            <div class="modal-right">
+                <div class="modal-header">
+                    <div class="modal-subtitle" id="modalBrandCategory">Yataş Bedding | Collection</div>
+                    <h2 id="modalFamilyTitle">Activio Collection</h2>
+                </div>
+
+                <div class="family-tabs-bar" id="familyTabsBar"></div>
+
+                <div class="variant-box">
+                    <div class="form-group" id="kartelaSection" style="display:none;">
+                        <label data-i18n="select_kartela">SELECT FABRIC COLLECTION / KARTELA</label>
+                        <div class="kartela-cards-grid" id="kartelaCardsGrid"></div>
+                    </div>
+
+                    <div class="form-group" id="colorSection" style="display:none;">
+                        <label data-i18n="select_color">SELECT COLOR / RENK</label>
+                        <div class="color-chips-grid" id="colorChipsGrid"></div>
+                    </div>
+
+                    <div class="form-group" id="sizeSection">
+                        <label data-i18n="select_size">SELECT DIMENSION / SIZE</label>
+                        <div class="size-chips-grid" id="sizeChipsGrid"></div>
+                    </div>
+
+                    <div id="firmnessSection" style="margin-bottom: 12px; display: none; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;" data-i18n="firmness_title">FIRMNESS / SERTLİK</span>
+                        
+                        <div class="firmness-gauge-container">
+                            <div class="firmness-icon-circle" title="Soft"><i class="fa-solid fa-feather"></i></div>
+                            <span id="firmnessLabelText" style="margin: 0 4px;">Medium</span>
+                            <div class="firmness-dots-wrapper">
+                                <div class="firmness-dot" id="fDot1"></div>
+                                <div class="firmness-dot" id="fDot2"></div>
+                                <div class="firmness-dot" id="fDot3"></div>
+                                <div class="firmness-dot" id="fDot4"></div>
+                            </div>
+                            <div class="firmness-icon-circle" title="Hard"><i class="fa-solid fa-cube"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="specs-grid">
+                        <div class="spec-item"><span data-i18n="gtip">HS CODE</span><strong id="specGtip">-</strong></div>
+                        <div class="spec-item"><span data-i18n="volume">UNIT VOL</span><strong id="specVolume">0 m³</strong></div>
+                        <div class="spec-item"><span data-i18n="weight">UNIT WT</span><strong id="specWeight">0 kg</strong></div>
+                        <div class="spec-item"><span data-i18n="height">HEIGHT</span><strong id="specHeight">0 cm</strong></div>
+                        <div class="spec-item"><span data-i18n="status">STATUS</span><strong id="specStatus" style="color:var(--yatas-red);">MTO</strong></div>
+                        <div class="spec-item"><span data-i18n="feature">FEATURE</span><strong id="specFeature">-</strong></div>
+                        <div class="spec-item"><span data-i18n="kartela_label">KARTELA</span><strong id="specKartela">-</strong></div>
+                        <div class="spec-item"><span data-i18n="color">COLOR</span><strong id="specColor">-</strong></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="qty-row">
+                        <div class="qty-picker">
+                            <button class="qty-btn" onclick="updateModalQty(-1)">-</button>
+                            <input type="number" class="qty-input" id="modalQty" value="1" min="1" oninput="updateModalPrice()">
+                            <button class="qty-btn" onclick="updateModalQty(1)">+</button>
+                        </div>
+                        <div class="total-price-tag" id="modalTotalPrice">$0.00</div>
+                    </div>
+
+                    <button class="add-cart-btn" onclick="addCurrentToCart()">
+                        <i class="fa-solid fa-cart-plus"></i> <span data-i18n="add_to_cart">Add Selected Item to Order</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="imageLightboxModal" class="lightbox-modal" onclick="closeLightboxOnBackdrop(event)">
+        <span style="position:absolute; top:24px; right:36px; color:#fff; font-size:36px; cursor:pointer; z-index:10001;" onclick="closeLightbox()">&times;</span>
+        <span class="lightbox-counter" id="lightboxCounter">1 / 1</span>
+        
+        <button class="lightbox-nav-arrow prev" onclick="prevLightboxPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
+        <img class="lightbox-content" id="lightboxImg" src="" alt="Zoomed Photo" onclick="nextLightboxPhoto(event)">
+        <button class="lightbox-nav-arrow next" onclick="nextLightboxPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <!-- CART DRAWER & OVERLAY (Z-INDEX: 99999 - EN ÜSTTE) -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart(false)"></div>
+
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3 data-i18n="cart_title"><i class="fa-solid fa-file-invoice-dollar"></i> Proforma Order Summary</h3>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button style="background:none; border:none; color:var(--yatas-red); cursor:pointer; font-size:15px; font-weight:700;" onclick="clearCart()" title="Clear Cart">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <button class="modal-close" onclick="toggleCart(false)" style="position:static;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+
+        <div class="cart-items-list" id="cartItemsList"></div>
+
+        <div class="logistics-bar-container">
+            <div class="logistics-title">
+                <i class="fa-solid fa-truck-ramp-box"></i> <span data-i18n="logistics_calc">LOGISTICS & VEHICLE CAPACITY</span>
+            </div>
+
+            <div class="logistics-row">
+                <div class="logistics-label">
+                    <span><i class="fa-solid fa-ship"></i> <span data-i18n="hq_container">40' HQ Container (68 m³)</span></span>
+                    <strong id="hqCountText">0 Cont. (%0)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill-hq" id="hqProgressFill"></div></div>
+            </div>
+
+            <div class="logistics-row">
+                <div class="logistics-label">
+                    <span><i class="fa-solid fa-truck-front"></i> <span data-i18n="std_truck">Standard Truck (90 m³)</span></span>
+                    <strong id="truckCountText">0 Truck (%0)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill-truck" id="truckProgressFill"></div></div>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top:10px; font-weight:700;" id="logisticsMeta">
+                Total Pcs: 0 | Total Vol: 0.00 m³ | Total Wt: 0.0 kg
+            </div>
+        </div>
+
+        <div class="cart-footer">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:18px; margin-bottom:16px;">
+                <span data-i18n="grand_total">Grand Total:</span>
+                <span id="cartGrandTotal" style="color:var(--yatas-navy);">$0.00</span>
+            </div>
+
+            <button class="export-excel-btn" onclick="exportProformaExcel()">
+                <i class="fa-solid fa-file-excel"></i> <span data-i18n="export_excel">Export Excel Order with Photos</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer id="appFooter">
+        <div>Copyright © 2026 Yataş International. All rights reserved.</div>
+        <div class="footer-right">Proudly presented by International Sales Development Team</div>
+    </footer>
+
+    <script>
+        const i18n = {
+            TR: {
+                notice_badge: "DUYURU",
+                notice1: "Fiyatlarımız 2026 Temmuz ayında güncellenmiştir.",
+                notice2: "Yeni 2026 Yataş Bedding & Enza Home Koleksiyonları B2B Portala Eklenmiştir.",
+                tab_portal: "Sipariş Portalı",
+                tab_catalog: "Kataloglar & Sunumlar",
+                spotlight_ph: "Hızlı SKU, koleksiyon veya GTİP ara...",
+                all_brands: "Tüm Markalar",
+                sort_default: "Sıralama: Önerilen",
+                sort_name_asc: "İsim (A-Z)",
+                sort_name_desc: "İsim (Z-A)",
+                sort_price_asc: "Fiyat (Düşükten Yükseğe)",
+                sort_price_desc: "Fiyat (Yüksekten Düşüğe)",
+                hardness_all: "Tüm Sertlik Seviyeleri",
+                hardness_soft: "Soft / Yumuşak",
+                hardness_medium: "Medium / Orta",
+                hardness_firm: "Firm / Sert",
+                hardness_extrafirm: "Extra Firm / Ultra Sert",
+                select_kartela: "KUMAŞ KOLEKSİYONU / KARTELA SEÇİNİZ",
+                select_color: "RENK SEÇİNİZ",
+                select_size: "ÖLÇÜ / EBAT SEÇİNİZ",
+                firmness_title: "SERTLİK DERECESİ",
+                gtip: "GTİP KODU", volume: "BİRİM HACİM", weight: "BİRİM AĞIRLIK", height: "YÜKSEKLİK", status: "DURUM",
+                feature: "ÖZELLİK", kartela_label: "KARTELA", color: "RENK", hardness: "SERTLİK",
+                add_to_cart: "Seçileni Siparişe Ekle", cart_title: "Proforma Sipariş Özeti",
+                logistics_calc: "LOJİSTİK KAPASİTE VE ARAÇ HESABI", hq_container: "40' HQ Konteyner (68 m³)", std_truck: "Standart Tır (90 m³)",
+                grand_total: "Genel Toplam:", export_excel: "Fotoğraflı Excel Sipariş Listesi İndir", from: "başlayan fiyatlar",
+                cart: "Sepet",
+                chat_title: "Yataş B2B AI Asistanı", chat_status: "Çevrimiçi • Ürün Danışmanı",
+                chat_welcome: "Merhaba! Yataş B2B Ürün Danışmanınızım. Sertlik derecesi, ölçü seçimi veya kumaş önerileri konusunda size nasıl yardımcı olabilirim?",
+                chat_opt1: "🛌 Sertlik Seçim Rehberi", chat_opt2: "📐 Standart Ölçüler", chat_opt3: "🎨 Kumaş & Renk Seçenekleri"
+            },
+            EN: {
+                notice_badge: "Notice",
+                notice1: "Our prices have been updated as of July 2026.",
+                notice2: "New 2026 Yataş Bedding & Enza Home Collections added to B2B Portal.",
+                tab_portal: "Order Portal",
+                tab_catalog: "Catalogues & Decks",
+                spotlight_ph: "Quick search SKU, family...",
+                all_brands: "All Brands",
+                sort_default: "Sort By: Recommended",
+                sort_name_asc: "Name (A-Z)",
+                sort_name_desc: "Name (Z-A)",
+                sort_price_asc: "Price (Low to High)",
+                sort_price_desc: "Price (High to Low)",
+                hardness_all: "All Firmness Levels",
+                hardness_soft: "Soft / Yumuşak",
+                hardness_medium: "Medium / Orta",
+                hardness_firm: "Firm / Sert",
+                hardness_extrafirm: "Extra Firm / Ultra Sert",
+                select_kartela: "SELECT FABRIC COLLECTION / KARTELA",
+                select_color: "SELECT COLOR / RENK",
+                select_size: "SELECT DIMENSION / SIZE",
+                firmness_title: "FIRMNESS / SERTLİK",
+                gtip: "HS CODE", volume: "UNIT VOL", weight: "UNIT WT", height: "HEIGHT", status: "STATUS",
+                feature: "FEATURE", kartela_label: "KARTELA", color: "COLOR", hardness: "HARDNESS",
+                add_to_cart: "Add Selected Item to Order", cart_title: "Proforma Order Summary",
+                logistics_calc: "LOGISTICS & VEHICLE CAPACITY", hq_container: "40' HQ Container (68 m³)", std_truck: "Standard Truck (90 m³)",
+                grand_total: "Grand Total:", export_excel: "Export Excel Order with Photos", from: "from",
+                cart: "Cart",
+                chat_title: "Yataş B2B AI Assistant", chat_status: "Online • Product Advisor",
+                chat_welcome: "Hello! I am your Yataş B2B Product Advisor. How can I assist you with mattress firmness, dimensions, or fabric recommendations today?",
+                chat_opt1: "🛌 How to choose Firmness?", chat_opt2: "📐 Standard Sizes", chat_opt3: "🎨 Fabrics & Colors"
+            },
+            DE: {
+                notice_badge: "HINWEIS",
+                notice1: "Unsere Preise wurden im Juli 2026 aktualisiert.",
+                notice2: "Neue Kollektionen 2026 Yataş Bedding & Enza Home wurden hinzugefügt.",
+                tab_portal: "Bestellportal",
+                tab_catalog: "Kataloge & Präsentationen",
+                spotlight_ph: "Schnellsuche SKU, Kollektion...",
+                all_brands: "Alle Marken",
+                sort_default: "Sortierung: Empfohlen",
+                sort_name_asc: "Name (A-Z)",
+                sort_name_desc: "Name (Z-A)",
+                sort_price_asc: "Preis (Aufsteigend)",
+                sort_price_desc: "Preis (Absteigend)",
+                hardness_all: "Alle Härtegradstufen",
+                hardness_soft: "Weich / Soft",
+                hardness_medium: "Mittel / Medium",
+                hardness_firm: "Hart / Firm",
+                hardness_extrafirm: "Sehr Hart / Extra Firm",
+                select_kartela: "STOFFKOLLEKTION WÄHLEN",
+                select_color: "FARBE WÄHLEN",
+                select_size: "GRÖSSE WÄHLEN",
+                firmness_title: "HÄRTEGRAD",
+                gtip: "HS CODE", volume: "VOLUMEN", weight: "GEWICHT", height: "HÖHE", status: "STATUS",
+                feature: "EIGENSCHAFT", kartela_label: "KARTELA", color: "FARBE", hardness: "HÄRTE",
+                add_to_cart: "Ausgewähltes Element hinzufügen", cart_title: "Proforma-Bestellübersicht",
+                logistics_calc: "LOGISTIK- UND FAHRZEUGKAPAZITÄT", hq_container: "40' HQ Container (68 m³)", std_truck: "Standard LKW (90 m³)",
+                grand_total: "Gesamtsumme:", export_excel: "Excel-Bestellung mit Fotos exportieren", from: "ab",
+                cart: "Warenkorb",
+                chat_title: "Yataş B2B AI Assistent", chat_status: "Online • Produktberater",
+                chat_welcome: "Hallo! Ich bin Ihr Yataş B2B Produktberater. Wie kann ich Ihnen bei Matratzenhärte, Größen oder Stoffen helfen?",
+                chat_opt1: "🛌 Härtegrad-Ratgeber", chat_opt2: "📐 Standardgrößen", chat_opt3: "🎨 Stoffe & Farben"
+            },
+            RU: {
+                notice_badge: "УВЕДОМЛЕНИЕ",
+                notice1: "Наши цены были обновлены в июле 2026 года.",
+                notice2: "Новые коллекции 2026 Yataş Bedding и Enza Home добавлены на портал.",
+                tab_portal: "Портал заказов",
+                tab_catalog: "Каталоги и презентации",
+                spotlight_ph: "Быстрый поиск SKU, коллекции...",
+                all_brands: "Все бренды",
+                sort_default: "Сортировка: Рекомендуем",
+                sort_name_asc: "Название (А-Я)",
+                sort_name_desc: "Название (Я-А)",
+                sort_price_asc: "Цена (По возрастанию)",
+                sort_price_desc: "Цена (По убыванию)",
+                hardness_all: "Все уровни жесткости",
+                hardness_soft: "Мягкий / Soft",
+                hardness_medium: "Средний / Medium",
+                hardness_firm: "Жесткий / Firm",
+                hardness_extrafirm: "Очень жесткий / Extra Firm",
+                select_kartela: "ВЫБЕРИТЕ КОЛЛЕКЦИЮ ТКАНИ",
+                select_color: "ВЫБЕРИТЕ ЦВЕТ",
+                select_size: "ВЫБЕРИТЕ РАЗМЕР",
+                firmness_title: "ЖЕСТКОСТЬ",
+                gtip: "ТН ВЭД", volume: "ОБЪЕМ", weight: "ВЕС", height: "ВЫСОТА", status: "СТАТУС",
+                feature: "СВОЙСТВО", kartela_label: "КАРТЕЛЯ", color: "ЦВЕТ", hardness: "ЖЕСТКОСТЬ",
+                add_to_cart: "Добавить выбранный товар", cart_title: "Сводка Проформа-Заказа",
+                logistics_calc: "ЛОГИСТИКА И ЕМКОСТЬ ТРАНСПОРТА", hq_container: "40' HQ Контейнер (68 m³)", std_truck: "Стандартная Фура (90 m³)",
+                grand_total: "Итого:", export_excel: "Скачать Excel с фото", from: "от",
+                cart: "Корзина",
+                chat_title: "Yataş B2B AI Консультант", chat_status: "Онлайн • Консультант",
+                chat_welcome: "Здравствуйте! Я ваш B2B консультант Yataş. Как я могу помочь вам с выбором жесткости, размеров или тканей?",
+                chat_opt1: "🛌 Руководство по жесткости", chat_opt2: "📐 Стандартные размеры", chat_opt3: "🎨 Варианты тканей и цветов"
+            }
+        };
+
+        const termTranslations = {
+            "Yatak": { EN: "Mattress", DE: "Matratze", RU: "Матрас" },
+            "Baza": { EN: "Base / Boxspring", DE: "Bettkasten", RU: "Основание" },
+            "Başlık": { EN: "Headboard", DE: "Kopfteil", RU: "Изголовье" },
+            "Yastık": { EN: "Pillow", DE: "Kissen", RU: "Подушка" },
+            "Yorgan": { EN: "Duvet", DE: "Bettdecke", RU: "Одеяло" },
+            "Alez": { EN: "Mattress Protector", DE: "Matratzenschoner", RU: "Наматрасник" },
+            "Karyola": { EN: "Bed Frame", DE: "Bettgestell", RU: "Кровать" },
+            "Aksesuar": { EN: "Accessories", DE: "Zubehör", RU: "Аксессуары" },
+            "Çocuk Yatak": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" },
+            "Çocuk Mattress": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" },
+            "Pacific": { EN: "Pacific Blue", DE: "Pazifikblau", RU: "Тихий океан" },
+            "Krem": { EN: "Cream", DE: "Creme", RU: "Кремовый" },
+            "Vizon": { EN: "Mink / Taupe", DE: "Mink", RU: "Норковый" },
+            "Açık Gri": { EN: "Light Gray", DE: "Hellgrau", RU: "Светло-серый" },
+            "Antrasit": { EN: "Anthracite", DE: "Anthrazit", RU: "Антрацит" },
+            "Mavi": { EN: "Blue", DE: "Blau", RU: "Синий" },
+            "Çağla": { EN: "Almond Green", DE: "Mandelgrün", RU: "Миндально-зеленый" },
+            "Koyu Gri": { EN: "Dark Gray", DE: "Dunkelgrau", RU: "Темно-серый" },
+            "Gri": { EN: "Gray", DE: "Grau", RU: "Серый" },
+            "Kum": { EN: "Sand", DE: "Sand", RU: "Песочный" },
+            "Bej": { EN: "Beige", DE: "Beige", RU: "Бежевый" },
+            "Pudra": { EN: "Powder Pink", DE: "Puder", RU: "Пудровый" },
+            "Lacivert": { EN: "Navy Blue", DE: "Marineblau", RU: "Темно-синий" },
+            "Ekru": { EN: "Ecru", DE: "Ekrü", RU: "Экрю" },
+            "Kemik": { EN: "Bone", DE: "Elfenbein", RU: "Слоновая кость" },
+            "Kül": { EN: "Ash", DE: "Asche", RU: "Пепельный" },
+            "Sütlü Kahve": { EN: "Milk Coffee", DE: "Milchkaffee", RU: "Кофе с молоком" },
+            "Spring": { EN: "Spring", DE: "Federkern", RU: "Пружинный" },
+            "Springless": { EN: "Foam / Springless", DE: "Schaumstoff", RU: "Беспружинный" },
+            "Hibrit": { EN: "Hybrid", DE: "Hybrid", RU: "Гибридный" },
+            "Foam": { EN: "Foam", DE: "Schaumstoff", RU: "Поролоновый" },
+            "Storage Base": { EN: "Storage Base", DE: "Bettkasten Baza", RU: "Основание с ящиком" },
+            "Sert": { EN: "Firm / Hard", DE: "Hart", RU: "Жесткий" },
+            "Medium": { EN: "Medium", DE: "Mittel", RU: "Средний" },
+            "Ultra Sert": { EN: "Extra Firm", DE: "Sehr Hart", RU: "Супер жесткий" }
+        };
+
+        function autoTranslateText(text, targetLang) {
+            if (!text || targetLang === 'TR') return text;
+            let translated = String(text);
+            for (const [trTerm, langMap] of Object.entries(termTranslations)) {
+                if (langMap[targetLang]) {
+                    const regex = new RegExp(`\\b${trTerm}\\b`, 'gi');
+                    translated = translated.replace(regex, langMap[targetLang]);
+                }
+            }
+            return translated;
+        }
+
+        function formatCurrency(amount, currencySymbol = '$') {
+            const num = parseFloat(amount) || 0;
+            return `${currencySymbol}${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function formatNumber(amount) {
+            const num = parseFloat(amount) || 0;
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        let currentLang = 'EN';
+        let currentCurrency = 'USD';
+        let rawProducts = [];
+        let productFamilies = {};
+        let activeBrandFilter = 'ALL';
+        let activeCategoryFilter = null;
+        let activeFamilyFilter = null;
+        let cart = [];
+
+        let currentActiveFamily = null;
+        let currentActiveCategoryKey = null;
+
+        let activeSelectedKartela = null;
+        let activeSelectedColor = null;
+        let activeSelectedVariant = null;
+
+        let modalPhotosList = [];
+        let currentPhotoIndex = 0;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            let storedCart = JSON.parse(localStorage.getItem('b2b_cart'));
+            if (storedCart && storedCart.length > 0) {
+                cart = storedCart.map(item => ({
+                    family: item.name || 'B2B Proforma Item',
+                    category: 'Collection',
+                    brand: 'Yataş Group',
+                    photoUrl: item.image || 'https://via.placeholder.com/100',
+                    code: item.code,
+                    size: 'Standard',
+                    gtip: '9404.21',
+                    volume: item.m3 || 0.45,
+                    weight: item.weight || 12.5,
+                    height: 25,
+                    status: 'MTO',
+                    barcode: '-',
+                    feature: '-',
+                    hardness: '-',
+                    kartela: '-',
+                    color: '-',
+                    qty: Number(item.qty) || 1,
+                    unitPrice: Number(item.price) || 250,
+                    currency: 'USD'
+                }));
+                updateCartDisplay();
+            }
+
+            await loadExcelData();
+            initScrollFooterBehavior();
+            initKeyboardShortcuts();
+            initSwipeGestures();
+            initNoticeTicker();
+            initScrollTopButton();
+            changeLanguage(currentLang);
+
             if (localStorage.getItem('open_b2b_cart_panel') === 'true') {
                 localStorage.removeItem('open_b2b_cart_panel');
                 toggleCart(true);
