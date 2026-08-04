@@ -1,213 +1,167 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yataş Group - RetailHub360</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>RetailHub360 - Yataş Group</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        :root {
-            --bg-main: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f2744;
-            --border-color: #e2e8f0;
-            --text-muted: #64748b;
-        }
-        [data-theme="dark"] {
-            --bg-main: #020617;
-            --card-bg: #0f172a;
-            --text-main: #f8fafc;
-            --border-color: #1e293b;
-            --text-muted: #94a3b8;
-        }
-
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-main); }
-        .hub-card { transition: all 0.25s ease-in-out; background: var(--card-bg); border: 1px solid var(--border-color); }
-        .hub-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px -4px rgba(15, 39, 68, 0.15); }
-        
-        .brand-logo-container { height: 40px; min-width: 130px; display: flex; align-items: center; }
-        .brand-logo-container img { height: 32px; width: auto; object-fit: contain; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col justify-between">
-
-    <!-- TOP HEADER BAR -->
-    <header class="h-20 px-8 flex items-center justify-between border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
-        <!-- SOL ÜST KÖŞE LOGO (ORİJİNAL LOGO LİNKİ ENTEGRE EDİLDİ) -->
-        <div class="flex items-center gap-3">
-            <div class="brand-logo-container">
-                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
-            </div>
-        </div>
-
-        <!-- SAĞ ÜST KONTROLLER (DİL / TEMA / SIGN OUT) -->
-        <div class="flex items-center gap-4">
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition" title="Toggle Theme">
-                <i class="fa-solid fa-moon" id="themeIcon"></i>
-            </button>
-
-            <!-- FULL İŞLEVSEL ÇOKLU DİL MOTORU (DEFAULTS TO EN) -->
-            <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-100 border border-slate-200 text-xs font-bold px-3 py-2 rounded-xl text-slate-700 outline-none cursor-pointer">
-                <option value="EN" selected>EN</option>
-                <option value="TR">TR</option>
-                <option value="DE">DE</option>
-                <option value="RU">RU</option>
-            </select>
-
-            <a href="index.html" class="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 font-bold text-xs rounded-xl hover:bg-rose-100 transition border border-rose-100">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span data-i18n="sign_out">Sign Out</span>
-            </a>
-        </div>
-    </header>
-
-    <!-- MAIN HUB CONTENT (4'LÜ TEMİZ GRID YERLEŞİMİ) -->
-    <main class="max-w-[1600px] mx-auto px-8 py-10 flex-1 w-full space-y-8 flex flex-col justify-center">
-        <div>
-            <h1 class="text-3xl font-black text-[#0f2744]">RetailHub360</h1>
-            <p class="text-xs text-slate-500 font-bold mt-1" data-i18n="subtitle">Yataş Group International Sales, Order & Master Data Portal</p>
-        </div>
-
-        <!-- 4'LÜ YAN YANA GRID -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- CARD 1: SellTrackIQ -->
-            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-sky-500 shadow-sm">
-                <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <h3 class="text-base font-extrabold text-[#0f2744]">SellTrackIQ Portal</h3>
-                    <p class="text-xs text-slate-500 font-medium leading-relaxed" data-i18n="desc_selltrack">Real-time sell-out analytics, regional stock deduction, and live POS tracking.</p>
-                </div>
-                <a href="SellTrackIQ.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-sky-600 transition">
-                    <span data-i18n="launch">Launch Portal</span> <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <!-- CARD 2: B2B Order Portal -->
-            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-emerald-500 shadow-sm">
-                <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-cart-flatbed"></i>
-                    </div>
-                    <h3 class="text-base font-extrabold text-[#0f2744]">B2B Order Portal</h3>
-                    <p class="text-xs text-slate-500 font-medium leading-relaxed" data-i18n="desc_b2b">Interactive B2B order building, Excel exports with photos, and container volume calculations.</p>
-                </div>
-                <a href="Yatas-B2B-Portal/Yatas-B2B-Portal.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-emerald-600 transition">
-                    <span data-i18n="launch">Launch Portal</span> <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <!-- CARD 3: Catalogues & Decks -->
-            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-purple-500 shadow-sm">
-                <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-book"></i>
-                    </div>
-                    <h3 class="text-base font-extrabold text-[#0f2744]">Brands' Catalogues & Decks</h3>
-                    <p class="text-xs text-slate-500 font-medium leading-relaxed" data-i18n="desc_catalog">Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.</p>
-                </div>
-                <a href="Yatas-Corporate-Deck/Yatas-Corporate-Deck.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-purple-600 transition">
-                    <span data-i18n="launch">Launch Portal</span> <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <!-- CARD 4: DEALER MASTER DATA & ANALYTICS -->
-            <div class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-amber-500 shadow-sm">
-                <div class="space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <h3 class="text-base font-extrabold text-[#0f2744]">Dealer Master Data & KPIs</h3>
-                    <p class="text-xs text-slate-500 font-medium leading-relaxed" data-i18n="desc_dealer_kpi">Dealer daily sell-out revenue, stock valuation, brand distribution pie charts & monthly trends.</p>
-                </div>
-                <a href="DealerAnalytics.html" target="_self" class="inline-flex items-center gap-2 text-xs font-extrabold text-[#0f2744] hover:text-amber-600 transition">
-                    <span data-i18n="launch">Launch Portal</span> <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="pt-4">
-            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold text-rose-600 hover:text-rose-800 transition">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span data-i18n="sign_out">Sign Out</span>
-            </a>
-        </div>
-    </main>
-
-    <!-- RESMİ İLETİLEN ALT BANNER -->
-    <footer class="h-12 border-t border-slate-200 bg-white px-8 flex items-center justify-between text-[11px] font-bold text-[#00205b] shrink-0">
-        <div>Copyright © 2026 Yataş International. All rights reserved.</div>
-        <div class="font-extrabold">Proudly presented by International Sales Development Team</div>
-    </footer>
-
-    <!-- TÜM DİLLERİ KAPSAYAN TAM SÖZLÜK SCRIPT ENGINE -->
     <script>
-        const translations = {
-            EN: {
-                subtitle: "Yataş Group International Sales, Order & Master Data Portal",
-                launch: "Launch Portal",
-                sign_out: "Sign Out",
-                desc_selltrack: "Real-time sell-out analytics, regional stock deduction, and live POS tracking.",
-                desc_b2b: "Interactive B2B order building, Excel exports with photos, and container volume calculations.",
-                desc_catalog: "Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.",
-                desc_dealer_kpi: "Dealer daily sell-out revenue, stock valuation, brand distribution pie charts & monthly trends."
-            },
-            TR: {
-                subtitle: "Yataş Grup Uluslararası Satış, Sipariş ve Master Data Portalı",
-                launch: "Portalı Aç",
-                sign_out: "Çıkış Yap",
-                desc_selltrack: "Canlı satış analitiği, bölgesel stok düşümü ve canlı POS kasa takibi.",
-                desc_b2b: "Etkileşimli B2B sipariş oluşturma, fotoğraflı Excel çıktısı ve konteyner hacim hesabı.",
-                desc_catalog: "Etkileşimli 2026 Yataş Bedding, Enza Home PDF katalogları ve kurumsal sunumlar.",
-                desc_dealer_kpi: "Bayi günlük kasa cirosu, envanter maliyeti, marka dağılım pastası ve aylık satış trendi."
-            },
-            DE: {
-                subtitle: "Yataş Group Internationales Verkaufs-, Bestell- und Stammdatenportal",
-                launch: "Portal Starten",
-                sign_out: "Abmelden",
-                desc_selltrack: "Echtzeit-Verkaufsanalysen, regionaler Lagerabbau und Live-Kassenverfolgung.",
-                desc_b2b: "Interaktive B2B-Bestellerstellung, Excel-Export mit Fotos und Containerberechnung.",
-                desc_catalog: "Interaktive PDF-Kataloge und Unternehmenspräsentationen für 2026.",
-                desc_dealer_kpi: "Tagesumsatz des Händlers, Lagerbewertung, Markenverteilung und Monatstrends."
-            },
-            RU: {
-                subtitle: "Международный портал продаж, заказов и мастер-данных Yataş Group",
-                launch: "Открыть Портал",
-                sign_out: "Выйти",
-                desc_selltrack: "Аналитика продаж в реальном времени, списание запасов и POS-касса.",
-                desc_b2b: "Интерактивное создание B2B заказов, экспорт в Excel с фото и расчет контейнеров.",
-                desc_catalog: "Интерактивные PDF-каталоги 2026 Yataş Bedding, Enza Home и презентации.",
-                desc_dealer_kpi: "Ежедневная выручка дилера, оценка запасов, диаграмма брендов и тренды."
-            }
-        };
-
-        function changeLanguage(lang) {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) {
-                    el.innerText = translations[lang][key];
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#0284c7',
+                            green: '#10b981',
+                            purple: '#8b5cf6',
+                            amber: '#f59e0b'
+                        }
+                    }
                 }
-            });
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('themeIcon');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.setAttribute('data-theme', 'light');
-                icon.className = 'fa-solid fa-moon';
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                icon.className = 'fa-solid fa-sun';
             }
         }
     </script>
+    <style>
+        /* Koyu modda okunabilirliği garanti altına alan ek CSS düzenlemeleri */
+        .dark body {
+            background-color: #0B0F19;
+            color: #F3F4F6;
+        }
+        .dark .portal-card {
+            background-color: #111827;
+        }
+        .dark .portal-title {
+            color: #FFFFFF !important;
+        }
+        .dark .portal-desc {
+            color: #9CA3AF !important;
+        }
+        /* Kart Hovr Efektleri */
+        .portal-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .portal-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans antialiased">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="bg-white p-2 rounded-lg flex items-center justify-center">
+                <span class="text-slate-900 font-extrabold text-lg tracking-wider">[yataş]</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+                ⚙️
+            </button>
+            <select class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none">
+                <option>EN</option>
+                <option>TR</option>
+            </select>
+            <button class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm px-4 py-1.5 rounded-lg transition font-medium flex items-center space-x-2">
+                <span>🚪 Sign Out</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="max-w-7xl mx-auto w-full px-8 py-12 flex-1 flex flex-col justify-center">
+        
+        <!-- Dashboard Title -->
+        <div class="mb-10">
+            <h1 class="portal-title text-4xl font-extrabold text-white tracking-tight mb-2">RetailHub360</h1>
+            <p class="portal-desc text-slate-400 text-base">Yataş Group International Sales, Order & Master Data Portal</p>
+        </div>
+
+        <!-- 4 Grid Portal Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Card 1: SellTrackIQ -->
+            <div onclick="window.location.href='selltrackiq.html'" 
+                 class="portal-card cursor-pointer group bg-slate-900/90 border-2 border-sky-500/40 hover:border-sky-400 rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-sky-500/10">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition-transform">
+                        📊
+                    </div>
+                    <h3 class="portal-title text-xl font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">SellTrackIQ Portal</h3>
+                    <p class="portal-desc text-sm text-slate-400 leading-relaxed">
+                        Real-time sell-out analytics, regional stock deduction, and live POS tracking.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-sm font-semibold text-sky-400 group-hover:translate-x-1 transition-transform">
+                    <span>Open Dashboard</span>
+                    <span class="ml-2">→</span>
+                </div>
+            </div>
+
+            <!-- Card 2: B2B Order Portal -->
+            <div onclick="window.location.href='b2b.html'" 
+                 class="portal-card cursor-pointer group bg-slate-900/90 border-2 border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-emerald-500/10">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition-transform">
+                        🛒
+                    </div>
+                    <h3 class="portal-title text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">B2B Order Portal</h3>
+                    <p class="portal-desc text-sm text-slate-400 leading-relaxed">
+                        Interactive B2B order building, Excel exports with photos, and container volume calculations.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-sm font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform">
+                    <span>Open Dashboard</span>
+                    <span class="ml-2">→</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Brands' Catalogues & Decks -->
+            <div onclick="window.location.href='catalogues.html'" 
+                 class="portal-card cursor-pointer group bg-slate-900/90 border-2 border-purple-500/40 hover:border-purple-400 rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-purple-500/10">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition-transform">
+                        📖
+                    </div>
+                    <h3 class="portal-title text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Brands' Catalogues & Decks</h3>
+                    <p class="portal-desc text-sm text-slate-400 leading-relaxed">
+                        Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-sm font-semibold text-purple-400 group-hover:translate-x-1 transition-transform">
+                    <span>Open Dashboard</span>
+                    <span class="ml-2">→</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Dealer Master Data & KPIs -->
+            <div onclick="window.location.href='masterdata.html'" 
+                 class="portal-card cursor-pointer group bg-slate-900/90 border-2 border-amber-500/40 hover:border-amber-400 rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-amber-500/10">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition-transform">
+                        📈
+                    </div>
+                    <h3 class="portal-title text-xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">Dealer Master Data & KPIs</h3>
+                    <p class="portal-desc text-sm text-slate-400 leading-relaxed">
+                        Dealer daily sell-out revenue, stock valuation, brand distribution pie charts & monthly trends.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-sm font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
+                    <span>Open Dashboard</span>
+                    <span class="ml-2">→</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-4 px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500">
+        <div>Copyright © 2026 Yataş International. All rights reserved.</div>
+        <div class="font-medium text-slate-400 mt-2 sm:mt-0">Proudly presented by International Sales Development Team</div>
+    </footer>
+
 </body>
 </html>
