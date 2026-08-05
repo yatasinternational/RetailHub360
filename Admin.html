@@ -627,9 +627,6 @@
 
                 populateFilterOptions();
                 applyFilters();
-                renderSelloutTable();
-                renderOrdersTable();
-                renderMarginTable();
 
             } catch (ex) {
                 console.error("Fetch Exception:", ex);
@@ -648,6 +645,7 @@
             brandSelect.innerHTML = '<option value="ALL">Tüm Markalar</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
         }
 
+        /* TÜM SEKMELERİ CANLI FİLTRELERE UYUMLU SÜZEN ORTAK MİMARİ */
         function applyFilters() {
             const selectedYear = document.getElementById('filterYear').value;
             const selectedMonth = document.getElementById('filterMonth').value;
@@ -662,12 +660,17 @@
                 return matchYear && matchMonth && matchRegion && matchBrand;
             });
 
+            // Seçili filtrelere uyan aktif bayi kodlarını ve müşteri adlarını süz
+            const filteredDealerCodes = new Set(filteredReportData.map(i => String(i.musteri_kodu)));
+
             updateKPIs(filteredReportData);
             renderTable(filteredReportData);
             updateCharts(filteredReportData);
-            renderSelloutTable();
-            renderOrdersTable();
-            renderMarginTable();
+            
+            // Diğer 3 sekmeyi de canlı filtrelere uyan bayilere göre süzüp yenile
+            renderSelloutTable(filteredDealerCodes);
+            renderOrdersTable(filteredDealerCodes);
+            renderMarginTable(filteredDealerCodes);
         }
 
         function updateKPIs(data) {
@@ -794,8 +797,8 @@
             });
         }
 
-        /* 1. SUPABASE CANLI BAYİ SELL-OUT HESAPLAMA SİSTEMİ */
-        function renderSelloutTable() {
+        /* 1. CANLI FİLTRELERE UYUMLU SUPABASE LIVE SELL-OUT HESAPLAMA */
+        function renderSelloutTable(filteredDealerCodes) {
             const tbody = document.getElementById('selloutDealerTableBody');
             if (!tbody) return;
 
@@ -806,15 +809,17 @@
 
             const dealerSummary = {};
 
-            // Supabase'den çekilen canlı dealers listesini eşleştir
+            // Canlı bayi listesini filtreye göre eşleştir
             dealersList.forEach(d => {
-                dealerSummary[d.id] = { code: d.code, name: d.name, salesQty: 0, revUSD: 0, stockQty: 0 };
+                if (!filteredDealerCodes || filteredDealerCodes.size === 0 || filteredDealerCodes.has(String(d.code))) {
+                    dealerSummary[d.id] = { code: d.code, name: d.name, salesQty: 0, revUSD: 0, stockQty: 0 };
+                }
             });
 
-            // Canlı Stok Hareketlerini (Stock Movements - SALE) Bayilere Topla
+            // Canlı Stok Hareketlerini Bayilere Topla
             liveStockMovements.forEach(m => {
                 const qty = Number(m.quantity) || 0;
-                const unitPrice = 250; // Ort. satış fiyatı
+                const unitPrice = 250;
                 totalTodayQty += qty;
                 totalTodayRev += (qty * unitPrice);
 
@@ -824,7 +829,7 @@
                 }
             });
 
-            // Canlı Stokları (Stocks) Bayilere Topla
+            // Canlı Stokları Bayilere Topla
             liveStocksList.forEach(s => {
                 if (dealerSummary[s.dealer_id]) {
                     dealerSummary[s.dealer_id].stockQty += (Number(s.quantity) || 0);
@@ -834,7 +839,7 @@
             const rows = Object.values(dealerSummary);
 
             if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Canlı bayi hareketi bulunamadı.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Seçili filtreye ait canlı bayi hareketi bulunamadı.</td></tr>`;
                 return;
             }
 
@@ -854,16 +859,20 @@
             document.getElementById('soCriticalAlerts').innerText = criticalAlertsCount + ' Ürün';
         }
 
-        /* 2. SADELEŞTİRİLMİŞ B2B PROFORMA SIPARIŞ KONSOLU */
-        function renderOrdersTable() {
+        /* 2. CANLI FİLTRELERE UYUMLU SADELEŞTİRİLMİŞ B2B PROFORMA SIPARIŞ KONSOLU */
+        function renderOrdersTable(filteredDealerCodes) {
             const tbody = document.getElementById('b2bOrdersTableBody');
             if (!tbody) return;
 
-            const pendingShipments = liveShipmentsList.filter(s => String(s.status).toUpperCase() === 'PENDING');
+            let pendingShipments = liveShipmentsList.filter(s => String(s.status).toUpperCase() === 'PENDING');
+
+            if (filteredDealerCodes && filteredDealerCodes.size > 0) {
+                pendingShipments = pendingShipments.filter(s => filteredDealerCodes.has(String(s.dealer_code)));
+            }
 
             if (pendingShipments.length === 0) {
                 tbody.innerHTML = `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold">
                         <td class="p-3.5 font-mono text-slate-500">05.08.2026</td>
                         <td class="p-3.5 font-bold text-yatas-navy">4000001368</td>
                         <td class="p-3.5 font-bold text-slate-800">Enza Home Basel</td>
@@ -875,7 +884,6 @@
                 return;
             }
 
-            // Bayi Bazlı Gruplama
             const groupedOrders = {};
             pendingShipments.forEach(s => {
                 const dealerCode = s.dealer_code || '4000001368';
@@ -903,15 +911,22 @@
             `).join('');
         }
 
-        /* 3. KONSOLİDE BAYİ MARJ VE MARK-UP MATRIXI */
-        function renderMarginTable() {
+        /* 3. CANLI FİLTRELERE UYUMLU KONSOLİDE BAYİ MARJ VE MARK-UP MATRIXI */
+        function renderMarginTable(filteredDealerCodes) {
             const tbody = document.getElementById('adminMarginTableBody');
             if (!tbody) return;
 
-            let rows = dealersList.length > 0 ? dealersList : [
-                { code: '4000001368', name: 'Enza Home Basel' },
-                { code: '4000001420', name: 'Enza Home Dubai' }
-            ];
+            let rows = dealersList;
+            if (filteredDealerCodes && filteredDealerCodes.size > 0) {
+                rows = dealersList.filter(d => filteredDealerCodes.has(String(d.code)));
+            }
+
+            if (rows.length === 0) {
+                rows = [
+                    { code: '4000001368', name: 'Enza Home Basel' },
+                    { code: '4000001420', name: 'Enza Home Dubai' }
+                ];
+            }
 
             tbody.innerHTML = rows.map(d => `
                 <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold">
@@ -953,7 +968,6 @@
             if (activeBtn) activeBtn.classList.add('active');
             if (activeContent) activeContent.classList.remove('hidden');
 
-            // Finans/Turquality/Aging alt butonlarını SADECE Executive Live Dashboard sekmesinde göster
             const subTabsContainer = document.getElementById('executiveSubTabsContainer');
             if (subTabsContainer) {
                 if (tabKey === 'live') {
