@@ -45,7 +45,6 @@
             box-shadow: 0 4px 12px rgba(15, 39, 68, 0.15);
         }
 
-        /* 5 SANİYELİK KAPTAN KÖŞKÜ WELCOMING SLAYT ANİMASYONU */
         #captainWelcomeOverlay {
             transition: opacity 1s ease-in-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -70,7 +69,7 @@
 </head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
 
-    <!-- 1. ADMIN SECURE LOGIN GATE -->
+    <!-- 1. MANUEL GİRİŞ ŞİFRE EKRANI (LİNK İLE DİREKT GELENLER İÇİN) -->
     <div id="adminAuthGate" class="fixed inset-0 bg-slate-100/90 backdrop-blur-xl z-[99999] flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="w-16 h-16 bg-[#0f2744] text-[#c59b27] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-lg">
@@ -92,12 +91,12 @@
         </div>
     </div>
 
-    <!-- 2. SİNEMATİK "KAPTAN KÖŞKÜNE HOŞ GELDİNİZ" SLAYT ANİMASYON OVERLAY -->
+    <!-- 2. SİNEMATİK WELCOMING SLAYT ANİMASYON OVERLAY -->
     <div id="captainWelcomeOverlay" class="fixed inset-0 bg-[#0f2744] z-[9999] flex flex-col items-center justify-center p-6 text-white text-center hidden">
         <div class="max-w-lg w-full space-y-8">
             <div class="relative inline-block">
                 <div class="w-24 h-24 bg-[#c59b27]/20 border-2 border-[#c59b27] rounded-3xl mx-auto flex items-center justify-center text-4xl text-[#c59b27] shadow-2xl animate-bounce">
-                    <i class="fa-solid fa-[#0f2744] fa-ship text-[#c59b27]"></i>
+                    <i class="fa-solid fa-ship text-[#c59b27]"></i>
                 </div>
                 <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border-2 border-[#0f2744]">LIVE</span>
             </div>
@@ -109,7 +108,6 @@
                 </p>
             </div>
 
-            <!-- 5 SANİYELİK İLERLEME ÇUBUĞU -->
             <div class="space-y-2">
                 <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
                     <div class="bg-[#c59b27] h-full progress-bar-fill"></div>
@@ -128,7 +126,6 @@
 
     <!-- 3. PROTECTED ADMIN CONTENT -->
     <div id="adminProtectedContent" class="hidden min-h-screen flex flex-col">
-        <!-- HEADER / NAVIGATION -->
         <header class="bg-yatas-navy text-white sticky top-0 z-50 shadow-md border-b border-slate-700">
             <div class="max-w-[1700px] mx-auto px-6 h-20 flex items-center justify-between">
                 <div class="flex items-center gap-6">
@@ -156,7 +153,6 @@
                         <i class="fa-solid fa-rotate"></i>
                         <span>Yenile (F5)</span>
                     </button>
-                    <!-- KAPTAN KÖŞKÜ ÜST SEKMELER -->
                     <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
                         <button onclick="switchAdminTab('live-dashboard')" id="btn-tab-live" class="admin-tab-btn active px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5">
                             <i class="fa-solid fa-chart-line text-yatas-gold"></i>
@@ -179,10 +175,7 @@
             </div>
         </header>
 
-        <!-- DASHBOARD CONTAINER -->
         <main class="max-w-[1700px] mx-auto px-6 mt-6 space-y-6 pb-12 flex-1 w-full">
-
-            <!-- CANLI FİLTRE BARI -->
             <section class="glass-card rounded-2xl p-5 border border-slate-200">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-4 flex-1">
@@ -234,7 +227,6 @@
                         </div>
                     </div>
 
-                    <!-- Sub Tab Switcher -->
                     <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                         <button onclick="switchSubTab('finans')" id="tab-finans" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-yatas-navy text-white shadow">
                             Finans & LFL Ciro
@@ -252,9 +244,7 @@
                 </div>
             </section>
 
-            <!-- SEKME 1: EXECUTIVE LIVE DASHBOARD -->
             <div id="tab-content-live" class="space-y-6">
-                <!-- KPI CARDS GRID -->
                 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="glass-card rounded-2xl p-5 border-l-4 border-yatas-navy">
                         <div class="flex items-center justify-between text-slate-400 mb-2">
@@ -317,7 +307,6 @@
                     </div>
                 </section>
 
-                <!-- CHARTS SECTION GRID -->
                 <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-card rounded-2xl p-6 lg:col-span-2 border border-slate-200">
                         <div class="flex items-center justify-between mb-4">
@@ -346,7 +335,6 @@
                     </div>
                 </section>
 
-                <!-- PERFORMANCE TABLE MATRIX -->
                 <section class="glass-card rounded-2xl p-6 border border-slate-200">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
@@ -381,7 +369,6 @@
                 </section>
             </div>
 
-            <!-- SEKME 2: BAYİ SELL-OUT & Z-RAPORU CANLI AYNA MODU -->
             <div id="tab-content-sellout" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -431,7 +418,6 @@
                 </section>
             </div>
 
-            <!-- SEKME 3: B2B PROFORMA & SAP ORDERS -->
             <div id="tab-content-proforma" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -467,7 +453,6 @@
                 </section>
             </div>
 
-            <!-- SEKME 4: MARJ & MARGIN MATRIX -->
             <div id="tab-content-margin" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -517,20 +502,30 @@
         let chartMarkaInstance = null;
         let welcomeTimer = null;
 
+        window.addEventListener('DOMContentLoaded', () => {
+            const isAdminAuth = localStorage.getItem('retailhub_admin_authenticated');
+            const userRole = localStorage.getItem('retailhub_user_role');
+
+            // Eğer index.html üzerinden Admin olarak başarıyla giriş yapıldıysa şifre sormadan doğrudan slayta geç
+            if (isAdminAuth === 'true' || userRole === 'admin') {
+                document.getElementById('adminAuthGate').classList.add('hidden');
+                triggerCaptainWelcomeAnimation();
+            }
+        });
+
         function verifyAdminAuth(e) {
             e.preventDefault();
             const inputPass = document.getElementById('adminGatePassword').value;
             if (inputPass === ADMIN_MASTER_PASS) {
+                localStorage.setItem('retailhub_admin_authenticated', 'true');
+                localStorage.setItem('retailhub_user_role', 'admin');
                 document.getElementById('adminAuthGate').classList.add('hidden');
-                
-                // KAPTAN KÖŞKÜ WELCOMING SLAYT ANİMASYONUNU BAŞLAT
                 triggerCaptainWelcomeAnimation();
             } else {
                 alert("Hatalı Master Şifre!");
             }
         }
 
-        /* 5 SANİYELİK KAPTAN KÖŞKÜ ANİMASYON DÖNGÜSÜ */
         function triggerCaptainWelcomeAnimation() {
             const overlay = document.getElementById('captainWelcomeOverlay');
             overlay.classList.remove('hidden');
@@ -546,7 +541,6 @@
                 }
             }, 1000);
 
-            // Arka planda Supabase verilerini yükle ki slayt bittiğinde rapor anında hazır olsun
             loadLiveSupabaseData();
         }
 

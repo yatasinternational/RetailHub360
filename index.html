@@ -61,7 +61,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <!-- LOGIN MODAL (ÇIKIŞ YAPILINCA VEYA İLK GİRİŞTE AÇILIR) -->
+    <!-- LOGIN MODAL -->
     <div id="indexLoginModal" class="fixed inset-0 bg-[#00153e]/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-slate-900">
             <div class="text-center mb-6">
@@ -89,20 +89,17 @@
 
     <!-- TOP HEADER BAR -->
     <header class="h-20 px-8 flex items-center justify-between border-b border-slate-200/85 bg-white/85 backdrop-blur-md">
-        <!-- SOL ÜST KÖŞE LOGO -->
         <div class="flex items-center gap-3">
             <a href="index.html" class="flex items-center justify-center h-10 min-w-[120px] shrink-0 overflow-hidden">
                 <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" class="brand-logo-img h-8 w-auto max-w-[140px] object-contain block" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
             </a>
         </div>
 
-        <!-- SAĞ ÜST KONTROLLER -->
         <div class="flex items-center gap-4">
             <button onclick="toggleTheme()" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition" title="Toggle Theme">
                 <i class="fa-solid fa-moon" id="themeIcon"></i>
             </button>
 
-            <!-- MULTI-LANG ENGINE -->
             <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-100 border border-slate-200 text-xs font-bold px-3 py-2 rounded-xl text-slate-700 outline-none cursor-pointer">
                 <option value="EN" selected>EN</option>
                 <option value="TR">TR</option>
@@ -110,7 +107,6 @@
                 <option value="RU">RU</option>
             </select>
 
-            <!-- DİREKT ÇIKIŞ YAPAN BUTON -->
             <button onclick="executeGlobalSignOut()" class="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 font-bold text-xs rounded-xl hover:bg-rose-100 transition border border-rose-100 cursor-pointer">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span data-i18n="sign_out">Sign Out</span>
@@ -125,10 +121,7 @@
             <p class="main-subtitle-text text-xs text-slate-500 font-bold mt-1" data-i18n="subtitle">Yataş Group International Sales, Order & Master Data Portal</p>
         </div>
 
-        <!-- 4'LÜ DÜZGÜN GRID -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <!-- CARD 1: SellTrackIQ -->
             <div onclick="window.location.href='SellTrackIQ.html'" class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-sky-500 shadow-sm">
                 <div class="space-y-4">
                     <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl font-bold">
@@ -139,7 +132,6 @@
                 </div>
             </div>
 
-            <!-- CARD 2: B2B Order Portal -->
             <div onclick="window.location.href='Yatas-B2B-Portal/Yatas-B2B-Portal.html'" class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-emerald-500 shadow-sm">
                 <div class="space-y-4">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
@@ -150,7 +142,6 @@
                 </div>
             </div>
 
-            <!-- CARD 3: Catalogues & Decks -->
             <div onclick="window.location.href='Yatas-Corporate-Deck/Yatas-Corporate-Deck.html'" class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-purple-500 shadow-sm">
                 <div class="space-y-4">
                     <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold">
@@ -161,7 +152,6 @@
                 </div>
             </div>
 
-            <!-- CARD 4: DEALER MASTER DATA & ANALYTICS -->
             <div onclick="window.location.href='DealerAnalytics.html'" class="hub-card p-6 rounded-2xl flex flex-col justify-between space-y-6 border-t-4 border-amber-500 shadow-sm">
                 <div class="space-y-4">
                     <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
@@ -174,18 +164,12 @@
         </div>
     </main>
 
-    <!-- RESMİ İLETİLEN ALT BANNER -->
     <footer class="h-12 border-t border-slate-200 bg-white px-8 flex items-center justify-between text-[11px] font-bold text-[#00205b] shrink-0">
         <div>Copyright © 2026 Yataş International. All rights reserved.</div>
         <div class="font-extrabold">Proudly presented by International Sales Development Team</div>
     </footer>
 
-    <!-- SCRIPT ENGINE -->
     <script>
-        const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_driObdIP3fOd-eIwFGIiww_W58pe88f';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         window.addEventListener('DOMContentLoaded', () => {
             const isLoggedOut = localStorage.getItem('retailhub_logged_out');
             const currentUserRole = localStorage.getItem('retailhub_user_role');
@@ -193,7 +177,6 @@
             if (isLoggedOut === 'true') {
                 document.getElementById('indexLoginModal').classList.remove('hidden');
             } else if (currentUserRole === 'admin') {
-                // Eğer daha önceden Admin girişi yapıldıysa doğrudan Admin.html'e yönlendir
                 window.location.href = 'Admin.html';
             }
         });
@@ -205,13 +188,12 @@
 
             localStorage.removeItem('retailhub_logged_out');
 
-            // ADMIN KONTROLÜ
             if ((code === 'admin' || code === 'kaptan') && pass === 'Yatas2026*') {
                 localStorage.setItem('retailhub_user_role', 'admin');
+                localStorage.setItem('retailhub_admin_authenticated', 'true'); // Otomatik doğrulama jetonu
                 localStorage.setItem('retailhub_dealer_code', 'ADMIN');
-                window.location.href = 'Admin.html'; // Doğrudan Kaptan Köşküne Geçiş
+                window.location.href = 'Admin.html';
             } else {
-                // NORMAL BAYİ GİRİŞİ
                 localStorage.setItem('retailhub_user_role', 'dealer');
                 localStorage.setItem('retailhub_dealer_code', code.toUpperCase());
                 document.getElementById('indexLoginModal').classList.add('hidden');
@@ -220,50 +202,31 @@
         }
 
         const translations = {
-            EN: {
-                subtitle: "Yataş Group International Sales, Order & Master Data Portal",
-                sign_out: "Sign Out",
-                desc_selltrack: "Real-time sell-out analytics, regional stock deduction, and live POS tracking.",
-                desc_b2b: "Interactive B2B order building, Excel exports with photos, and container volume calculations.",
-                desc_catalog: "Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.",
-                desc_dealer_kpi: "Dealer daily sell-out revenue, stock valuation, brand distribution pie charts & monthly trends."
-            },
-            TR: {
-                subtitle: "Yataş Grup Uluslararası Satış, Sipariş ve Master Data Portalı",
-                sign_out: "Çıkış Yap",
-                desc_selltrack: "Canlı satış analitiği, bölgesel stok düşümü ve canlı POS kasa takibi.",
-                desc_b2b: "Etkileşimli B2B sipariş oluşturma, fotoğraflı Excel çıktısı ve konteyner hacim hesabı.",
-                desc_catalog: "Etkileşimli 2026 Yataş Bedding, Enza Home PDF katalogları ve kurumsal sunumlar.",
-                desc_dealer_kpi: "Bayi günlük kasa cirosu, envanter maliyeti, marka dağılım pastası ve aylık satış trendi."
-            }
+            EN: { subtitle: "Yataş Group International Sales, Order & Master Data Portal", sign_out: "Sign Out", desc_selltrack: "Real-time sell-out analytics, regional stock deduction, and live POS tracking.", desc_b2b: "Interactive B2B order building, Excel exports with photos, and container volume calculations.", desc_catalog: "Interactive 2026 Yataş Bedding, Enza Home PDF catalogues, and corporate deck presentations.", desc_dealer_kpi: "Dealer daily sell-out revenue, stock valuation, brand distribution pie charts & monthly trends." },
+            TR: { subtitle: "Yataş Grup Uluslararası Satış, Sipariş ve Master Data Portalı", sign_out: "Çıkış Yap", desc_selltrack: "Canlı satış analitiği, bölgesel stok düşümü ve canlı POS kasa takibi.", desc_b2b: "Etkileşimli B2B sipariş oluşturma, fotoğraflı Excel çıktısı ve konteyner hacim hesabı.", desc_catalog: "Etkileşimli 2026 Yataş Bedding, Enza Home PDF katalogları ve kurumsal sunumlar.", desc_dealer_kpi: "Bayi günlük kasa cirosu, envanter maliyeti, marka dağılım pastası ve aylık satış trendi." }
         };
 
         function changeLanguage(lang) {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) {
-                    el.innerText = translations[lang][key];
-                }
+                if (translations[lang] && translations[lang][key]) el.innerText = translations[lang][key];
             });
         }
 
         function toggleTheme() {
             const html = document.documentElement;
             const icon = document.getElementById('themeIcon');
-            const currentTheme = html.getAttribute('data-theme');
-            
-            if (currentTheme === 'dark') {
-                html.setAttribute('data-theme', 'light');
-                icon.className = 'fa-solid fa-moon';
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light'); icon.className = 'fa-solid fa-moon';
             } else {
-                html.setAttribute('data-theme', 'dark');
-                icon.className = 'fa-solid fa-sun';
+                html.setAttribute('data-theme', 'dark'); icon.className = 'fa-solid fa-sun';
             }
         }
 
         function executeGlobalSignOut() {
             localStorage.setItem('retailhub_logged_out', 'true');
             localStorage.removeItem('retailhub_user_role');
+            localStorage.removeItem('retailhub_admin_authenticated');
             localStorage.removeItem('retailhub_dealer_code');
             localStorage.removeItem('b2b_cart');
             window.location.href = 'index.html';
