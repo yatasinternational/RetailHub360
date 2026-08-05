@@ -67,13 +67,13 @@
             <div class="text-center mb-6">
                 <div class="w-12 h-12 bg-[#00205b] text-white rounded-xl mx-auto flex items-center justify-center font-black text-xl mb-3">Y</div>
                 <h2 class="text-xl font-extrabold text-[#00205b] tracking-tight">RetailHub360 Portal</h2>
-                <p class="text-xs text-slate-500 font-semibold mt-1">Please sign in with your dealer credentials</p>
+                <p class="text-xs text-slate-500 font-semibold mt-1">Please sign in with your credentials</p>
             </div>
 
             <form onsubmit="handleIndexLogin(event)" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dealer Code</label>
-                    <input type="text" id="indexLoginCode" required value="4000001368" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dealer Code / Admin</label>
+                    <input type="text" id="indexLoginCode" required value="4000001368" placeholder="Dealer Code or 'admin'" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00205b]">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Password</label>
@@ -188,18 +188,35 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const isLoggedOut = localStorage.getItem('retailhub_logged_out');
+            const currentUserRole = localStorage.getItem('retailhub_user_role');
+
             if (isLoggedOut === 'true') {
                 document.getElementById('indexLoginModal').classList.remove('hidden');
+            } else if (currentUserRole === 'admin') {
+                // Eğer daha önceden Admin girişi yapıldıysa doğrudan Admin.html'e yönlendir
+                window.location.href = 'Admin.html';
             }
         });
 
         async function handleIndexLogin(e) {
             e.preventDefault();
-            const code = document.getElementById('indexLoginCode').value.trim();
-            localStorage.setItem('retailhub_dealer_code', code);
+            const code = document.getElementById('indexLoginCode').value.trim().toLowerCase();
+            const pass = document.getElementById('indexLoginPass').value.trim();
+
             localStorage.removeItem('retailhub_logged_out');
-            document.getElementById('indexLoginModal').classList.add('hidden');
-            window.location.reload();
+
+            // ADMIN KONTROLÜ
+            if ((code === 'admin' || code === 'kaptan') && pass === 'Yatas2026*') {
+                localStorage.setItem('retailhub_user_role', 'admin');
+                localStorage.setItem('retailhub_dealer_code', 'ADMIN');
+                window.location.href = 'Admin.html'; // Doğrudan Kaptan Köşküne Geçiş
+            } else {
+                // NORMAL BAYİ GİRİŞİ
+                localStorage.setItem('retailhub_user_role', 'dealer');
+                localStorage.setItem('retailhub_dealer_code', code.toUpperCase());
+                document.getElementById('indexLoginModal').classList.add('hidden');
+                window.location.reload();
+            }
         }
 
         const translations = {
@@ -218,22 +235,6 @@
                 desc_b2b: "Etkileşimli B2B sipariş oluşturma, fotoğraflı Excel çıktısı ve konteyner hacim hesabı.",
                 desc_catalog: "Etkileşimli 2026 Yataş Bedding, Enza Home PDF katalogları ve kurumsal sunumlar.",
                 desc_dealer_kpi: "Bayi günlük kasa cirosu, envanter maliyeti, marka dağılım pastası ve aylık satış trendi."
-            },
-            DE: {
-                subtitle: "Yataş Group Internationales Verkaufs-, Bestell- und Stammdatenportal",
-                sign_out: "Abmelden",
-                desc_selltrack: "Echtzeit-Verkaufsanalysen, regionaler Lagerabbau und Live-Kassenverfolgung.",
-                desc_b2b: "Interaktive B2B-Bestellerstellung, Excel-Export mit Fotos und Containerberechnung.",
-                desc_catalog: "Interaktive PDF-Kataloge und Unternehmenspräsentationen für 2026.",
-                desc_dealer_kpi: "Tagesumsatz des Händlers, Lagerbewertung, Markenverteilung und Monatstrends."
-            },
-            RU: {
-                subtitle: "Международный портал продаж, заказов и мастер-данных Yataş Group",
-                sign_out: "Выйти",
-                desc_selltrack: "Аналитика продаж в реальном времени, списание запасов и POS-касса.",
-                desc_b2b: "Интерактивное создание B2B заказов, экспорт в Excel с фото и расчет контейнеров.",
-                desc_catalog: "Интерактивные PDF-каталоги 2026 Yataş Bedding, Enza Home и презентации.",
-                desc_dealer_kpi: "Ежедневная выручка дилера, оценка запасов, диаграмма брендов и тренды."
             }
         };
 
@@ -262,6 +263,7 @@
 
         function executeGlobalSignOut() {
             localStorage.setItem('retailhub_logged_out', 'true');
+            localStorage.removeItem('retailhub_user_role');
             localStorage.removeItem('retailhub_dealer_code');
             localStorage.removeItem('b2b_cart');
             window.location.href = 'index.html';
