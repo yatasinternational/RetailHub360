@@ -59,7 +59,7 @@
         }
 
         .progress-bar-fill {
-            animation: fillProgress 4s linear forwards;
+            animation: fillProgress 3s linear forwards;
         }
         @keyframes fillProgress {
             0% { width: 0%; }
@@ -73,7 +73,7 @@
 </head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
 
-    <!-- 1. MANUEL GİRİŞ ŞİFRE EKRANI -->
+    <!-- MANUEL GİRİŞ ŞİFRE EKRANI -->
     <div id="adminAuthGate" class="fixed inset-0 bg-slate-100/90 backdrop-blur-xl z-[99999] flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="w-16 h-16 bg-[#0f2744] text-[#c59b27] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-lg">
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <!-- 2. SİNEMATİK WELCOMING SLAYT ANİMASYONU -->
+    <!-- SİNEMATİK WELCOMING SLAYT ANİMASYONU -->
     <div id="captainWelcomeOverlay" class="fixed inset-0 bg-[#0f2744] z-[9999] flex flex-col items-center justify-center p-6 text-white text-center hidden">
         <div class="max-w-lg w-full space-y-8">
             <div class="relative inline-block">
@@ -128,14 +128,14 @@
         </div>
     </div>
 
-    <!-- 3. PROTECTED ADMIN CONTENT -->
+    <!-- PROTECTED ADMIN CONTENT -->
     <div id="adminProtectedContent" class="hidden min-h-screen flex flex-col">
         <!-- HEADER / NAVIGATION -->
         <header class="bg-yatas-navy text-white sticky top-0 z-50 shadow-md border-b border-slate-700">
             <div class="max-w-[1700px] mx-auto px-6 h-20 flex items-center justify-between">
                 <div class="flex items-center gap-5">
                     
-                    <!-- İSTEĞİNİZE UYGUN KIRMIZI FONT / BUTONLU SIGN-OUT -->
+                    <!-- KIRMIZI SIGN-OUT BUTONU -->
                     <button onclick="executeAdminSignOut()" class="flex items-center gap-2 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black border border-rose-500/40 transition duration-200 cursor-pointer shadow-sm">
                         <i class="fa-solid fa-right-from-bracket text-rose-400 group-hover:text-white"></i>
                         <span class="tracking-wide">Sign Out</span>
@@ -161,7 +161,7 @@
                         <span>Yenile (F5)</span>
                     </button>
                     
-                    <!-- KAPTAN KÖŞKÜ ÜST SEKMELERİ (TIRIL TIRIL DOLAN BÖLÜM) -->
+                    <!-- KAPTAN KÖŞKÜ ÜST SEKMELERİ -->
                     <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700">
                         <button onclick="switchAdminTab('live')" id="btn-tab-live" class="admin-tab-btn active px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5">
                             <i class="fa-solid fa-chart-line text-yatas-gold"></i>
@@ -239,8 +239,8 @@
                         </div>
                     </div>
 
-                    <!-- Sub Tab Switcher -->
-                    <div class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <!-- SADECE EXECUTIVE LIVE DASHBOARD SEKMESİNDE GÖRÜNEN ÖZEL ALT FİLTRELER -->
+                    <div id="executiveSubTabsContainer" class="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                         <button onclick="switchSubTab('finans')" id="tab-finans" class="sub-tab-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-yatas-navy text-white shadow">
                             Finans & LFL Ciro
                         </button>
@@ -257,7 +257,7 @@
                 </div>
             </section>
 
-            <!-- TAB 1: EXECUTIVE LIVE DASHBOARD (VARSAYILAN AÇIK) -->
+            <!-- TAB 1: EXECUTIVE LIVE DASHBOARD -->
             <div id="tab-content-live" class="space-y-6">
                 <!-- KPI CARDS GRID -->
                 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -386,15 +386,15 @@
                 </section>
             </div>
 
-            <!-- TAB 2: BAYİ LIVE SELL-OUT & Z-RAPORU CANLI AYNA MODU -->
+            <!-- TAB 2: BAYİ LIVE SELL-OUT & Z-RAPORU CANLI SUPABASE AYNA MODU -->
             <div id="tab-content-sellout" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
                         <div>
                             <h3 class="text-base font-extrabold text-yatas-navy flex items-center gap-2">
-                                <i class="fa-solid fa-cash-register text-emerald-500"></i> Bayi Günlük Sell-Out Satışı & Z-Raporu İzleme Paneli
+                                <i class="fa-solid fa-cash-register text-emerald-500"></i> Bayi Günlük Live Sell-Out Satışı & Kasa İzleme Paneli
                             </h3>
-                            <p class="text-xs text-slate-500 mt-1">Bayilerin kasalarında anlık gerçekleşen satışlar, teslimatlar ve canlı envanter düşümleri</p>
+                            <p class="text-xs text-slate-500 mt-1">Bayilerin kasalarında anlık gerçekleşen canlı satış hareketleri ve gerçek zamanlı mağaza stokları</p>
                         </div>
                     </div>
 
@@ -421,30 +421,30 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-100 text-yatas-navy font-extrabold uppercase border-b">
-                                    <th class="p-3">Bayi Kodu & Adı</th>
-                                    <th class="p-3 text-center">Günlük Satış (Adet)</th>
-                                    <th class="p-3 text-right">Günlük Kasa Cirosu ($)</th>
-                                    <th class="p-3 text-center">Mevcut Envanter Stok</th>
-                                    <th class="p-3 text-center">Z-Rapor Durumu</th>
+                                    <th class="p-3.5">Bayi Kodu & Adı</th>
+                                    <th class="p-3.5 text-center">Canlı Satış (Adet)</th>
+                                    <th class="p-3.5 text-right">Canlı Kasa Cirosu ($)</th>
+                                    <th class="p-3.5 text-center">Mevcut Stok Envanteri</th>
+                                    <th class="p-3.5 text-center">Canlı Durum</th>
                                 </tr>
                             </thead>
                             <tbody id="selloutDealerTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700">
-                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Veri yükleniyor...</td></tr>
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Supabase canlı satış verileri çekiliyor...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </section>
             </div>
 
-            <!-- TAB 3: B2B PROFORMA & SAP ORDERS -->
+            <!-- TAB 3: B2B PROFORMA & SAP ORDERS (SADELEŞTİRİLDİ) -->
             <div id="tab-content-proforma" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
                         <div>
                             <h3 class="text-base font-extrabold text-yatas-navy flex items-center gap-2">
-                                <i class="fa-solid fa-file-signature text-sky-500"></i> B2B Bayi Proforma Sipariş & Otomatik Öneri Konsolu
+                                <i class="fa-solid fa-file-signature text-sky-500"></i> Bekleyen B2B Proforma Siparişler & SAP Aktarım Konsolu
                             </h3>
-                            <p class="text-xs text-slate-500 mt-1">Bayilerin oluşturduğu proformalar, akıllı sipariş öneri dönüşüm oranları ve SAP aktarımları</p>
+                            <p class="text-xs text-slate-500 mt-1">Bayilerden gelen toplu sipariş talepleri ve SAP sistemine aktarım durumları</p>
                         </div>
                         <button onclick="approveAllProformasToSAP()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow transition">
                             Toplu SAP'ye Onayla
@@ -455,32 +455,31 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-100 text-yatas-navy font-extrabold uppercase border-b">
-                                    <th class="p-3">Tarih</th>
-                                    <th class="p-3">Doküman / Proforma No</th>
-                                    <th class="p-3">Bayi Kodu</th>
-                                    <th class="p-3">SKU & Ürün Adı</th>
-                                    <th class="p-3 text-center">Miktar</th>
-                                    <th class="p-3 text-center">Durum</th>
-                                    <th class="p-3 text-right">Aksiyon</th>
+                                    <th class="p-3.5">Tarih</th>
+                                    <th class="p-3.5">Bayi Kodu</th>
+                                    <th class="p-3.5">Bayi Adı</th>
+                                    <th class="p-3.5 text-center">Bekleyen Toplam Adet</th>
+                                    <th class="p-3.5 text-center">Durum</th>
+                                    <th class="p-3.5 text-right">Aksiyon</th>
                                 </tr>
                             </thead>
                             <tbody id="b2bOrdersTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700">
-                                <tr><td colspan="7" class="p-4 text-center text-slate-400">Veri yükleniyor...</td></tr>
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sipariş verileri yükleniyor...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </section>
             </div>
 
-            <!-- TAB 4: MARJ & MARGIN MATRIX -->
+            <!-- TAB 4: MARJ & MARGIN MATRIX (BAYİ BAZLI MARK-UP ADIMLARI) -->
             <div id="tab-content-margin" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
                         <div>
                             <h3 class="text-base font-extrabold text-yatas-navy flex items-center gap-2">
-                                <i class="fa-solid fa-calculator text-amber-500"></i> Ürün Maliyet (COGS), Navlun & Brüt Kârlılık Analitiği
+                                <i class="fa-solid fa-calculator text-amber-500"></i> Konsolide Bayi Maliyet (COGS), Navlun & Mark-up Analitiği
                             </h3>
-                            <p class="text-xs text-slate-500 mt-1">Yataş Fabrika Alım Fiyatı ($ COGS), Navlun Gideri, Bayi SMM ve Son Müşteri Mark-up Dengesi</p>
+                            <p class="text-xs text-slate-500 mt-1">Fabrika Alım Fiyatı, Yataş Satış / Bayi SMM, Navlun, Bayi Müşteri Fiyatı ve Fiyatlandırma Adımları</p>
                         </div>
                     </div>
 
@@ -488,17 +487,17 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-100 text-yatas-navy font-extrabold uppercase border-b">
-                                    <th class="p-3">SKU & Ürün Adı</th>
-                                    <th class="p-3 text-center">Yataş COGS ($)</th>
-                                    <th class="p-3 text-center">Yataş Satış / Bayi SMM ($)</th>
-                                    <th class="p-3 text-center">Navlun ($/m³)</th>
-                                    <th class="p-3 text-center">Bayi Müşteri Satış Fiyatı ($)</th>
-                                    <th class="p-3 text-center">Yataş Kâr Marjı %</th>
-                                    <th class="p-3 text-center">Bayi Mark-up (x)</th>
+                                    <th class="p-3.5">Bayi Kodu & Adı</th>
+                                    <th class="p-3.5 text-center">Ort. Fabrika Alım ($)</th>
+                                    <th class="p-3.5 text-center">Yataş Satış / Bayi SMM ($)</th>
+                                    <th class="p-3.5 text-center">Ort. Navlun ($/m³)</th>
+                                    <th class="p-3.5 text-center">Bayi Müşteri Satış Fiyatı ($)</th>
+                                    <th class="p-3.5 text-center">Yataş Mark-up (x)</th>
+                                    <th class="p-3.5 text-center">Bayi Mark-up (x)</th>
                                 </tr>
                             </thead>
                             <tbody id="adminMarginTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700">
-                                <tr><td colspan="7" class="p-4 text-center text-slate-400">Veri yükleniyor...</td></tr>
+                                <tr><td colspan="7" class="p-4 text-center text-slate-400">Fiyatlandırma verileri yükleniyor...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -519,6 +518,8 @@
         let filteredReportData = [];
         let dealersList = [];
         let liveShipmentsList = [];
+        let liveStockMovements = [];
+        let liveStocksList = [];
         let chartTrendInstance = null;
         let chartMarkaInstance = null;
         let welcomeTimer = null;
@@ -558,7 +559,7 @@
             const overlay = document.getElementById('captainWelcomeOverlay');
             overlay.classList.remove('hidden');
 
-            let countdown = 4;
+            let countdown = 3;
             const textEl = document.getElementById('welcomeCountdownText');
 
             welcomeTimer = setInterval(() => {
@@ -594,6 +595,7 @@
             let hasMore = true;
 
             try {
+                // 1. Executive Master Report
                 while (hasMore) {
                     const { data, error } = await supabaseClient
                         .from('executive_master_report')
@@ -609,11 +611,19 @@
                 masterReportData = allData;
                 statusEl.innerText = `Supabase Canlı: ${masterReportData.length.toLocaleString()} Kayıt`;
 
+                // 2. Bayiler, Sevkiyatlar ve Canlı Kasa Satışları
                 let { data: dData } = await supabaseClient.from('dealers').select('*');
                 dealersList = dData || [];
 
                 let { data: sData } = await supabaseClient.from('shipments').select('*');
                 liveShipmentsList = sData || [];
+
+                // 3. CANLI SELL-OUT HAREKETLERİ & STOKLAR
+                let { data: smData } = await supabaseClient.from('stock_movements').select('*');
+                liveStockMovements = smData || [];
+
+                let { data: stData } = await supabaseClient.from('stocks').select('*');
+                liveStocksList = stData || [];
 
                 populateFilterOptions();
                 applyFilters();
@@ -655,6 +665,9 @@
             updateKPIs(filteredReportData);
             renderTable(filteredReportData);
             updateCharts(filteredReportData);
+            renderSelloutTable();
+            renderOrdersTable();
+            renderMarginTable();
         }
 
         function updateKPIs(data) {
@@ -781,46 +794,80 @@
             });
         }
 
-        /* ÜST BANNER SEKMELERİ DOLDURAN DİNAMİK RENDER FONKSİYONLARI */
+        /* 1. SUPABASE CANLI BAYİ SELL-OUT HESAPLAMA SİSTEMİ */
         function renderSelloutTable() {
             const tbody = document.getElementById('selloutDealerTableBody');
             if (!tbody) return;
 
-            let rows = dealersList.length > 0 ? dealersList : [
-                { code: '4000001368', name: 'Enza Home Basel / İsviçre' },
-                { code: '4000001420', name: 'Enza Home Dubai / BAE' },
-                { code: '4000001550', name: 'Yataş Bedding Bakü / Azerbaycan' },
-                { code: '4000001610', name: 'Enza Home Frankfurt / Almanya' }
-            ];
+            let totalTodayQty = 0;
+            let totalTodayRev = 0;
+            let totalInvQty = liveStocksList.reduce((acc, s) => acc + (Number(s.quantity) || 0), 0);
+            let criticalAlertsCount = liveStocksList.filter(s => Number(s.quantity) <= 3).length;
+
+            const dealerSummary = {};
+
+            // Supabase'den çekilen canlı dealers listesini eşleştir
+            dealersList.forEach(d => {
+                dealerSummary[d.id] = { code: d.code, name: d.name, salesQty: 0, revUSD: 0, stockQty: 0 };
+            });
+
+            // Canlı Stok Hareketlerini (Stock Movements - SALE) Bayilere Topla
+            liveStockMovements.forEach(m => {
+                const qty = Number(m.quantity) || 0;
+                const unitPrice = 250; // Ort. satış fiyatı
+                totalTodayQty += qty;
+                totalTodayRev += (qty * unitPrice);
+
+                if (dealerSummary[m.dealer_id]) {
+                    dealerSummary[m.dealer_id].salesQty += qty;
+                    dealerSummary[m.dealer_id].revUSD += (qty * unitPrice);
+                }
+            });
+
+            // Canlı Stokları (Stocks) Bayilere Topla
+            liveStocksList.forEach(s => {
+                if (dealerSummary[s.dealer_id]) {
+                    dealerSummary[s.dealer_id].stockQty += (Number(s.quantity) || 0);
+                }
+            });
+
+            const rows = Object.values(dealerSummary);
+
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Canlı bayi hareketi bulunamadı.</td></tr>`;
+                return;
+            }
 
             tbody.innerHTML = rows.map(d => `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold">
                     <td class="p-3.5 font-bold text-yatas-navy">${d.code} - ${d.name}</td>
-                    <td class="p-3.5 text-center font-black text-emerald-600">24 Adet</td>
-                    <td class="p-3.5 text-right font-black text-yatas-navy">$6,450.00</td>
-                    <td class="p-3.5 text-center font-bold text-sky-600">186 Pcs</td>
-                    <td class="p-3.5 text-center"><span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full text-[10px]">Z-Raporu Onaylı</span></td>
+                    <td class="p-3.5 text-center font-black text-emerald-600">${d.salesQty} Adet</td>
+                    <td class="p-3.5 text-right font-black text-yatas-navy">$${d.revUSD.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                    <td class="p-3.5 text-center font-bold text-sky-600">${d.stockQty} Pcs</td>
+                    <td class="p-3.5 text-center"><span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full text-[10px]">Canlı Online</span></td>
                 </tr>
             `).join('');
 
-            document.getElementById('soTodaySalesQty').innerText = '1,480 Adet';
-            document.getElementById('soTodayRevenue').innerText = '$370,000';
-            document.getElementById('soTotalInventory').innerText = '18,450 Pcs';
-            document.getElementById('soCriticalAlerts').innerText = '14 Ürün';
+            document.getElementById('soTodaySalesQty').innerText = totalTodayQty + ' Adet';
+            document.getElementById('soTodayRevenue').innerText = '$' + totalTodayRev.toLocaleString('en-US', {minimumFractionDigits:2});
+            document.getElementById('soTotalInventory').innerText = totalInvQty.toLocaleString() + ' Pcs';
+            document.getElementById('soCriticalAlerts').innerText = criticalAlertsCount + ' Ürün';
         }
 
+        /* 2. SADELEŞTİRİLMİŞ B2B PROFORMA SIPARIŞ KONSOLU */
         function renderOrdersTable() {
             const tbody = document.getElementById('b2bOrdersTableBody');
             if (!tbody) return;
 
-            if (liveShipmentsList.length === 0) {
+            const pendingShipments = liveShipmentsList.filter(s => String(s.status).toUpperCase() === 'PENDING');
+
+            if (pendingShipments.length === 0) {
                 tbody.innerHTML = `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                         <td class="p-3.5 font-mono text-slate-500">05.08.2026</td>
-                        <td class="p-3.5 font-mono font-black text-yatas-navy">PRF-2026-9812</td>
-                        <td class="p-3.5 font-bold">4000001368</td>
-                        <td class="p-3.5 font-bold text-slate-800">180X200 ACTIVIO POCKET SPRING MATTRESS</td>
-                        <td class="p-3.5 text-center font-black text-yatas-navy">12 Pcs</td>
+                        <td class="p-3.5 font-bold text-yatas-navy">4000001368</td>
+                        <td class="p-3.5 font-bold text-slate-800">Enza Home Basel</td>
+                        <td class="p-3.5 text-center font-black text-yatas-navy">24 Pcs</td>
                         <td class="p-3.5 text-center"><span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full text-[10px]">SAP BEKLEYEN</span></td>
                         <td class="p-3.5 text-right"><button onclick="alert('SAP Siparişi Oluşturuldu!')" class="bg-[#0f2744] hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold transition">SAP PO'ya Çevir</button></td>
                     </tr>
@@ -828,43 +875,55 @@
                 return;
             }
 
-            tbody.innerHTML = liveShipmentsList.map(s => `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="p-3.5 font-mono text-slate-500">${s.created_at ? new Date(s.created_at).toLocaleDateString('tr-TR') : '05.08.2026'}</td>
-                    <td class="p-3.5 font-mono font-black text-yatas-navy">${s.invoice_no}</td>
-                    <td class="p-3.5 font-bold">${s.dealer_code}</td>
-                    <td class="p-3.5 font-bold text-slate-800">${s.product_name || s.product_code}</td>
-                    <td class="p-3.5 text-center font-black text-yatas-navy">${s.quantity} Pcs</td>
-                    <td class="p-3.5 text-center"><span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full text-[10px]">${s.status}</span></td>
-                    <td class="p-3.5 text-right"><button onclick="approveSingleToSAP('${s.id}')" class="bg-[#0f2744] hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold transition">SAP'ye Onayla</button></td>
+            // Bayi Bazlı Gruplama
+            const groupedOrders = {};
+            pendingShipments.forEach(s => {
+                const dealerCode = s.dealer_code || '4000001368';
+                if (!groupedOrders[dealerCode]) {
+                    const matchedDealer = dealersList.find(d => d.code === dealerCode);
+                    groupedOrders[dealerCode] = {
+                        date: s.created_at ? new Date(s.created_at).toLocaleDateString('tr-TR') : '05.08.2026',
+                        dealerCode: dealerCode,
+                        dealerName: matchedDealer ? matchedDealer.name : ('Dealer ' + dealerCode),
+                        totalQty: 0
+                    };
+                }
+                groupedOrders[dealerCode].totalQty += (Number(s.quantity) || 1);
+            });
+
+            tbody.innerHTML = Object.values(groupedOrders).map(o => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold">
+                    <td class="p-3.5 font-mono text-slate-500">${o.date}</td>
+                    <td class="p-3.5 font-bold text-yatas-navy">${o.dealerCode}</td>
+                    <td class="p-3.5 font-bold text-slate-800">${o.dealerName}</td>
+                    <td class="p-3.5 text-center font-black text-yatas-navy">${o.totalQty} Pcs</td>
+                    <td class="p-3.5 text-center"><span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full text-[10px]">SAP BEKLEYEN</span></td>
+                    <td class="p-3.5 text-right"><button onclick="alert('Bayi Proforması SAP Siparişine Aktarıldı!')" class="bg-[#0f2744] hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold transition">SAP PO'ya Çevir</button></td>
                 </tr>
             `).join('');
         }
 
+        /* 3. KONSOLİDE BAYİ MARJ VE MARK-UP MATRIXI */
         function renderMarginTable() {
             const tbody = document.getElementById('adminMarginTableBody');
             if (!tbody) return;
 
-            tbody.innerHTML = `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="p-3.5 font-bold text-yatas-navy">50503000008202 - Queen Size Valeri Duvet Set</td>
-                    <td class="p-3.5 text-center font-bold text-indigo-700">$120.00</td>
-                    <td class="p-3.5 text-center font-black text-[#0f2744]">$172.00</td>
-                    <td class="p-3.5 text-center font-bold text-slate-600">$15.00</td>
-                    <td class="p-3.5 text-center font-black text-emerald-600">$295.00</td>
-                    <td class="p-3.5 text-center"><span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-black text-[10px]">%43.3</span></td>
-                    <td class="p-3.5 text-center font-black text-amber-600">1.71 x</td>
+            let rows = dealersList.length > 0 ? dealersList : [
+                { code: '4000001368', name: 'Enza Home Basel' },
+                { code: '4000001420', name: 'Enza Home Dubai' }
+            ];
+
+            tbody.innerHTML = rows.map(d => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold">
+                    <td class="p-3.5 font-bold text-yatas-navy">${d.code} - ${d.name}</td>
+                    <td class="p-3.5 text-center font-bold text-indigo-700">$130.00</td>
+                    <td class="p-3.5 text-center font-black text-[#0f2744]">$185.00</td>
+                    <td class="p-3.5 text-center font-bold text-slate-600">$18.00</td>
+                    <td class="p-3.5 text-center font-black text-emerald-600">$320.00</td>
+                    <td class="p-3.5 text-center font-black text-yatas-navy">1.42 x</td>
+                    <td class="p-3.5 text-center font-black text-amber-600">1.72 x</td>
                 </tr>
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="p-3.5 font-bold text-yatas-navy">5050100338009 - 180X200 Activio Mattress</td>
-                    <td class="p-3.5 text-center font-bold text-indigo-700">$280.00</td>
-                    <td class="p-3.5 text-center font-black text-[#0f2744]">$390.00</td>
-                    <td class="p-3.5 text-center font-bold text-slate-600">$35.00</td>
-                    <td class="p-3.5 text-center font-black text-emerald-600">$720.00</td>
-                    <td class="p-3.5 text-center"><span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-black text-[10px]">%39.2</span></td>
-                    <td class="p-3.5 text-center font-black text-amber-600">1.84 x</td>
-                </tr>
-            `;
+            `).join('');
         }
 
         async function approveSingleToSAP(id) {
@@ -877,7 +936,7 @@
             alert('Tüm Proformalar Toplu Olarak SAP Sistemine İletildi!');
         }
 
-        /* ÜST BANNER SEKMELERİNİN HATASIZ VE TIRIL TIRIL GEÇİŞ MOTORU */
+        /* ÜST BANNER SEKMELERİ GEÇİŞ MOTORU & ALT FİLTRE GİZLEME */
         function switchAdminTab(tabKey) {
             const tabs = ['live', 'sellout', 'proforma', 'margin'];
             
@@ -893,6 +952,16 @@
 
             if (activeBtn) activeBtn.classList.add('active');
             if (activeContent) activeContent.classList.remove('hidden');
+
+            // Finans/Turquality/Aging alt butonlarını SADECE Executive Live Dashboard sekmesinde göster
+            const subTabsContainer = document.getElementById('executiveSubTabsContainer');
+            if (subTabsContainer) {
+                if (tabKey === 'live') {
+                    subTabsContainer.classList.remove('hidden');
+                } else {
+                    subTabsContainer.classList.add('hidden');
+                }
+            }
         }
 
         function switchSubTab(tab) {
