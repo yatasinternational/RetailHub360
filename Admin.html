@@ -45,6 +45,24 @@
             box-shadow: 0 4px 12px rgba(15, 39, 68, 0.15);
         }
 
+        /* 5 SANİYELİK KAPTAN KÖŞKÜ WELCOMING SLAYT ANİMASYONU */
+        #captainWelcomeOverlay {
+            transition: opacity 1s ease-in-out, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #captainWelcomeOverlay.fade-out-slide {
+            opacity: 0;
+            transform: translateY(-40px) scale(0.98);
+            pointer-events: none;
+        }
+
+        .progress-bar-fill {
+            animation: fillProgress 5s linear forwards;
+        }
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -52,8 +70,8 @@
 </head>
 <body class="min-h-screen bg-slate-50 flex flex-col">
 
-    <!-- ADMIN SECURE LOGIN GATE -->
-    <div id="adminAuthGate" class="fixed inset-0 bg-slate-100/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-4">
+    <!-- 1. ADMIN SECURE LOGIN GATE -->
+    <div id="adminAuthGate" class="fixed inset-0 bg-slate-100/90 backdrop-blur-xl z-[99999] flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="w-16 h-16 bg-[#0f2744] text-[#c59b27] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-lg">
                 <i class="fa-solid fa-user-shield"></i>
@@ -74,7 +92,41 @@
         </div>
     </div>
 
-    <!-- PROTECTED ADMIN CONTENT -->
+    <!-- 2. SİNEMATİK "KAPTAN KÖŞKÜNE HOŞ GELDİNİZ" SLAYT ANİMASYON OVERLAY -->
+    <div id="captainWelcomeOverlay" class="fixed inset-0 bg-[#0f2744] z-[9999] flex flex-col items-center justify-center p-6 text-white text-center hidden">
+        <div class="max-w-lg w-full space-y-8">
+            <div class="relative inline-block">
+                <div class="w-24 h-24 bg-[#c59b27]/20 border-2 border-[#c59b27] rounded-3xl mx-auto flex items-center justify-center text-4xl text-[#c59b27] shadow-2xl animate-bounce">
+                    <i class="fa-solid fa-[#0f2744] fa-ship text-[#c59b27]"></i>
+                </div>
+                <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border-2 border-[#0f2744]">LIVE</span>
+            </div>
+
+            <div class="space-y-3">
+                <h2 class="text-3xl font-black tracking-tight text-white">Kaptan Köşküne Hoş Geldiniz</h2>
+                <p class="text-sm font-medium text-slate-300 leading-relaxed">
+                    Yataş Group Üst Yönetim Canlı Performans, Konsolide Ciro, Bayi Sell-Out ve Envanter Analiz Portalı Hazırlanıyor...
+                </p>
+            </div>
+
+            <!-- 5 SANİYELİK İLERLEME ÇUBUĞU -->
+            <div class="space-y-2">
+                <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                    <div class="bg-[#c59b27] h-full progress-bar-fill"></div>
+                </div>
+                <div class="flex justify-between items-center text-[11px] font-extrabold text-slate-400">
+                    <span>Yataş Executive Engine</span>
+                    <span id="welcomeCountdownText">5 Saniye Sonra Açılıyor...</span>
+                </div>
+            </div>
+
+            <button onclick="skipWelcomeSlide()" class="px-5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-xs font-bold transition border border-white/20">
+                Hemen Geç <i class="fa-solid fa-forward ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. PROTECTED ADMIN CONTENT -->
     <div id="adminProtectedContent" class="hidden min-h-screen flex flex-col">
         <!-- HEADER / NAVIGATION -->
         <header class="bg-yatas-navy text-white sticky top-0 z-50 shadow-md border-b border-slate-700">
@@ -86,9 +138,9 @@
                     </a>
 
                     <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-white/20 shrink-0">
-    			<img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Admin" class="h-8 w-auto max-w-[130px] object-contain block" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
-   			<span class="text-[#0f2744] text-[10px] font-black uppercase tracking-widest border-l border-slate-300 pl-2">ADMIN</span>
-		    </div>
+                        <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group Admin" class="h-8 w-auto max-w-[130px] object-contain block" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
+                        <span class="text-[#0f2744] text-[10px] font-black uppercase tracking-widest border-l border-slate-300 pl-2">ADMIN</span>
+                    </div>
 
                     <div>
                         <h1 class="font-bold text-lg leading-snug tracking-wide">Executive Live Performance Dashboard</h1>
@@ -200,7 +252,7 @@
                 </div>
             </section>
 
-            <!-- SEKME 1: EXECUTIVE LIVE DASHBOARD (ORİJİNAL EKRANININ BİREBİR KENDİSİ) -->
+            <!-- SEKME 1: EXECUTIVE LIVE DASHBOARD -->
             <div id="tab-content-live" class="space-y-6">
                 <!-- KPI CARDS GRID -->
                 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -329,7 +381,7 @@
                 </section>
             </div>
 
-            <!-- SEKME 2: YENİ - BAYİ SELL-OUT & Z-RAPORU CANLI AYNA MODU -->
+            <!-- SEKME 2: BAYİ SELL-OUT & Z-RAPORU CANLI AYNA MODU -->
             <div id="tab-content-sellout" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -379,7 +431,7 @@
                 </section>
             </div>
 
-            <!-- SEKME 3: YENİ - B2B PROFORMA & SAP ORDERS -->
+            <!-- SEKME 3: B2B PROFORMA & SAP ORDERS -->
             <div id="tab-content-proforma" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -415,7 +467,7 @@
                 </section>
             </div>
 
-            <!-- SEKME 4: YENİ - MARJ & MARGIN MATRIX -->
+            <!-- SEKME 4: MARJ & MARGIN MATRIX -->
             <div id="tab-content-margin" class="space-y-6 hidden">
                 <section class="glass-card p-6 rounded-2xl border border-slate-200 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -450,7 +502,7 @@
         </main>
     </div>
 
-    <!-- JAVASCRIPT LOGIC (TAM SUPABASE REAL-TIME AKIŞI) -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         const ADMIN_MASTER_PASS = "Yatas2026*";
         const SUPABASE_URL = 'https://kjdkleaqaduagsnkciqy.supabase.co';
@@ -463,16 +515,50 @@
         let liveShipmentsList = [];
         let chartTrendInstance = null;
         let chartMarkaInstance = null;
+        let welcomeTimer = null;
 
         function verifyAdminAuth(e) {
             e.preventDefault();
             const inputPass = document.getElementById('adminGatePassword').value;
             if (inputPass === ADMIN_MASTER_PASS) {
                 document.getElementById('adminAuthGate').classList.add('hidden');
-                document.getElementById('adminProtectedContent').classList.remove('hidden');
-                loadLiveSupabaseData();
+                
+                // KAPTAN KÖŞKÜ WELCOMING SLAYT ANİMASYONUNU BAŞLAT
+                triggerCaptainWelcomeAnimation();
             } else {
                 alert("Hatalı Master Şifre!");
+            }
+        }
+
+        /* 5 SANİYELİK KAPTAN KÖŞKÜ ANİMASYON DÖNGÜSÜ */
+        function triggerCaptainWelcomeAnimation() {
+            const overlay = document.getElementById('captainWelcomeOverlay');
+            overlay.classList.remove('hidden');
+
+            let countdown = 5;
+            const textEl = document.getElementById('welcomeCountdownText');
+
+            welcomeTimer = setInterval(() => {
+                countdown--;
+                if (textEl) textEl.innerText = `${countdown} Saniye Sonra Açılıyor...`;
+                if (countdown <= 0) {
+                    skipWelcomeSlide();
+                }
+            }, 1000);
+
+            // Arka planda Supabase verilerini yükle ki slayt bittiğinde rapor anında hazır olsun
+            loadLiveSupabaseData();
+        }
+
+        function skipWelcomeSlide() {
+            if (welcomeTimer) clearInterval(welcomeTimer);
+            const overlay = document.getElementById('captainWelcomeOverlay');
+            if (overlay) {
+                overlay.classList.add('fade-out-slide');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    document.getElementById('adminProtectedContent').classList.remove('hidden');
+                }, 800);
             }
         }
 
@@ -486,7 +572,6 @@
             let hasMore = true;
 
             try {
-                // 1. Ana C-Level Master Data
                 while (hasMore) {
                     const { data, error } = await supabaseClient
                         .from('executive_master_report')
@@ -502,7 +587,6 @@
                 masterReportData = allData;
                 statusEl.innerText = `Supabase Canlı: ${masterReportData.length.toLocaleString()} Kayıt`;
 
-                // 2. Bayi ve Sevkiyat Verileri
                 let { data: dData } = await supabaseClient.from('dealers').select('*');
                 dealersList = dData || [];
 
@@ -675,7 +759,6 @@
             });
         }
 
-        // CANLI BAYİ AYNA MODU TABLE
         function renderSelloutTable() {
             const tbody = document.getElementById('selloutDealerTableBody');
             if (!tbody) return;
@@ -701,7 +784,6 @@
             document.getElementById('soCriticalAlerts').innerText = '14 Ürün';
         }
 
-        // B2B ORDERS TABLE
         function renderOrdersTable() {
             const tbody = document.getElementById('b2bOrdersTableBody');
             if (!tbody) return;
@@ -734,7 +816,6 @@
             `).join('');
         }
 
-        // MARGIN TABLE
         function renderMarginTable() {
             const tbody = document.getElementById('adminMarginTableBody');
             if (!tbody) return;
