@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Yataş Group - Executive B2B Experience & Order Portal</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#00205b">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +47,6 @@
             max-width: 140px !important; object-fit: contain !important; display: block !important;
         }
 
-        .chat-widget-btn, .chat-window { z-index: 4000 !important; }
         .cart-drawer, .cart-overlay { z-index: 99999 !important; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -153,6 +155,32 @@
             margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
         }
         .sidebar-header-logo img { height: 28px; width: auto; cursor: pointer; object-fit: contain; }
+
+        .nav-tree-item { margin-bottom: 8px; }
+        .nav-tree-header {
+            padding: 10px 12px; background: var(--bg-main);
+            border-radius: var(--radius-md); font-size: 12.5px; font-weight: 700; color: var(--text-main);
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; border: 1px solid var(--border-color);
+        }
+        .nav-tree-children { padding-left: 10px; display: none; margin-top: 6px; }
+        .nav-tree-children.active { display: block; }
+
+        .cat-tree-header {
+            padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--text-main);
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; border-radius: 6px; margin-top: 4px; background: rgba(0,0,0,0.02);
+            border: 1px dashed var(--border-color);
+        }
+        .cat-tree-children { padding-left: 10px; display: none; margin-top: 4px; }
+        .cat-tree-children.active { display: block; }
+
+        .sub-link-item {
+            padding: 7px 10px; font-size: 11.5px; color: var(--text-main); font-weight: 600;
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            border-radius: 6px; transition: all 0.2s; margin-bottom: 2px;
+        }
+        .sub-link-item:hover { color: var(--yatas-red); background: var(--bg-main); }
 
         main { flex: 1; padding: 24px 28px; max-width: 1600px; margin: 0 auto; width: 100%; }
 
@@ -827,14 +855,14 @@
             }
         }
 
-        /* GİTHUB YENİ KLASÖR MİMARİSİNE DİNAMİK BAĞLANAN MOTO MİMARİSİ */
+        /* DÜZELTİLMİŞ GİTHUB RESİM RESOLVER HESABI (11 KLASÖR İLE BİREBİR EŞLEŞİR) */
         function getWebPPhotoUrl(productCode, photoIndex = 0) {
             const cleanCode = String(productCode).trim();
             if (photoIndex === 0) {
                 return `${GITHUB_PHOTO_BASE}urun_foto/${cleanCode}.webp`;
             } else {
-                const folderIndex = photoIndex + 1;
-                return `${GITHUB_PHOTO_BASE}urun_foto${folderIndex > 1 ? folderIndex : ''}/${cleanCode}_${photoIndex}.webp`;
+                const folderNumber = photoIndex + 1; // photoIndex=1 -> urun_foto2, photoIndex=2 -> urun_foto3
+                return `${GITHUB_PHOTO_BASE}urun_foto${folderNumber}/${cleanCode}_${photoIndex}.webp`;
             }
         }
 
@@ -1020,10 +1048,10 @@
             const catData = currentActiveFamily.categories[catKey];
             document.getElementById('modalBrandCategory').innerText = `${currentActiveFamily.brand} | ${autoTranslateText(catKey, currentLang)}`;
 
-            // DİNAMİK 10 AÇI RESMİ OLUŞTURMA MOTORU
+            // O YILDIZLI ÜRÜN KODU İLE 11 KLASÖRÜ DİNAMİK ADRESLEME
             const sampleVariantCode = catData.variants[0] ? catData.variants[0].code : '50501000000015';
             modalPhotosList = [];
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 11; i++) {
                 modalPhotosList.push(getWebPPhotoUrl(sampleVariantCode, i));
             }
 
@@ -1032,6 +1060,7 @@
             renderKartelaSection(catData.variants);
         }
 
+        /* SIFIR KIRIK RESİM - AKILLI FOTOĞRAF VE THUMBNAIL GÜNCELLEME MOTORU */
         function updateModalPhotoDisplay() {
             if (modalPhotosList.length === 0) return;
             const imgEl = document.getElementById('modalImg');
@@ -1044,7 +1073,7 @@
 
             thumbsBar.style.display = 'flex';
             thumbsBar.innerHTML = modalPhotosList.map((pUrl, i) => `
-                <img src="${pUrl}" class="thumb-img ${i === currentPhotoIndex ? 'active' : ''}" onclick="setModalPhotoIndex(${i})" onerror="this.style.opacity='0.3';">
+                <img src="${pUrl}" class="thumb-img ${i === currentPhotoIndex ? 'active' : ''}" onclick="setModalPhotoIndex(${i})" onerror="this.remove();">
             `).join('');
         }
 
