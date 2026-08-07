@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -25,79 +25,50 @@
             --yatas-blue: #00d2ff;
             --yatas-red: #d71921;
             --bg-main: #f8fafc;
-            --card-bg: rgba(255, 255, 255, 0.88);
-            --card-border: rgba(226, 232, 240, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(226, 232, 240, 0.9);
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --accent-gold: #c5a059;
-            --header-bg: rgba(255, 255, 255, 0.78);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --shadow-subtle: 0 8px 32px 0 rgba(0, 32, 91, 0.08);
+            --header-bg: rgba(255, 255, 255, 0.92);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --shadow-subtle: 0 8px 32px 0 rgba(0, 32, 91, 0.06);
             --radius-md: 12px;
             --radius-lg: 20px;
-            --brand-ambient: radial-gradient(circle at 10% 20%, rgba(0, 40, 112, 0.06) 0%, transparent 50%);
         }
 
-        [data-theme="dark"] {
-            --yatas-navy: #38bdf8;
-            --yatas-navy-hover: #0284c7;
-            --yatas-blue: #38bdf8;
-            --yatas-red: #f43f5e;
-            --bg-main: #020617;
-            --card-bg: rgba(15, 23, 42, 0.75);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #1e293b;
-            --header-bg: rgba(2, 6, 23, 0.78);
-            --glass-bg: rgba(15, 23, 42, 0.7);
-            --shadow-subtle: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            --brand-ambient: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+        .brand-logo-btn {
+            height: 38px !important;
+            min-width: 120px !important;
+            flex-shrink: 0 !important;
+            overflow: hidden !important;
+            background: transparent; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
+        .brand-logo-btn img {
+            height: 32px !important;
+            width: auto !important;
+            max-width: 140px !important;
+            object-fit: contain !important;
+            display: block !important;
+        }
+
+        .chat-widget-btn, .chat-window { z-index: 4000 !important; }
+        .cart-drawer, .cart-overlay { z-index: 99999 !important; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
             background-color: var(--bg-main);
-            background-image: var(--brand-ambient);
             font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             color: var(--text-main);
             min-height: 100vh;
-            min-height: 100dvh;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
             padding-bottom: 70px;
-            transition: background-color 0.4s ease, color 0.3s;
         }
-
-        /* ANNOUNCEMENT TICKER BANNER */
-        .announcement-ticker-bar {
-            background: linear-gradient(90deg, #00205b, #0040b0);
-            color: #ffffff;
-            font-size: 12px; font-weight: 700;
-            padding: 8px 24px;
-            display: flex; align-items: center; justify-content: center;
-            gap: 12px; overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            height: 36px;
-        }
-        .ticker-badge {
-            background: var(--yatas-red); color: #fff;
-            padding: 2px 8px; border-radius: 12px; font-size: 10px; text-transform: uppercase;
-            flex-shrink: 0;
-        }
-        .ticker-viewport {
-            height: 20px; overflow: hidden; position: relative; width: 100%; max-width: 800px;
-        }
-        .ticker-slide-item {
-            position: absolute; width: 100%; text-align: center;
-            opacity: 0; transform: translateY(100%);
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .ticker-slide-item.active { opacity: 1; transform: translateY(0); }
 
         /* HEADER NAVBAR */
         header {
@@ -105,155 +76,90 @@
             background: var(--header-bg);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 28px;
+            padding: 12px 24px;
             display: flex; align-items: center; justify-content: space-between;
             box-shadow: var(--shadow-subtle);
         }
 
-        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
 
-        .hamburger-btn, .view-tab-btn, .theme-toggle-btn, .cart-trigger-btn, .filter-chip {
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        .btn-back-hub-portal {
+            background: #00205b; color: #ffffff; border: none;
+            padding: 9px 14px; border-radius: var(--radius-md);
+            font-size: 12px; font-weight: 800; text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease;
         }
-        .hamburger-btn:hover, .view-tab-btn:hover, .theme-toggle-btn:hover, .cart-trigger-btn:hover, .filter-chip:hover {
-            transform: translateY(-2.5px);
-            box-shadow: 0 6px 18px rgba(0, 32, 91, 0.15);
-        }
+        .btn-back-hub-portal:hover { background: var(--yatas-navy-hover); }
 
         .hamburger-btn {
-            width: 42px; height: 42px;
+            width: 40px; height: 40px;
             background: #00205b;
             border: none; border-radius: var(--radius-md); cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 18px;
+            color: #fff; font-size: 16px; transition: all 0.2s;
         }
         .hamburger-btn:hover { background: var(--yatas-red); }
-
-        .brand-logo-btn {
-            background: transparent; border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; height: 40px;
-        }
-        .brand-logo-btn img { height: 32px; width: auto; object-fit: contain; }
-
-        .nav-view-tabs { display: flex; gap: 8px; margin-left: 10px; }
-        .view-tab-btn {
-            padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
-            border: 1px solid var(--border-color); cursor: pointer; background: var(--glass-bg);
-            color: var(--text-main); backdrop-filter: blur(10px);
-            display: flex; align-items: center; gap: 6px;
-        }
-        .view-tab-btn.active { background: #00205b; color: #fff; border-color: #00205b; }
 
         .spotlight-trigger {
             display: flex; align-items: center; gap: 10px;
             background: var(--glass-bg); border: 1px solid var(--border-color);
             padding: 8px 16px; border-radius: 30px; cursor: pointer;
-            font-size: 13px; color: var(--text-muted); transition: all 0.25s;
-            backdrop-filter: blur(10px);
+            font-size: 12.5px; color: var(--text-muted); transition: all 0.2s;
+            margin-left: 8px;
         }
-        .spotlight-trigger:hover { transform: translateY(-2px); border-color: #00205b; color: var(--text-main); }
+        .spotlight-trigger:hover { border-color: #00205b; color: var(--text-main); }
         .spotlight-key {
-            background: var(--card-bg); border: 1px solid var(--border-color);
+            background: #ffffff; border: 1px solid var(--border-color);
             padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;
         }
 
-        .header-right { display: flex; align-items: center; gap: 12px; }
-
-        .theme-toggle-btn {
-            background: var(--glass-bg); border: 1px solid var(--border-color);
-            color: var(--text-main); width: 40px; height: 40px; border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
+        .header-right { display: flex; align-items: center; gap: 10px; }
 
         .currency-selector, .lang-selector {
             background: var(--glass-bg); border: 1px solid var(--border-color);
             color: var(--text-main); padding: 8px 12px; border-radius: var(--radius-md);
             font-size: 12.5px; font-weight: 700; cursor: pointer; outline: none;
-            font-family: inherit; backdrop-filter: blur(10px); transition: all 0.2s;
+            font-family: inherit;
         }
 
         .cart-trigger-btn {
             position: relative; background: #00205b; border: none;
-            color: #fff; padding: 10px 20px; border-radius: var(--radius-md);
+            color: #fff; padding: 10px 18px; border-radius: var(--radius-md);
             font-size: 13px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 32, 91, 0.2);
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 32, 91, 0.15); transition: all 0.2s;
         }
+        .cart-trigger-btn:hover { background: var(--yatas-navy-hover); }
 
         .cart-badge {
             background: var(--yatas-red); color: #fff;
-            font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 20px;
+            font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 20px;
         }
 
-        /* HERO SLIDER */
-        .hero-banner-container {
-            position: relative;
-            width: 100%; height: 380px;
-            margin-bottom: 28px; border-radius: var(--radius-lg);
-            overflow: hidden; box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-color);
-        }
-        .hero-slide {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s;
-            background-size: cover; background-position: center;
-            display: flex; align-items: center; padding: 0 60px;
-        }
-        .hero-slide.active { opacity: 1; visibility: visible; }
-        .hero-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, rgba(0, 32, 91, 0.85) 0%, rgba(0, 32, 91, 0.3) 60%, transparent 100%);
-        }
-        .hero-content { position: relative; z-index: 2; max-width: 580px; color: #ffffff; }
-        .hero-tag {
-            display: inline-block; padding: 4px 12px; background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px); border-radius: 20px; font-size: 11px;
-            font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;
-        }
-        .hero-title { font-size: 34px; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
-        .hero-desc { font-size: 13.5px; opacity: 0.9; margin-bottom: 20px; line-height: 1.5; }
-        .hero-cta-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 22px; background: #ffffff; color: #00205b;
-            border-radius: 30px; font-size: 13px; font-weight: 800;
-            text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .hero-cta-btn:hover { transform: translateY(-2px); background: var(--yatas-red); color: #fff; }
-
+        /* FILTER PANEL */
         .filter-control-panel {
             background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg); padding: 16px 24px; margin-bottom: 28px;
-            display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;
-            box-shadow: var(--shadow-subtle); backdrop-filter: blur(15px);
+            border-radius: var(--radius-lg); padding: 12px 20px; margin-bottom: 24px;
+            display: flex; gap: 12px; align-items: center; justify-content: flex-start;
+            box-shadow: var(--shadow-subtle);
         }
 
-        .quick-filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .quick-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         
         .filter-chip {
-            padding: 8px 20px; background: #ffffff;
+            padding: 8px 18px; background: #ffffff;
             border: 1.5px solid var(--border-color); border-radius: 30px;
             font-size: 12.5px; font-weight: 800; color: #00205b; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
         }
         .filter-chip.active {
             background: #ffffff; border-color: #00205b;
-            box-shadow: 0 4px 16px rgba(0, 32, 91, 0.22);
-            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 32, 91, 0.18);
         }
-        [data-theme="dark"] .filter-chip { background: #0f172a; color: #f8fafc; }
-        [data-theme="dark"] .filter-chip.active { background: #0f172a; border-color: #38bdf8; box-shadow: 0 4px 16px rgba(56, 189, 248, 0.25); }
+        .filter-chip-logo { height: 20px; width: auto; object-fit: contain; }
 
-        .filter-chip-logo { height: 22px; width: auto; object-fit: contain; }
-
-        .filter-dropdown-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .filter-select {
-            background: var(--bg-main); border: 1px solid var(--border-color);
-            color: var(--text-main); padding: 8px 14px; border-radius: var(--radius-md);
-            font-size: 12.5px; font-weight: 700; outline: none; cursor: pointer; font-family: inherit;
-        }
-
-        /* SOL BANNER BÜTÜNCÜL BEYAZ ZEMİN (image_713300.png FIX) */
+        /* SIDEBAR DRAWER */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 32, 91, 0.3); backdrop-filter: blur(4px);
@@ -264,32 +170,29 @@
         .sidebar-nav {
             position: fixed; left: -360px; top: 0; height: 100vh; width: 340px;
             background: #ffffff; border-right: 1px solid var(--border-color);
-            z-index: 1001; padding: 32px 24px; display: flex; flex-direction: column; gap: 16px;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow-y: auto; box-shadow: var(--shadow-subtle);
+            z-index: 1001; padding: 28px 20px; display: flex; flex-direction: column; gap: 16px;
+            transition: all 0.3s ease; overflow-y: auto; box-shadow: var(--shadow-subtle);
         }
-        [data-theme="dark"] .sidebar-nav { background: #0f172a; }
         .sidebar-nav.open { left: 0; }
 
         .sidebar-header-logo {
-            padding-bottom: 16px; border-bottom: 2px solid #00205b;
-            margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;
-            background: transparent;
+            padding-bottom: 14px; border-bottom: 2px solid #00205b;
+            margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
         }
-        .sidebar-header-logo img { height: 30px; width: auto; cursor: pointer; object-fit: contain; }
+        .sidebar-header-logo img { height: 28px; width: auto; cursor: pointer; object-fit: contain; }
 
         .nav-tree-item { margin-bottom: 8px; }
         .nav-tree-header {
-            padding: 12px 14px; background: var(--bg-main);
-            border-radius: var(--radius-md); font-size: 13px; font-weight: 700; color: var(--text-main);
+            padding: 10px 12px; background: var(--bg-main);
+            border-radius: var(--radius-md); font-size: 12.5px; font-weight: 700; color: var(--text-main);
             display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; transition: all 0.2s; border: 1px solid var(--border-color);
+            cursor: pointer; border: 1px solid var(--border-color);
         }
         .nav-tree-children { padding-left: 10px; display: none; margin-top: 6px; }
         .nav-tree-children.active { display: block; }
 
         .cat-tree-header {
-            padding: 10px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-main);
+            padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--text-main);
             display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; border-radius: 6px; margin-top: 4px; background: rgba(0,0,0,0.02);
             border: 1px dashed var(--border-color);
@@ -298,53 +201,44 @@
         .cat-tree-children.active { display: block; }
 
         .sub-link-item {
-            padding: 8px 12px; font-size: 12px; color: var(--text-main); font-weight: 600;
+            padding: 7px 10px; font-size: 11.5px; color: var(--text-main); font-weight: 600;
             display: flex; align-items: center; gap: 8px; cursor: pointer;
             border-radius: 6px; transition: all 0.2s; margin-bottom: 2px;
         }
         .sub-link-item:hover { color: var(--yatas-red); background: var(--bg-main); }
 
         /* MAIN LAYOUT */
-        main { flex: 1; padding: 28px 32px; max-width: 1600px; margin: 0 auto; width: 100%; }
+        main { flex: 1; padding: 24px 28px; max-width: 1600px; margin: 0 auto; width: 100%; }
 
         /* PRODUCT GRID & CARDS */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 28px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
 
         .product-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative;
-            box-shadow: var(--shadow-subtle); backdrop-filter: blur(15px);
+            cursor: pointer; transition: all 0.25s ease; position: relative;
+            box-shadow: var(--shadow-subtle);
         }
-        .product-card:hover { transform: translateY(-5px); border-color: #00205b; box-shadow: 0 12px 30px rgba(0, 32, 91, 0.12); }
+        .product-card:hover { transform: translateY(-4px); border-color: #00205b; box-shadow: 0 10px 25px rgba(0, 32, 91, 0.1); }
 
         .card-img-wrap {
-            position: relative; width: 100%; height: 230px;
+            position: relative; width: 100%; height: 220px;
             background: var(--bg-main); overflow: hidden; display: flex;
             align-items: center; justify-content: center;
         }
-        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
-        .product-card:hover .card-img-wrap img { transform: scale(1.04); }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .product-card:hover .card-img-wrap img { transform: scale(1.03); }
 
         .card-badge {
-            position: absolute; top: 14px; right: 14px; background: #00205b; color: #fff;
-            font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;
+            position: absolute; top: 12px; right: 12px; background: #00205b; color: #fff;
+            font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px;
         }
 
-        .card-magnifier-btn {
-            position: absolute; bottom: 12px; right: 12px;
-            background: rgba(255,255,255,0.85); color: #00205b; width: 34px; height: 34px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 13px; backdrop-filter: blur(5px); transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .card-magnifier-btn:hover { background: #00205b; color: #fff; transform: scale(1.12); }
-
-        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); font-weight: 800; }
-        .card-title { font-size: 18px; font-weight: 800; margin: 6px 0 14px 0; color: var(--text-main); }
-        .card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 14px; }
-        .card-price { font-size: 17px; font-weight: 800; color: var(--yatas-navy); }
+        .card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-brand { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 800; }
+        .card-title { font-size: 17px; font-weight: 800; margin: 4px 0 12px 0; color: var(--text-main); }
+        .card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 12px; }
+        .card-price { font-size: 16px; font-weight: 800; color: var(--yatas-navy); }
 
         /* PRODUCT DETAIL MODAL */
         .modal-overlay {
@@ -355,198 +249,164 @@
         .modal-overlay.active { display: flex; }
 
         .modal-card {
-            background: var(--card-bg); border-radius: var(--radius-lg); width: 100%; max-width: 1200px;
+            background: var(--card-bg); border-radius: var(--radius-lg); width: 100%; max-width: 1100px;
             max-height: 90vh; overflow-y: auto; display: flex; flex-wrap: wrap;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); position: relative; border: 1px solid var(--border-color);
-            backdrop-filter: blur(25px);
         }
 
         .modal-close {
-            position: absolute; top: 18px; right: 18px; width: 38px; height: 38px;
+            position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
             background: var(--bg-main); border-radius: 50%; border: 1px solid var(--border-color);
-            color: var(--text-main); font-size: 16px; cursor: pointer; z-index: 10;
+            color: var(--text-main); font-size: 15px; cursor: pointer; z-index: 10;
             display: flex; align-items: center; justify-content: center; transition: all 0.2s;
         }
         .modal-close:hover { background: var(--yatas-red); color: #fff; border-color: var(--yatas-red); }
 
         .modal-left { 
-            flex: 1.1; min-width: 360px; background: var(--bg-main); 
+            flex: 1.1; min-width: 340px; background: var(--bg-main); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 28px; border-right: 1px solid var(--border-color); position: relative;
+            padding: 24px; border-right: 1px solid var(--border-color); position: relative;
         }
 
         .gallery-main-container {
-            position: relative; width: 100%; height: 350px;
+            position: relative; width: 100%; height: 320px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; overflow: hidden; border-radius: 12px; user-select: none;
         }
-        .gallery-main-container img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s ease; }
+        .gallery-main-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* GÖRSEL ÜSTÜ ŞEFFAF VE HOVER EFEKTLİ OKLAR (image_71b29d.jpg FIX) */
         .modal-nav-arrow {
             position: absolute; top: 50%; transform: translateY(-50%);
-            width: 44px; height: 44px; background: rgba(255, 255, 255, 0.88);
+            width: 40px; height: 40px; background: rgba(255, 255, 255, 0.9);
             border: 1px solid var(--border-color); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: #00205b; font-size: 15px; cursor: pointer; z-index: 5;
-            opacity: 0.65; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15); backdrop-filter: blur(8px);
+            color: #00205b; font-size: 14px; cursor: pointer; z-index: 5;
+            transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .modal-nav-arrow:hover {
-            opacity: 1; transform: translateY(-50%) scale(1.12);
-            background: #00205b; color: #ffffff; border-color: #00205b;
-            box-shadow: 0 6px 20px rgba(0, 32, 91, 0.3);
-        }
-        .modal-nav-arrow.prev { left: 14px; }
-        .modal-nav-arrow.next { right: 14px; }
+        .modal-nav-arrow:hover { background: #00205b; color: #ffffff; }
+        .modal-nav-arrow.prev { left: 10px; }
+        .modal-nav-arrow.next { right: 10px; }
 
         .modal-photo-counter {
-            position: absolute; top: 12px; left: 12px; z-index: 5;
-            background: rgba(0, 32, 91, 0.75); color: #fff;
-            padding: 4px 10px; border-radius: 20px; font-size: 10.5px;
-            font-weight: 800; backdrop-filter: blur(5px); letter-spacing: 0.5px;
+            position: absolute; top: 10px; left: 10px; z-index: 5;
+            background: rgba(0, 32, 91, 0.8); color: #fff;
+            padding: 4px 8px; border-radius: 16px; font-size: 10px; font-weight: 800;
         }
 
-        .modal-thumbnails-bar { display: flex; gap: 8px; margin-top: 18px; overflow-x: auto; max-width: 100%; width: 100%; padding-bottom: 4px; }
+        .modal-thumbnails-bar { display: flex; gap: 8px; margin-top: 14px; overflow-x: auto; max-width: 100%; width: 100%; }
         .thumb-img {
-            width: 60px; height: 60px; border-radius: 8px; border: 2px solid var(--border-color);
+            width: 54px; height: 54px; border-radius: 8px; border: 2px solid var(--border-color);
             object-fit: cover; cursor: pointer; flex-shrink: 0; background: #fff; transition: all 0.2s;
         }
-        .thumb-img.active { border-color: #00205b; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0, 32, 91, 0.2); }
+        .thumb-img.active { border-color: #00205b; transform: scale(1.04); }
 
-        .modal-right { flex: 1.5; min-width: 360px; padding: 36px; display: flex; flex-direction: column; justify-content: space-between; }
-        .modal-header h2 { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
-        .modal-subtitle { font-size: 12px; color: var(--yatas-red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; font-weight: 800; }
+        .modal-right { flex: 1.4; min-width: 340px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; }
+        .modal-header h2 { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+        .modal-subtitle { font-size: 11px; color: var(--yatas-red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; font-weight: 800; }
 
-        /* ÜRÜNE ÖZEL İKONLU VE YATAŞ MAVİSİ VEKTÖREL SEKMELER (image_70cabc.png FIX) */
-        .family-tabs-bar { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; overflow-x: auto; }
+        .family-tabs-bar { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; overflow-x: auto; }
         .family-tab-btn {
-            padding: 8px 16px; background: var(--bg-main); border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); font-size: 12px; font-weight: 800; color: #00205b;
-            cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+            padding: 7px 14px; background: var(--bg-main); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); font-size: 11.5px; font-weight: 800; color: #00205b;
+            cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
         }
-        .family-tab-btn i { font-size: 14px; color: #00205b; }
-        .family-tab-btn.active { background: #00205b; color: #ffffff; border-color: #00205b; box-shadow: 0 4px 12px rgba(0, 32, 91, 0.2); }
-        .family-tab-btn.active i { color: #ffffff; }
+        .family-tab-btn.active { background: #00205b; color: #ffffff; border-color: #00205b; }
 
-        .variant-box { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-bottom: 22px; }
-        .form-group label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; font-weight: 800; letter-spacing: 0.5px; }
+        .variant-box { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 10.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-weight: 800; }
         
-        .kartela-cards-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+        .kartela-cards-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
         .kartela-card {
             background: var(--card-bg); border: 2px solid var(--border-color);
-            border-radius: var(--radius-md); padding: 8px; width: 100px;
+            border-radius: var(--radius-md); padding: 6px; width: 90px;
             display: flex; flex-direction: column; align-items: center; cursor: pointer;
             transition: all 0.2s; position: relative;
         }
-        .kartela-card:hover, .kartela-card.active { border-color: #00205b; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 32, 91, 0.15); }
-        .kartela-card.active::after {
-            content: "✓"; position: absolute; top: -6px; right: -6px;
-            background: #00205b; color: #fff; font-size: 10px; font-weight: 800;
-            width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
+        .kartela-card.active { border-color: #00205b; }
         .kartela-swatch-box {
-            width: 100%; height: 42px; border-radius: 6px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-            display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 6px;
+            width: 100%; height: 36px; border-radius: 6px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 4px;
         }
-        .kartela-code-text { font-size: 11px; font-weight: 800; color: var(--text-main); letter-spacing: 0.5px; }
+        .kartela-code-text { font-size: 10.5px; font-weight: 800; color: var(--text-main); }
 
-        .color-chips-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .color-chips-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
         .color-chip {
-            padding: 6px 14px; background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            padding: 5px 12px; background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s;
             display: flex; align-items: center; gap: 6px;
         }
         .color-chip.active { background: #00205b; color: #fff; border-color: #00205b; }
 
-        .size-chips-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .size-chips-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
         .size-chip {
-            padding: 6px 14px; background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            padding: 5px 12px; background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s;
         }
         .size-chip.active { background: #00205b; color: #fff; border-color: #00205b; }
 
-        .firmness-gauge-container {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 700;
-        }
-        .firmness-icon-circle {
-            width: 22px; height: 22px; border-radius: 50%;
-            background: var(--bg-main); border: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; color: var(--text-main);
-        }
-        .firmness-dots-wrapper { display: flex; align-items: center; gap: 6px; }
-        .firmness-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: var(--border-color); transition: all 0.3s;
-        }
-        .firmness-dot.active { background: #00205b; box-shadow: 0 0 8px rgba(0, 32, 91, 0.4); }
-
-        .specs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
+        .specs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
         .spec-item { 
-            background: var(--card-bg); padding: 10px 6px; border-radius: 8px; text-align: center; 
-            border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 62px;
+            background: var(--card-bg); padding: 8px 4px; border-radius: 8px; text-align: center; 
+            border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px;
         }
-        .spec-item span { display: block; font-size: 8.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
-        .spec-item strong { font-size: 11.5px; color: var(--text-main); font-weight: 800; margin-top: 4px; }
+        .spec-item span { display: block; font-size: 8px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
+        .spec-item strong { font-size: 11px; color: var(--text-main); font-weight: 800; margin-top: 2px; }
 
-        .qty-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-        .qty-picker { display: flex; align-items: center; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 3px; }
-        .qty-btn { width: 40px; height: 40px; background: none; border: none; color: var(--text-main); font-size: 18px; cursor: pointer; font-weight: 800; }
-        .qty-input { width: 60px; text-align: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-weight: 800; font-size: 15px; padding: 4px 0; outline: none; }
+        .qty-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .qty-picker { display: flex; align-items: center; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2px; }
+        .qty-btn { width: 36px; height: 36px; background: none; border: none; color: var(--text-main); font-size: 16px; cursor: pointer; font-weight: 800; }
+        .qty-input { width: 50px; text-align: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-weight: 800; font-size: 14px; padding: 3px 0; outline: none; }
 
-        .total-price-tag { font-size: 28px; font-weight: 800; color: var(--yatas-navy); }
+        .total-price-tag { font-size: 24px; font-weight: 800; color: var(--yatas-navy); }
 
         .add-cart-btn {
-            width: 100%; background: #00205b; color: #ffffff; border: none; padding: 16px;
-            border-radius: var(--radius-md); font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 32, 91, 0.2);
+            width: 100%; background: #00205b; color: #ffffff; border: none; padding: 14px;
+            border-radius: var(--radius-md); font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 32, 91, 0.15);
         }
-        .add-cart-btn:hover { background: var(--yatas-navy-hover); transform: translateY(-1px); }
+        .add-cart-btn:hover { background: var(--yatas-navy-hover); }
 
-        /* CART DRAWER */
+        /* CART DRAWER & OVERLAY */
         .cart-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 32, 91, 0.3); backdrop-filter: blur(4px);
-            z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s;
+            z-index: 99990; opacity: 0; visibility: hidden; transition: all 0.3s;
         }
         .cart-overlay.active { opacity: 1; visibility: visible; }
 
         .cart-drawer {
-            position: fixed; right: -460px; top: 0; height: 100vh; width: 440px;
+            position: fixed; right: -460px; top: 0; height: 100vh; width: 420px;
             background: var(--card-bg); border-left: 1px solid var(--border-color);
-            z-index: 2001; padding: 28px; display: flex; flex-direction: column; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: var(--shadow-subtle); backdrop-filter: blur(25px);
+            z-index: 99999 !important; padding: 24px; display: flex; flex-direction: column; transition: all 0.3s ease;
+            box-shadow: var(--shadow-subtle);
         }
         .cart-drawer.open { right: 0; }
 
-        .cart-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--border-color); padding-bottom: 16px; color: var(--text-main); }
-        .cart-items-list { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 14px; }
+        .cart-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--border-color); padding-bottom: 14px; color: var(--text-main); }
+        .cart-items-list { flex: 1; overflow-y: auto; padding: 14px 0; display: flex; flex-direction: column; gap: 12px; }
 
         .cart-item-card {
             background: var(--bg-main); border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); padding: 12px; display: flex; gap: 14px; align-items: center;
+            border-radius: var(--radius-md); padding: 10px; display: flex; gap: 12px; align-items: center;
         }
-        .cart-item-card img { width: 62px; height: 62px; object-fit: cover; border-radius: 8px; }
+        .cart-item-card img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; }
         .cart-item-info { flex: 1; }
-        .cart-item-info h4 { font-size: 14px; font-weight: 800; color: var(--text-main); }
-        .cart-item-price { font-size: 13.5px; font-weight: 800; color: var(--yatas-navy); margin-top: 4px; }
+        .cart-item-info h4 { font-size: 13px; font-weight: 800; color: var(--text-main); }
+        .cart-item-price { font-size: 13px; font-weight: 800; color: var(--yatas-navy); margin-top: 2px; }
 
-        .logistics-bar-container { background: var(--bg-main); border-radius: var(--radius-md); padding: 16px; margin: 14px 0; border: 1px solid var(--border-color); }
-        .logistics-title { font-size: 11px; font-weight: 800; color: var(--yatas-navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .logistics-row { margin-bottom: 12px; }
-        .logistics-label { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 6px; color: var(--text-main); font-weight: 700; }
-        .progress-track { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .logistics-bar-container { background: var(--bg-main); border-radius: var(--radius-md); padding: 14px; margin: 12px 0; border: 1px solid var(--border-color); }
+        .logistics-title { font-size: 10.5px; font-weight: 800; color: var(--yatas-navy); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .logistics-row { margin-bottom: 10px; }
+        .logistics-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: var(--text-main); font-weight: 700; }
+        .progress-track { width: 100%; height: 7px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
         .progress-fill-hq { height: 100%; background: #00205b; width: 0%; transition: width 0.3s ease; }
         .progress-fill-truck { height: 100%; background: var(--accent-gold); width: 0%; transition: width 0.3s ease; }
 
-        .cart-footer { border-top: 2px solid var(--border-color); padding-top: 18px; }
+        .cart-footer { border-top: 2px solid var(--border-color); padding-top: 16px; }
         .export-excel-btn {
-            width: 100%; background: #10b981; color: #fff; border: none; padding: 14px;
-            border-radius: var(--radius-md); font-size: 13.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; background: #10b981; color: #fff; border: none; padding: 12px;
+            border-radius: var(--radius-md); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
             transition: background 0.2s;
         }
         .export-excel-btn:hover { background: #059669; }
@@ -555,162 +415,66 @@
         .spotlight-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 20, 60, 0.5); backdrop-filter: blur(8px);
-            z-index: 3000; display: none; align-items: flex-start; justify-content: center; padding-top: 100px;
+            z-index: 3000; display: none; align-items: flex-start; justify-content: center; padding-top: 80px;
         }
         .spotlight-modal.active { display: flex; }
         .spotlight-box {
             background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg); width: 100%; max-width: 640px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); overflow: hidden;
+            border-radius: var(--radius-lg); width: 100%; max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;
         }
-        .spotlight-input-wrap { display: flex; align-items: center; gap: 14px; padding: 18px 24px; border-bottom: 1px solid var(--border-color); }
-        .spotlight-input-wrap input { width: 100%; background: transparent; border: none; outline: none; font-size: 16px; font-weight: 600; color: var(--text-main); font-family: inherit; }
-        .spotlight-results { max-height: 380px; overflow-y: auto; padding: 12px; }
-        .spotlight-item { padding: 12px 16px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .spotlight-input-wrap { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+        .spotlight-input-wrap input { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; font-weight: 600; color: var(--text-main); font-family: inherit; }
+        .spotlight-results { max-height: 360px; overflow-y: auto; padding: 10px; }
+        .spotlight-item { padding: 10px 14px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
         .spotlight-item:hover { background: var(--bg-main); }
 
-        /* YENİLENEN YATAŞ CHATBOT ROBOT İKONU VE LOGOSU */
-        .chat-widget-btn {
-            position: fixed; bottom: 80px; right: 28px; z-index: 2500;
-            width: 58px; height: 58px; border-radius: 50%;
-            background: linear-gradient(135deg, #00205b, #0040b0);
-            color: #ffffff; border: 2px solid rgba(255,255,255,0.25);
-            box-shadow: 0 8px 25px rgba(0, 32, 91, 0.35); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .chat-widget-btn:hover { transform: scale(1.1) rotate(5deg); }
-        .chat-widget-btn::after {
-            content: ""; position: absolute; top: 2px; right: 2px;
-            width: 12px; height: 12px; background: #10b981; border: 2px solid #ffffff;
-            border-radius: 50%;
-        }
-
-        .chat-window {
-            position: fixed; bottom: 150px; right: 28px; z-index: 2500;
-            width: 380px; height: 500px; background: var(--card-bg);
-            border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: none; flex-direction: column;
-            overflow: hidden; backdrop-filter: blur(25px); transition: all 0.3s;
-        }
-        .chat-window.active { display: flex; }
-
-        .chat-header {
-            background: #00205b; color: #fff; padding: 16px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 13px; }
-        .chat-msg { padding: 10px 14px; border-radius: 12px; max-width: 85%; line-height: 1.4; }
-        .chat-msg.bot { background: var(--bg-main); border: 1px solid var(--border-color); align-self: flex-start; color: var(--text-main); }
-        .chat-msg.user { background: #00205b; color: #fff; align-self: flex-end; }
-
-        .chat-options-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-        .chat-opt-btn {
-            padding: 6px 12px; background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 20px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-            color: var(--text-main);
-        }
-        .chat-opt-btn:hover { background: #00205b; color: #fff; }
-
-        /* YUKARI ÇIK (SCROLL TO TOP) OK BUTONU - image_712b5a.png FIX */
+        /* SCROLL TO TOP */
         .scroll-top-btn {
-            position: fixed; bottom: 80px; left: 28px; z-index: 2500;
-            width: 48px; height: 48px; border-radius: 50%;
-            background: #00205b; color: #ffffff; border: 1.5px solid rgba(255,255,255,0.25);
-            box-shadow: 0 6px 20px rgba(0, 32, 91, 0.3); cursor: pointer;
+            position: fixed; bottom: 30px; left: 24px; z-index: 2500;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: #00205b; color: #ffffff; border: 1.5px solid rgba(255,255,255,0.2);
+            box-shadow: 0 6px 18px rgba(0, 32, 91, 0.25); cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 16px; opacity: 0; visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 15px; opacity: 0; visibility: hidden; transition: all 0.25s ease;
         }
         .scroll-top-btn.visible { opacity: 1; visibility: visible; }
-        .scroll-top-btn:hover { transform: translateY(-4px); background: var(--yatas-red); }
+        .scroll-top-btn:hover { background: var(--yatas-red); }
 
-        /* GELİŞTİRİLMİŞ TAM EKRAN LIGHTBOX MODAL (image_714623.png FIX) */
-        .lightbox-modal {
-            display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.92); backdrop-filter: blur(10px);
-            align-items: center; justify-content: center; user-select: none;
-        }
-        .lightbox-modal.active { display: flex; }
-        .lightbox-content { max-width: 88%; max-height: 85vh; border-radius: 8px; object-fit: contain; cursor: pointer; }
-
-        .lightbox-nav-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 52px; height: 52px; background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255,255,255,0.25); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: #ffffff; font-size: 20px; cursor: pointer; z-index: 10000;
-            transition: all 0.25s ease; backdrop-filter: blur(8px);
-        }
-        .lightbox-nav-arrow:hover { background: #ffffff; color: #00205b; transform: translateY(-50%) scale(1.1); }
-        .lightbox-nav-arrow.prev { left: 30px; }
-        .lightbox-nav-arrow.next { right: 30px; }
-
-        .lightbox-counter {
-            position: absolute; top: 24px; left: 30px; color: rgba(255,255,255,0.85);
-            font-size: 14px; font-weight: 800; background: rgba(0,0,0,0.4);
-            padding: 6px 16px; border-radius: 20px; backdrop-filter: blur(5px);
-        }
-
-        /* YENİLENEN YATAŞ LACİVERTLİ SABİT FOOTER (image_714206.png FIX) */
+        /* FOOTER */
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 900;
-            background: var(--header-bg);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-top: 1px solid var(--border-color);
-            color: #00205b; padding: 12px 32px;
-            display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: opacity 0.3s;
+            background: var(--header-bg); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color); color: #00205b; padding: 10px 28px;
+            display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 700;
         }
         footer .footer-right { color: #00205b !important; font-weight: 800; }
-        [data-theme="dark"] footer { color: #38bdf8; }
-        [data-theme="dark"] footer .footer-right { color: #38bdf8 !important; }
 
-        @media (max-width: 992px) { 
-            .specs-grid { grid-template-columns: repeat(2, 1fr); }
-            .hero-banner-container { height: 300px; }
-            .hero-title { font-size: 26px; }
-        }
         @media (max-width: 768px) {
-            main { padding: 20px 16px; }
-            header { padding: 12px 16px; }
+            main { padding: 16px 12px; }
+            header { padding: 10px 14px; }
             .cart-drawer { width: 100%; right: -100%; }
             .modal-card { flex-direction: column; }
             .spotlight-trigger { display: none; }
-            .hero-banner-container { height: 260px; }
-            .hero-slide { padding: 0 24px; }
-            .hero-title { font-size: 22px; }
-            .chat-window { width: 90%; right: 5%; bottom: 100px; }
-            footer { padding: 10px 16px; flex-direction: column; gap: 4px; text-align: center; }
-            .lightbox-nav-arrow { width: 40px; height: 40px; font-size: 14px; }
-            .lightbox-nav-arrow.prev { left: 10px; }
-            .lightbox-nav-arrow.next { right: 10px; }
+            footer { padding: 8px 14px; flex-direction: column; gap: 2px; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ANNOUNCEMENT TICKER BANNER -->
-    <div class="announcement-ticker-bar">
-        <span class="ticker-badge" data-i18n="notice_badge">Notice</span>
-        <div class="ticker-viewport">
-            <div class="ticker-slide-item active" id="ticker1" data-i18n="notice1">Fiyatlarımız 2026 Temmuz ayında güncellenmiştir.</div>
-            <div class="ticker-slide-item" id="ticker2" data-i18n="notice2">Yeni 2026 Yataş Bedding & Enza Home Koleksiyonları B2B Portala Eklenmiştir.</div>
-        </div>
-    </div>
-
     <!-- HEADER NAVIGATION -->
     <header>
         <div class="header-left">
-            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars" id="hamburgerIcon"></i></button>
-            <button class="brand-logo-btn" onclick="resetToHome()">
-                <img src="yatas_grup_logo.jpg" alt="Yataş Group" onerror="this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png'">
+            <a href="../index.html" target="_self" class="btn-back-hub-portal">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Hub</span>
+            </a>
+
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+
+            <button class="brand-logo-btn" onclick="resetToHome()" title="Yataş Group Home">
+                <img src="https://yatasinternational.github.io/Yatas-B2B-Portal/yatas_grup_logo.jpg" alt="Yataş Group" onerror="this.onerror=null; this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png';">
             </button>
-            
-            <div class="nav-view-tabs">
-                <button class="view-tab-btn active" id="btnOrderPortal" onclick="switchView('portal')"><i class="fa-solid fa-store"></i> <span data-i18n="tab_portal">Order Portal</span></button>
-                <button class="view-tab-btn" id="btnCatalogViewer" onclick="switchView('catalog')"><i class="fa-solid fa-book-open"></i> <span data-i18n="tab_catalog">Catalogues & Decks</span></button>
-            </div>
 
             <div class="spotlight-trigger" onclick="openSpotlight()">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -720,10 +484,6 @@
         </div>
 
         <div class="header-right">
-            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-                <i class="fa-solid fa-moon" id="themeIcon"></i>
-            </button>
-
             <select class="currency-selector" id="currencySelect" onchange="changeCurrency(this.value)">
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -749,7 +509,7 @@
 
     <div class="sidebar-nav" id="sidebarNav">
         <div class="sidebar-header-logo">
-            <img src="yatas_grup_logo.jpg" alt="Yataş Group" onclick="resetToHome()" onerror="this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png'">
+            <img src="../yatas_grup_logo.jpg" alt="Yataş Group" onclick="resetToHome()" onerror="this.src='https://yatasinternational.github.io/Products-Photos/yatas_logo.png'">
             <i class="fa-solid fa-xmark" style="cursor:pointer; color:var(--text-muted);" onclick="toggleSidebar()"></i>
         </div>
         <div id="navigationTree"></div>
@@ -757,34 +517,6 @@
 
     <!-- MAIN PORTAL SECTION -->
     <main id="mainPortalSection">
-        <!-- HERO BANNER SLIDER -->
-        <div class="hero-banner-container" id="heroBanner">
-            <div class="hero-slide active" style="background-image: url('https://yatasinternational.github.io/Products-Photos/Activio/activio.jpg');">
-                <div class="hero-overlay"></div>
-                <div class="hero-content">
-                    <span class="hero-tag">YATAŞ BEDDING COLLECTION</span>
-                    <h1 class="hero-title">Not All Sleep Is The Same. This is Yataş Sleep.</h1>
-                    <p class="hero-desc">Engineered for global comfort with premium spinal support & innovative fabric technology.</p>
-                    <a href="https://www.yatasbedding.com/en-EN/" target="_blank" class="hero-cta-btn">
-                        <span>Explore Yataş World</span> <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="hero-slide" style="background-image: url('https://yatasinternational.github.io/Products-Photos/Supreme%20Pedic/supreme_pedic_baza.jpg');">
-                <div class="hero-overlay" style="background: linear-gradient(90deg, rgba(120, 50, 20, 0.88) 0%, rgba(120, 50, 20, 0.3) 60%, transparent 100%);"></div>
-                <div class="hero-content">
-                    <span class="hero-tag" style="background: rgba(215, 25, 33, 0.4);">ENZA HOME DESIGN</span>
-                    <h1 class="hero-title">Contemporary Living & Dining Solutions</h1>
-                    <p class="hero-desc">Transforming global homes with aesthetic furniture, upholstery & bedroom concepts.</p>
-                    <a href="https://www.enzahome.com/en-EN/" target="_blank" class="hero-cta-btn">
-                        <span>Discover Enza Home</span> <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ADVANCED FILTERING & SORTING TOOLBAR -->
         <div class="filter-control-panel">
             <div class="quick-filters" id="brandFilterChips">
                 <div class="filter-chip active" onclick="filterByBrand('ALL')">
@@ -797,67 +529,12 @@
                     <img src="https://p1-assets-yatas.sm.mncdn.com/assets/img/enza/logo.webp" alt="Enza Home" class="filter-chip-logo">
                 </div>
             </div>
-
-            <div class="filter-dropdown-group">
-                <select class="filter-select" id="filterHardness" onchange="applyFilters()">
-                    <option value="ALL" data-i18n="hardness_all">All Firmness Levels</option>
-                    <option value="Soft" data-i18n="hardness_soft">Soft / Yumuşak</option>
-                    <option value="Medium" data-i18n="hardness_medium">Medium / Orta</option>
-                    <option value="Firm" data-i18n="hardness_firm">Firm / Sert</option>
-                    <option value="Extra Firm" data-i18n="hardness_extrafirm">Extra Firm / Ultra Sert</option>
-                </select>
-
-                <select class="filter-select" id="sortSelect" onchange="applyFilters()">
-                    <option value="DEFAULT" data-i18n="sort_default">Sort By: Recommended</option>
-                    <option value="NAME_ASC" data-i18n="sort_name_asc">Name (A-Z)</option>
-                    <option value="NAME_DESC" data-i18n="sort_name_desc">Name (Z-A)</option>
-                    <option value="PRICE_ASC" data-i18n="sort_price_asc">Price (Low to High)</option>
-                    <option value="PRICE_DESC" data-i18n="sort_price_desc">Price (High to Low)</option>
-                </select>
-            </div>
         </div>
 
         <div class="product-grid" id="productGrid"></div>
     </main>
 
-    <!-- CANLI KATALOG SİTESİ -->
-    <main id="catalogViewSection" style="display:none; text-align:center; padding:16px 32px;">
-        <iframe src="https://yatasinternational.github.io/Yatas-Corporate-Deck/" style="width:100%; height:82vh; border:1px solid var(--border-color); border-radius:var(--radius-lg); box-shadow:var(--shadow-subtle);"></iframe>
-    </main>
-
-    <!-- AI SALES ASSISTANT CHATBOT WIDGET -->
-    <div class="chat-widget-btn" onclick="toggleChatWindow()" title="AI Sales Assistant">
-        <i class="fa-solid fa-headset"></i>
-    </div>
-
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <i class="fa-solid fa-headset" style="font-size:18px;"></i>
-                <div>
-                    <h4 style="font-size:14px; font-weight:800;" data-i18n="chat_title">Yataş B2B AI Assistant</h4>
-                    <span style="font-size:10px; opacity:0.8;" data-i18n="chat_status">Online • Product Advisor</span>
-                </div>
-            </div>
-            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleChatWindow()"></i>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-            <div class="chat-msg bot" id="chatWelcomeMsg" data-i18n="chat_welcome">
-                Hello! I am your Yataş B2B Product Advisor. How can I assist you with mattress firmness, dimensions, or fabric recommendations today?
-            </div>
-        </div>
-
-        <div style="padding:12px; border-top:1px solid var(--border-color); background:var(--bg-main);">
-            <div class="chat-options-group" id="chatOptionsGroup">
-                <button class="chat-opt-btn" onclick="sendChatQuery('Firmness Guide')" data-i18n="chat_opt1">🛌 How to choose Firmness?</button>
-                <button class="chat-opt-btn" onclick="sendChatQuery('Mattress Sizes')" data-i18n="chat_opt2">📐 Standard Sizes</button>
-                <button class="chat-opt-btn" onclick="sendChatQuery('Fabric Options')" data-i18n="chat_opt3">🎨 Fabrics & Colors</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- YUKARI ÇIK (SCROLL TO TOP) OK BUTONU -->
+    <!-- SCROLL TO TOP -->
     <div class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Scroll to top">
         <i class="fa-solid fa-chevron-up"></i>
     </div>
@@ -879,7 +556,7 @@
             <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="modal-left">
-                <div class="gallery-main-container" id="galleryContainer" onclick="handleMainImageClick(event)">
+                <div class="gallery-main-container" id="galleryContainer">
                     <span class="modal-photo-counter" id="modalPhotoCounter">1 / 1</span>
                     <button class="modal-nav-arrow prev" onclick="prevModalPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
                     <img id="modalImg" src="" alt="Product Main Image">
@@ -912,22 +589,6 @@
                         <div class="size-chips-grid" id="sizeChipsGrid"></div>
                     </div>
 
-                    <div id="firmnessSection" style="margin-bottom: 12px; display: none; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;" data-i18n="firmness_title">FIRMNESS / SERTLİK</span>
-                        
-                        <div class="firmness-gauge-container">
-                            <div class="firmness-icon-circle" title="Soft"><i class="fa-solid fa-feather"></i></div>
-                            <span id="firmnessLabelText" style="margin: 0 4px;">Medium</span>
-                            <div class="firmness-dots-wrapper">
-                                <div class="firmness-dot" id="fDot1"></div>
-                                <div class="firmness-dot" id="fDot2"></div>
-                                <div class="firmness-dot" id="fDot3"></div>
-                                <div class="firmness-dot" id="fDot4"></div>
-                            </div>
-                            <div class="firmness-icon-circle" title="Hard"><i class="fa-solid fa-cube"></i></div>
-                        </div>
-                    </div>
-
                     <div class="specs-grid">
                         <div class="spec-item"><span data-i18n="gtip">HS CODE</span><strong id="specGtip">-</strong></div>
                         <div class="spec-item"><span data-i18n="volume">UNIT VOL</span><strong id="specVolume">0 m³</strong></div>
@@ -958,17 +619,7 @@
         </div>
     </div>
 
-    <!-- GELİŞTİRİLMİŞ LIGHTBOX MODAL (image_714623.png FIX) -->
-    <div id="imageLightboxModal" class="lightbox-modal" onclick="closeLightboxOnBackdrop(event)">
-        <span style="position:absolute; top:24px; right:36px; color:#fff; font-size:36px; cursor:pointer; z-index:10001;" onclick="closeLightbox()">&times;</span>
-        <span class="lightbox-counter" id="lightboxCounter">1 / 1</span>
-        
-        <button class="lightbox-nav-arrow prev" onclick="prevLightboxPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
-        <img class="lightbox-content" id="lightboxImg" src="" alt="Zoomed Photo" onclick="nextLightboxPhoto(event)">
-        <button class="lightbox-nav-arrow next" onclick="nextLightboxPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
-    </div>
-
-    <!-- CART DRAWER BACKDROP & DRAWER -->
+    <!-- CART DRAWER & OVERLAY -->
     <div class="cart-overlay" id="cartOverlay" onclick="toggleCart(false)"></div>
 
     <div class="cart-drawer" id="cartDrawer">
@@ -1022,7 +673,7 @@
         </div>
     </div>
 
-    <!-- LIQUID GLASS FOOTER SIGNATURE (image_714206.png FIX) -->
+    <!-- FOOTER -->
     <footer id="appFooter">
         <div>Copyright © 2026 Yataş International. All rights reserved.</div>
         <div class="footer-right">Proudly presented by International Sales Development Team</div>
@@ -1031,132 +682,56 @@
     <script>
         const i18n = {
             TR: {
-                notice_badge: "DUYURU",
-                notice1: "Fiyatlarımız 2026 Temmuz ayında güncellenmiştir.",
-                notice2: "Yeni 2026 Yataş Bedding & Enza Home Koleksiyonları B2B Portala Eklenmiştir.",
-                tab_portal: "Sipariş Portalı",
-                tab_catalog: "Kataloglar & Sunumlar",
                 spotlight_ph: "Hızlı SKU, koleksiyon veya GTİP ara...",
                 all_brands: "Tüm Markalar",
-                sort_default: "Sıralama: Önerilen",
-                sort_name_asc: "İsim (A-Z)",
-                sort_name_desc: "İsim (Z-A)",
-                sort_price_asc: "Fiyat (Düşükten Yükseğe)",
-                sort_price_desc: "Fiyat (Yüksekten Düşüğe)",
-                hardness_all: "Tüm Sertlik Seviyeleri",
-                hardness_soft: "Soft / Yumuşak",
-                hardness_medium: "Medium / Orta",
-                hardness_firm: "Firm / Sert",
-                hardness_extrafirm: "Extra Firm / Ultra Sert",
                 select_kartela: "KUMAŞ KOLEKSİYONU / KARTELA SEÇİNİZ",
                 select_color: "RENK SEÇİNİZ",
                 select_size: "ÖLÇÜ / EBAT SEÇİNİZ",
-                firmness_title: "SERTLİK DERECESİ",
                 gtip: "GTİP KODU", volume: "BİRİM HACİM", weight: "BİRİM AĞIRLIK", height: "YÜKSEKLİK", status: "DURUM",
-                feature: "ÖZELLİK", kartela_label: "KARTELA", color: "RENK", hardness: "SERTLİK",
+                feature: "ÖZELLİK", kartela_label: "KARTELA", color: "RENK",
                 add_to_cart: "Seçileni Siparişe Ekle", cart_title: "Proforma Sipariş Özeti",
                 logistics_calc: "LOJİSTİK KAPASİTE VE ARAÇ HESABI", hq_container: "40' HQ Konteyner (68 m³)", std_truck: "Standart Tır (90 m³)",
                 grand_total: "Genel Toplam:", export_excel: "Fotoğraflı Excel Sipariş Listesi İndir", from: "başlayan fiyatlar",
-                cart: "Sepet",
-                chat_title: "Yataş B2B AI Asistanı", chat_status: "Çevrimiçi • Ürün Danışmanı",
-                chat_welcome: "Merhaba! Yataş B2B Ürün Danışmanınızım. Sertlik derecesi, ölçü seçimi veya kumaş önerileri konusunda size nasıl yardımcı olabilirim?",
-                chat_opt1: "🛌 Sertlik Seçim Rehberi", chat_opt2: "📐 Standart Ölçüler", chat_opt3: "🎨 Kumaş & Renk Seçenekleri"
+                cart: "Sepet"
             },
             EN: {
-                notice_badge: "Notice",
-                notice1: "Our prices have been updated as of July 2026.",
-                notice2: "New 2026 Yataş Bedding & Enza Home Collections added to B2B Portal.",
-                tab_portal: "Order Portal",
-                tab_catalog: "Catalogues & Decks",
                 spotlight_ph: "Quick search SKU, family...",
                 all_brands: "All Brands",
-                sort_default: "Sort By: Recommended",
-                sort_name_asc: "Name (A-Z)",
-                sort_name_desc: "Name (Z-A)",
-                sort_price_asc: "Price (Low to High)",
-                sort_price_desc: "Price (High to Low)",
-                hardness_all: "All Firmness Levels",
-                hardness_soft: "Soft / Yumuşak",
-                hardness_medium: "Medium / Orta",
-                hardness_firm: "Firm / Sert",
-                hardness_extrafirm: "Extra Firm / Ultra Sert",
                 select_kartela: "SELECT FABRIC COLLECTION / KARTELA",
                 select_color: "SELECT COLOR / RENK",
                 select_size: "SELECT DIMENSION / SIZE",
-                firmness_title: "FIRMNESS / SERTLİK",
                 gtip: "HS CODE", volume: "UNIT VOL", weight: "UNIT WT", height: "HEIGHT", status: "STATUS",
-                feature: "FEATURE", kartela_label: "KARTELA", color: "COLOR", hardness: "HARDNESS",
+                feature: "FEATURE", kartela_label: "KARTELA", color: "COLOR",
                 add_to_cart: "Add Selected Item to Order", cart_title: "Proforma Order Summary",
                 logistics_calc: "LOGISTICS & VEHICLE CAPACITY", hq_container: "40' HQ Container (68 m³)", std_truck: "Standard Truck (90 m³)",
                 grand_total: "Grand Total:", export_excel: "Export Excel Order with Photos", from: "from",
-                cart: "Cart",
-                chat_title: "Yataş B2B AI Assistant", chat_status: "Online • Product Advisor",
-                chat_welcome: "Hello! I am your Yataş B2B Product Advisor. How can I assist you with mattress firmness, dimensions, or fabric recommendations today?",
-                chat_opt1: "🛌 How to choose Firmness?", chat_opt2: "📐 Standard Sizes", chat_opt3: "🎨 Fabrics & Colors"
+                cart: "Cart"
             },
             DE: {
-                notice_badge: "HINWEIS",
-                notice1: "Unsere Preise wurden im Juli 2026 aktualisiert.",
-                notice2: "Neue Kollektionen 2026 Yataş Bedding & Enza Home wurden hinzugefügt.",
-                tab_portal: "Bestellportal",
-                tab_catalog: "Kataloge & Präsentationen",
                 spotlight_ph: "Schnellsuche SKU, Kollektion...",
                 all_brands: "Alle Marken",
-                sort_default: "Sortierung: Empfohlen",
-                sort_name_asc: "Name (A-Z)",
-                sort_name_desc: "Name (Z-A)",
-                sort_price_asc: "Preis (Aufsteigend)",
-                sort_price_desc: "Preis (Absteigend)",
-                hardness_all: "Alle Härtegradstufen",
-                hardness_soft: "Weich / Soft",
-                hardness_medium: "Mittel / Medium",
-                hardness_firm: "Hart / Firm",
-                hardness_extrafirm: "Sehr Hart / Extra Firm",
                 select_kartela: "STOFFKOLLEKTION WÄHLEN",
                 select_color: "FARBE WÄHLEN",
                 select_size: "GRÖSSE WÄHLEN",
-                firmness_title: "HÄRTEGRAD",
                 gtip: "HS CODE", volume: "VOLUMEN", weight: "GEWICHT", height: "HÖHE", status: "STATUS",
-                feature: "EIGENSCHAFT", kartela_label: "KARTELA", color: "FARBE", hardness: "HÄRTE",
+                feature: "EIGENSCHAFT", kartela_label: "KARTELA", color: "FARBE",
                 add_to_cart: "Ausgewähltes Element hinzufügen", cart_title: "Proforma-Bestellübersicht",
                 logistics_calc: "LOGISTIK- UND FAHRZEUGKAPAZITÄT", hq_container: "40' HQ Container (68 m³)", std_truck: "Standard LKW (90 m³)",
                 grand_total: "Gesamtsumme:", export_excel: "Excel-Bestellung mit Fotos exportieren", from: "ab",
-                cart: "Warenkorb",
-                chat_title: "Yataş B2B AI Assistent", chat_status: "Online • Produktberater",
-                chat_welcome: "Hallo! Ich bin Ihr Yataş B2B Produktberater. Wie kann ich Ihnen bei Matratzenhärte, Größen oder Stoffen helfen?",
-                chat_opt1: "🛌 Härtegrad-Ratgeber", chat_opt2: "📐 Standardgrößen", chat_opt3: "🎨 Stoffe & Farben"
+                cart: "Warenkorb"
             },
             RU: {
-                notice_badge: "УВЕДОМЛЕНИЕ",
-                notice1: "Наши цены были обновлены в июле 2026 года.",
-                notice2: "Новые коллекции 2026 Yataş Bedding и Enza Home добавлены на портал.",
-                tab_portal: "Портал заказов",
-                tab_catalog: "Каталоги и презентации",
                 spotlight_ph: "Быстрый поиск SKU, коллекции...",
                 all_brands: "Все бренды",
-                sort_default: "Сортировка: Рекомендуем",
-                sort_name_asc: "Название (А-Я)",
-                sort_name_desc: "Название (Я-А)",
-                sort_price_asc: "Цена (По возрастанию)",
-                sort_price_desc: "Цена (По убыванию)",
-                hardness_all: "Все уровни жесткости",
-                hardness_soft: "Мягкий / Soft",
-                hardness_medium: "Средний / Medium",
-                hardness_firm: "Жесткий / Firm",
-                hardness_extrafirm: "Очень жесткий / Extra Firm",
                 select_kartela: "ВЫБЕРИТЕ КОЛЛЕКЦИЮ ТКАНИ",
                 select_color: "ВЫБЕРИТЕ ЦВЕТ",
                 select_size: "ВЫБЕРИТЕ РАЗМЕР",
-                firmness_title: "ЖЕСТКОСТЬ",
                 gtip: "ТН ВЭД", volume: "ОБЪЕМ", weight: "ВЕС", height: "ВЫСОТА", status: "СТАТУС",
-                feature: "СВОЙСТВО", kartela_label: "КАРТЕЛЯ", color: "ЦВЕТ", hardness: "ЖЕСТКОСТЬ",
+                feature: "СВОЙСТВО", kartela_label: "КАРТЕЛЯ", color: "ЦВЕТ",
                 add_to_cart: "Добавить выбранный товар", cart_title: "Сводка Проформа-Заказа",
                 logistics_calc: "ЛОГИСТИКА И ЕМКОСТЬ ТРАНСПОРТА", hq_container: "40' HQ Контейнер (68 m³)", std_truck: "Стандартная Фура (90 m³)",
                 grand_total: "Итого:", export_excel: "Скачать Excel с фото", from: "от",
-                cart: "Корзина",
-                chat_title: "Yataş B2B AI Консультант", chat_status: "Онлайн • Консультант",
-                chat_welcome: "Здравствуйте! Я ваш B2B консультант Yataş. Как я могу помочь вам с выбором жесткости, размеров или тканей?",
-                chat_opt1: "🛌 Руководство по жесткости", chat_opt2: "📐 Стандартные размеры", chat_opt3: "🎨 Варианты тканей и цветов"
+                cart: "Корзина"
             }
         };
 
@@ -1169,33 +744,7 @@
             "Alez": { EN: "Mattress Protector", DE: "Matratzenschoner", RU: "Наматрасник" },
             "Karyola": { EN: "Bed Frame", DE: "Bettgestell", RU: "Кровать" },
             "Aksesuar": { EN: "Accessories", DE: "Zubehör", RU: "Аксессуары" },
-            "Çocuk Yatak": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" },
-            "Çocuk Mattress": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" },
-            "Pacific": { EN: "Pacific Blue", DE: "Pazifikblau", RU: "Тихий океан" },
-            "Krem": { EN: "Cream", DE: "Creme", RU: "Кремовый" },
-            "Vizon": { EN: "Mink / Taupe", DE: "Mink", RU: "Норковый" },
-            "Açık Gri": { EN: "Light Gray", DE: "Hellgrau", RU: "Светло-серый" },
-            "Antrasit": { EN: "Anthracite", DE: "Anthrazit", RU: "Антрацит" },
-            "Mavi": { EN: "Blue", DE: "Blau", RU: "Синий" },
-            "Çağla": { EN: "Almond Green", DE: "Mandelgrün", RU: "Миндально-зеленый" },
-            "Koyu Gri": { EN: "Dark Gray", DE: "Dunkelgrau", RU: "Темно-серый" },
-            "Gri": { EN: "Gray", DE: "Grau", RU: "Серый" },
-            "Kum": { EN: "Sand", DE: "Sand", RU: "Песочный" },
-            "Bej": { EN: "Beige", DE: "Beige", RU: "Бежевый" },
-            "Pudra": { EN: "Powder Pink", DE: "Puder", RU: "Пудровый" },
-            "Lacivert": { EN: "Navy Blue", DE: "Marineblau", RU: "Темно-синий" },
-            "Ekru": { EN: "Ecru", DE: "Ekrü", RU: "Экрю" },
-            "Kemik": { EN: "Bone", DE: "Elfenbein", RU: "Слоновая кость" },
-            "Kül": { EN: "Ash", DE: "Asche", RU: "Пепельный" },
-            "Sütlü Kahve": { EN: "Milk Coffee", DE: "Milchkaffee", RU: "Кофе с молоком" },
-            "Spring": { EN: "Spring", DE: "Federkern", RU: "Пружинный" },
-            "Springless": { EN: "Foam / Springless", DE: "Schaumstoff", RU: "Беспружинный" },
-            "Hibrit": { EN: "Hybrid", DE: "Hybrid", RU: "Гибридный" },
-            "Foam": { EN: "Foam", DE: "Schaumstoff", RU: "Поролоновый" },
-            "Storage Base": { EN: "Storage Base", DE: "Bettkasten Baza", RU: "Основание с ящиком" },
-            "Sert": { EN: "Firm / Hard", DE: "Hart", RU: "Жесткий" },
-            "Medium": { EN: "Medium", DE: "Mittel", RU: "Средний" },
-            "Ultra Sert": { EN: "Extra Firm", DE: "Sehr Hart", RU: "Супер жесткий" }
+            "Çocuk Yatak": { EN: "Kids Mattress", DE: "Kindermatratze", RU: "Детский матрас" }
         };
 
         function autoTranslateText(text, targetLang) {
@@ -1240,11 +789,22 @@
         let currentPhotoIndex = 0;
 
         window.addEventListener('DOMContentLoaded', async () => {
+            let storedCart = JSON.parse(localStorage.getItem('b2b_cart'));
+            if (storedCart && storedCart.length > 0) {
+                cart = storedCart.map(item => ({
+                    family: item.name || 'B2B Proforma Item',
+                    category: 'Collection',
+                    brand: 'Yataş Group',
+                    photoUrl: item.image || 'https://via.placeholder.com/100',
+                    code: item.code, size: 'Standard', gtip: '9404.21', volume: item.m3 || 0.45,
+                    weight: item.weight || 12.5, height: 25, status: 'MTO', barcode: '-', feature: '-',
+                    hardness: '-', kartela: '-', color: '-', qty: Number(item.qty) || 1, unitPrice: Number(item.price) || 250, currency: 'USD'
+                }));
+                updateCartDisplay();
+            }
+
             await loadExcelData();
-            initScrollFooterBehavior();
             initKeyboardShortcuts();
-            initSwipeGestures();
-            initNoticeTicker();
             initScrollTopButton();
             changeLanguage(currentLang);
         });
@@ -1252,112 +812,19 @@
         function initScrollTopButton() {
             const btn = document.getElementById('scrollTopBtn');
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    btn.classList.add('visible');
-                } else {
-                    btn.classList.remove('visible');
-                }
+                if (window.scrollY > 300) btn.classList.add('visible');
+                else btn.classList.remove('visible');
             });
         }
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function initNoticeTicker() {
-            let tIdx = 0;
-            setInterval(() => {
-                const t1 = document.getElementById('ticker1');
-                const t2 = document.getElementById('ticker2');
-                if (tIdx === 0) {
-                    t1.classList.remove('active'); t2.classList.add('active'); tIdx = 1;
-                } else {
-                    t2.classList.remove('active'); t1.classList.add('active'); tIdx = 0;
-                }
-            }, 5000);
-        }
-
-        function switchView(viewName) {
-            const portalSec = document.getElementById('mainPortalSection');
-            const catalogSec = document.getElementById('catalogViewSection');
-            const btnP = document.getElementById('btnOrderPortal');
-            const btnC = document.getElementById('btnCatalogViewer');
-
-            if (viewName === 'portal') {
-                portalSec.style.display = 'block'; catalogSec.style.display = 'none';
-                btnP.classList.add('active'); btnC.classList.remove('active');
-            } else {
-                portalSec.style.display = 'none'; catalogSec.style.display = 'block';
-                btnC.classList.add('active'); btnP.classList.remove('active');
-            }
-        }
-
-        function toggleChatWindow() {
-            document.getElementById('chatWindow').classList.toggle('active');
-        }
-
-        function sendChatQuery(queryText) {
-            const msgBox = document.getElementById('chatMessages');
-            
-            const userMsg = document.createElement('div');
-            userMsg.className = 'chat-msg user';
-            userMsg.innerText = queryText;
-            msgBox.appendChild(userMsg);
-
-            setTimeout(() => {
-                const botMsg = document.createElement('div');
-                botMsg.className = 'chat-msg bot';
-
-                if (queryText.includes('Firmness') || queryText.includes('Sertlik')) {
-                    botMsg.innerText = currentLang === 'TR' ? "Sırt üstü yatanlar için omurga desteği sunan Orta-Sert veya Sert yataklar (örn. Activio, Supreme Pedic) önerilir." : "For back sleepers, Medium-Firm or Firm mattresses (e.g. Activio, Supreme Pedic) are recommended for spinal alignment.";
-                } else if (queryText.includes('Sizes') || queryText.includes('Ölçüler')) {
-                    botMsg.innerText = currentLang === 'TR' ? "Popüler uluslararası ölçüler: Tek Kişilik (90x190/200), Çift Kişilik (140x200), Queen (160x200), King (180x200)." : "Popular international sizes: Single (90x190/200), Double (140x200), Queen (160x200), King (180x200).";
-                } else {
-                    botMsg.innerText = currentLang === 'TR' ? "18'den fazla kumaş seçeneğimiz bulunmaktadır. Başlık veya Baza seçerek kumaş ve renk kartelalarını inceleyebilirsiniz." : "We offer over 18 fabric colors including Anthracite, Mink, Cream, and Pacific Blue. Select any Headboard/Base to preview available swatches!";
-                }
-
-                msgBox.appendChild(botMsg);
-                msgBox.scrollTop = msgBox.scrollHeight;
-            }, 600);
-
-            msgBox.scrollTop = msgBox.scrollHeight;
-        }
-
-        let touchStartX = 0; let touchEndX = 0;
-
-        function initSwipeGestures() {
-            const gContainer = document.getElementById('galleryContainer');
-            if (!gContainer) return;
-
-            gContainer.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            gContainer.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                if (Math.abs(touchEndX - touchStartX) > 40) {
-                    if (touchEndX < touchStartX) nextModalPhoto();
-                    else prevModalPhoto();
-                }
-            }, { passive: true });
-        }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
         function initKeyboardShortcuts() {
             window.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
                     e.preventDefault(); openSpotlight();
                 }
-                if (e.key === 'Escape') {
-                    closeSpotlight(); closeModal(); closeLightbox();
-                }
-                if (document.getElementById('productModal').classList.contains('active')) {
-                    if (e.key === 'ArrowRight') nextModalPhoto();
-                    if (e.key === 'ArrowLeft') prevModalPhoto();
-                }
-                if (document.getElementById('imageLightboxModal').classList.contains('active')) {
-                    if (e.key === 'ArrowRight') nextLightboxPhoto();
-                    if (e.key === 'ArrowLeft') prevLightboxPhoto();
-                }
+                if (e.key === 'Escape') { closeSpotlight(); closeModal(); }
             });
         }
 
@@ -1400,27 +867,7 @@
             `).join('') || `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">No matching products found</div>`;
         }
 
-        function selectSpotlightResult(famName) {
-            closeSpotlight(); openProductModal(famName);
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('themeIcon');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.setAttribute('data-theme', 'light'); icon.className = 'fa-solid fa-moon';
-            } else {
-                html.setAttribute('data-theme', 'dark'); icon.className = 'fa-solid fa-sun';
-            }
-        }
-
-        function initScrollFooterBehavior() {
-            const footer = document.getElementById('appFooter');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 40) footer.classList.add('hidden-on-scroll');
-                else footer.classList.remove('hidden-on-scroll');
-            });
-        }
+        function selectSpotlightResult(famName) { closeSpotlight(); openProductModal(famName); }
 
         async function loadExcelData() {
             try {
@@ -1539,26 +986,12 @@
             const grid = document.getElementById('productGrid');
             let families = Object.values(productFamilies);
 
-            const selectedH = document.getElementById('filterHardness').value;
-            const sortVal = document.getElementById('sortSelect').value;
-
             families = families.filter(f => {
-                const matchBrand = (activeBrandFilter === 'ALL' || f.brand === activeBrandFilter);
+                const matchBrand = (activeBrandFilter === 'ALL' || String(f.brand).toLowerCase().trim() === String(activeBrandFilter).toLowerCase().trim());
                 let matchCat = !activeCategoryFilter || Object.keys(f.categories).includes(activeCategoryFilter);
                 const matchFam = (!activeFamilyFilter || f.familyName === activeFamilyFilter);
-
-                let matchHardness = true;
-                if (selectedH !== 'ALL') {
-                    matchHardness = Object.values(f.categories).some(c => 
-                        c.variants.some(v => v.hardness.toLowerCase().includes(selectedH.toLowerCase()))
-                    );
-                }
-
-                return matchBrand && matchCat && matchFam && matchHardness;
+                return matchBrand && matchCat && matchFam;
             });
-
-            if (sortVal === 'NAME_ASC') families.sort((a,b) => a.familyName.localeCompare(b.familyName));
-            if (sortVal === 'NAME_DESC') families.sort((a,b) => b.familyName.localeCompare(a.familyName));
 
             grid.innerHTML = families.map(f => {
                 let allVariants = []; let mainPhoto = '';
@@ -1572,9 +1005,6 @@
                     <div class="card-img-wrap">
                         <img src="${mainPhoto}" alt="${f.familyName}" onerror="this.src='https://via.placeholder.com/300x200?text=Yatas+Bedding'">
                         <div class="card-badge">${Object.keys(f.categories).length} Categories</div>
-                        <div class="card-magnifier-btn" onclick="openLightboxFromGrid(event, '${mainPhoto}')" title="Zoom Photo">
-                            <i class="fa-solid fa-magnifying-glass-plus"></i>
-                        </div>
                     </div>
                     <div class="card-body">
                         <div>
@@ -1589,24 +1019,25 @@
             `}).join('');
         }
 
-        function applyFilters() { renderProductGrid(); }
+        function filterByBrand(b) {
+            activeBrandFilter = b;
+            activeCategoryFilter = null;
+            activeFamilyFilter = null;
+            buildBrandChips();
+            renderProductGrid();
+        }
+
+        function filterByFamily(brand, cat, fam) {
+            activeBrandFilter = brand;
+            activeCategoryFilter = cat;
+            activeFamilyFilter = fam;
+            renderProductGrid();
+            toggleSidebar();
+        }
 
         function resetToHome() {
             activeBrandFilter = 'ALL'; activeCategoryFilter = null; activeFamilyFilter = null;
             buildBrandChips(); renderProductGrid();
-        }
-
-        function getCategoryIcon(catKey) {
-            const key = String(catKey).toLowerCase();
-            if (key.includes('yatak') || key.includes('mattress')) return 'fa-bed';
-            if (key.includes('baza') || key.includes('base') || key.includes('boxspring')) return 'fa-box-archive';
-            if (key.includes('başlık') || key.includes('headboard')) return 'fa-couch';
-            if (key.includes('yastık') || key.includes('pillow')) return 'fa-feather';
-            if (key.includes('yorgan') || key.includes('duvet')) return 'fa-scroll';
-            if (key.includes('karyola') || key.includes('frame')) return 'fa-border-all';
-            if (key.includes('aksesuar') || key.includes('accessories')) return 'fa-shapes';
-            if (key.includes('kids') || key.includes('çocuk')) return 'fa-child';
-            return 'fa-layer-group';
         }
 
         function openProductModal(familyName) {
@@ -1619,7 +1050,7 @@
 
             tabsContainer.innerHTML = categoryKeys.map((catKey, index) => `
                 <button class="family-tab-btn ${index === 0 ? 'active' : ''}" onclick="switchFamilyCategory('${catKey}', this)">
-                    <i class="fa-solid ${getCategoryIcon(catKey)}"></i> ${autoTranslateText(catKey, currentLang)}
+                    ${autoTranslateText(catKey, currentLang)}
                 </button>
             `).join('');
 
@@ -1670,49 +1101,6 @@
         function setModalPhotoIndex(idx) { currentPhotoIndex = idx; updateModalPhotoDisplay(); }
         function nextModalPhoto(e = null) { if (e) e.stopPropagation(); if (modalPhotosList.length <= 1) return; currentPhotoIndex = (currentPhotoIndex + 1) % modalPhotosList.length; updateModalPhotoDisplay(); }
         function prevModalPhoto(e = null) { if (e) e.stopPropagation(); if (modalPhotosList.length <= 1) return; currentPhotoIndex = (currentPhotoIndex - 1 + modalPhotosList.length) % modalPhotosList.length; updateModalPhotoDisplay(); }
-        function handleMainImageClick(e) { if (e.target.closest('.modal-nav-arrow')) return; openLightboxFromMain(); }
-
-        /* GELİŞTİRİLMİŞ TAM EKRAN LIGHTBOX MOTORU (image_714623.png FIX) */
-        function openLightboxFromMain() {
-            openLightboxWithList(modalPhotosList, currentPhotoIndex);
-        }
-
-        function openLightboxFromGrid(e, src) {
-            e.stopPropagation();
-            openLightboxWithList([src], 0);
-        }
-
-        function openLightboxWithList(photosArray, startIndex) {
-            modalPhotosList = photosArray && photosArray.length > 0 ? photosArray : [document.getElementById('modalImg').src];
-            currentPhotoIndex = startIndex || 0;
-            updateLightboxDisplay();
-            document.getElementById('imageLightboxModal').classList.add('active');
-        }
-
-        function updateLightboxDisplay() {
-            if (modalPhotosList.length === 0) return;
-            document.getElementById('lightboxImg').src = modalPhotosList[currentPhotoIndex];
-            document.getElementById('lightboxCounter').innerText = `${currentPhotoIndex + 1} / ${modalPhotosList.length}`;
-        }
-
-        function nextLightboxPhoto(e = null) {
-            if (e) e.stopPropagation();
-            if (modalPhotosList.length <= 1) return;
-            currentPhotoIndex = (currentPhotoIndex + 1) % modalPhotosList.length;
-            updateLightboxDisplay();
-            updateModalPhotoDisplay();
-        }
-
-        function prevLightboxPhoto(e = null) {
-            if (e) e.stopPropagation();
-            if (modalPhotosList.length <= 1) return;
-            currentPhotoIndex = (currentPhotoIndex - 1 + modalPhotosList.length) % modalPhotosList.length;
-            updateLightboxDisplay();
-            updateModalPhotoDisplay();
-        }
-
-        function closeLightbox() { document.getElementById('imageLightboxModal').classList.remove('active'); }
-        function closeLightboxOnBackdrop(e) { if (e.target === e.currentTarget) closeLightbox(); }
 
         function renderKartelaSection(variants) {
             const kartelaSec = document.getElementById('kartelaSection');
@@ -1725,7 +1113,7 @@
                 kartelaGrid.innerHTML = uniqueKartelas.map((kCode, idx) => `
                     <div class="kartela-card ${idx === 0 ? 'active' : ''}" onclick="selectKartela('${kCode}', this)">
                         <div class="kartela-swatch-box">
-                            <i class="fa-solid fa-swatchbook" style="color:var(--text-muted); font-size:18px;"></i>
+                            <i class="fa-solid fa-swatchbook" style="color:var(--text-muted); font-size:16px;"></i>
                         </div>
                         <span class="kartela-code-text">${kCode}</span>
                     </div>
@@ -1829,40 +1217,7 @@
             document.getElementById('specKartela').innerText = v.kartela || '-';
             document.getElementById('specColor').innerText = autoTranslateText(v.color, currentLang) || '-';
 
-            const isMattress = currentActiveCategoryKey.toLowerCase().includes('yatak') || currentActiveCategoryKey.toLowerCase().includes('mattress');
-            const firmnessSec = document.getElementById('firmnessSection');
-            
-            if (isMattress && v.hardness && v.hardness !== '-') {
-                firmnessSec.style.display = 'flex';
-                updateFirmnessGauge(v.hardness);
-            } else {
-                firmnessSec.style.display = 'none';
-            }
-
             updateModalPrice();
-        }
-
-        function updateFirmnessGauge(hardnessVal) {
-            const val = String(hardnessVal).toLowerCase();
-            const labelEl = document.getElementById('firmnessLabelText');
-            labelEl.innerText = autoTranslateText(hardnessVal, currentLang) || 'Medium';
-
-            const d1 = document.getElementById('fDot1'); const d2 = document.getElementById('fDot2');
-            const d3 = document.getElementById('fDot3'); const d4 = document.getElementById('fDot4');
-
-            [d1, d2, d3, d4].forEach(d => d.classList.remove('active'));
-
-            if (val.includes('yumuşak') || val.includes('soft')) {
-                d1.classList.add('active');
-            } else if (val.includes('medium') || val.includes('orta')) {
-                d1.classList.add('active'); d2.classList.add('active');
-            } else if (val.includes('ultra')) {
-                d1.classList.add('active'); d2.classList.add('active'); d3.classList.add('active'); d4.classList.add('active');
-            } else if (val.includes('sert') || val.includes('hard') || val.includes('firm')) {
-                d1.classList.add('active'); d2.classList.add('active'); d3.classList.add('active');
-            } else {
-                d1.classList.add('active'); d2.classList.add('active');
-            }
         }
 
         function updateModalQty(delta) {
@@ -1902,6 +1257,11 @@
                     qty: qty, unitPrice: unitPrice, currency: currentCurrency
                 });
             }
+            
+            localStorage.setItem('b2b_cart', JSON.stringify(cart.map(c => ({
+                code: c.code, name: `${c.family} (${c.size})`, qty: c.qty, price: c.unitPrice, m3: c.volume, weight: c.weight, image: c.photoUrl
+            }))));
+
             updateCartDisplay(); toggleCart(true); closeModal();
         }
 
@@ -1932,8 +1292,21 @@
             calculateLogistics(totalM3, totalKg, totalPcs);
         }
 
-        function removeFromCart(idx) { cart.splice(idx, 1); updateCartDisplay(); }
-        function clearCart() { if (confirm("Clear all items from proforma?")) { cart = []; updateCartDisplay(); } }
+        function removeFromCart(idx) { 
+            cart.splice(idx, 1); 
+            localStorage.setItem('b2b_cart', JSON.stringify(cart.map(c => ({
+                code: c.code, name: `${c.family} (${c.size})`, qty: c.qty, price: c.unitPrice, m3: c.volume, weight: c.weight, image: c.photoUrl
+            }))));
+            updateCartDisplay(); 
+        }
+
+        function clearCart() { 
+            if (confirm("Clear all items from proforma?")) { 
+                cart = []; 
+                localStorage.removeItem('b2b_cart');
+                updateCartDisplay(); 
+            } 
+        }
 
         function calculateLogistics(totalM3, totalKg, totalPcs) {
             const HQ_CAPACITY = 68.0; const TRUCK_CAPACITY = 90.0;
@@ -1963,40 +1336,24 @@
             nav.classList.toggle('open'); overlay.classList.toggle('active');
         }
 
-        function filterByBrand(b) { activeBrandFilter = b; buildBrandChips(); renderProductGrid(); }
-        function filterByFamily(brand, cat, fam) { activeBrandFilter = brand; activeCategoryFilter = cat; activeFamilyFilter = fam; renderProductGrid(); toggleSidebar(); }
         function changeCurrency(curr) { currentCurrency = curr; renderProductGrid(); updateCartDisplay(); }
 
-        /* MERKEZİ TAM ÇEVİRİ MOTORU */
         function changeLanguage(lang) {
             currentLang = lang;
             
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (i18n[lang] && i18n[lang][key]) {
-                    el.innerText = i18n[lang][key];
-                }
+                if (i18n[lang] && i18n[lang][key]) el.innerText = i18n[lang][key];
             });
 
             document.querySelectorAll('[data-i18n-ph]').forEach(el => {
                 const key = el.getAttribute('data-i18n-ph');
-                if (i18n[lang] && i18n[lang][key]) {
-                    el.placeholder = i18n[lang][key];
-                }
+                if (i18n[lang] && i18n[lang][key]) el.placeholder = i18n[lang][key];
             });
 
-            const chatWelcome = document.getElementById('chatWelcomeMsg');
-            if (chatWelcome && i18n[lang]['chat_welcome']) {
-                chatWelcome.innerText = i18n[lang]['chat_welcome'];
-            }
-
-            buildBrandChips();
-            buildNavigationTree();
-            renderProductGrid();
-            updateCartDisplay();
+            buildBrandChips(); buildNavigationTree(); renderProductGrid(); updateCartDisplay();
         }
 
-        /* DİNAMİK RESİM YÜKLEYİCİ VE EXCEL MOTORU */
         async function getImageBuffer(url) {
             try {
                 const response = await fetch(url, { mode: 'cors' });
@@ -2016,11 +1373,8 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0);
                         canvas.toBlob((blob) => {
-                            if (blob) {
-                                blob.arrayBuffer().then(buf => resolve({ buffer: buf, extension: 'png' }));
-                            } else {
-                                reject('Canvas blob failed');
-                            }
+                            if (blob) blob.arrayBuffer().then(buf => resolve({ buffer: buf, extension: 'png' }));
+                            else reject('Canvas blob failed');
                         }, 'image/png');
                     };
                     img.onerror = () => reject('Image load failed');
@@ -2045,7 +1399,6 @@
                 { header: 'Status', key: 'status', width: 12 },
                 { header: 'Height (cm)', key: 'height', width: 14 },
                 { header: 'Feature', key: 'feature', width: 16 },
-                { header: 'Hardness', key: 'hardness', width: 14 },
                 { header: 'Product Code', key: 'code', width: 20 },
                 { header: 'Barcode', key: 'barcode', width: 18 },
                 { header: 'HS CODE (GTİP)', key: 'gtip', width: 18 },
@@ -2080,7 +1433,6 @@
                     status: item.status || 'MTO',
                     height: item.height || '-',
                     feature: autoTranslateText(item.feature, currentLang) || '-',
-                    hardness: autoTranslateText(item.hardness, currentLang) || '-',
                     code: item.code,
                     barcode: item.barcode,
                     gtip: item.gtip,
