@@ -61,7 +61,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <!-- LOGIN MODAL (VARSAYILAN VALUE'LAR KALDIRILDI - GÜVENLİ HALE GETİRİLDİ) -->
+    <!-- LOGIN MODAL (GÜVENLİ & OTURUM KİLİTLİ) -->
     <div id="indexLoginModal" class="fixed inset-0 bg-[#00153e]/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-8 shadow-2xl text-slate-900">
             <div class="text-center mb-6">
@@ -175,11 +175,16 @@
             const currentUserRole = localStorage.getItem('retailhub_user_role');
             const activeDealerCode = localStorage.getItem('retailhub_dealer_code');
 
-            // Kullanıcı çıkış yapmışsa veya geçerli bir kod yoksa modalı zorunlu göster
-            if (isLoggedOut === 'true' || !activeDealerCode) {
-                document.getElementById('indexLoginModal').classList.remove('hidden');
-            } else if (currentUserRole === 'admin') {
+            if (currentUserRole === 'admin') {
                 window.location.href = 'Admin.html';
+                return;
+            }
+
+            // Eğer zaten önceden giriş yapılmışsa modalı gizle
+            if (isLoggedOut !== 'true' && activeDealerCode) {
+                document.getElementById('indexLoginModal').classList.add('hidden');
+            } else {
+                document.getElementById('indexLoginModal').classList.remove('hidden');
             }
         });
 
@@ -193,6 +198,7 @@
                 return;
             }
 
+            // Giriş yapıldığı an çıkış bayrağını sil
             localStorage.removeItem('retailhub_logged_out');
 
             // ADMIN KONTROLÜ
@@ -202,11 +208,10 @@
                 localStorage.setItem('retailhub_dealer_code', 'ADMIN');
                 window.location.href = 'Admin.html';
             } else {
-                // NORMAL BAYİ GİRİŞİ
+                // NORMAL BAYİ GİRİŞİ (SAYFAYI YENİLEMEDEN MODALI KAPAT)
                 localStorage.setItem('retailhub_user_role', 'dealer');
                 localStorage.setItem('retailhub_dealer_code', code.toUpperCase());
                 document.getElementById('indexLoginModal').classList.add('hidden');
-                window.location.reload();
             }
         }
 
